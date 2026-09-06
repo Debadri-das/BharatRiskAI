@@ -1,0 +1,1 @@
+export default function ResourceCard({ item }) { return <div className="panel" style={{ padding: 12 }}><b>{item.name}</b><div>{item.type} - {item.available}/{item.quantity} available</div><small>Road: {item.road_status}</small></div>; }

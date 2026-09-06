@@ -1,0 +1,18 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.backend
+    env_file: .env.example
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./bharatrisk.db:/app/bharatrisk.db
+  frontend:
+    build:
+      context: .
+      dockerfile: infra/Dockerfile.frontend
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend

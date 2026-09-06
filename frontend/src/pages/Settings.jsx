@@ -1,0 +1,5 @@
+import { useEmergencyStore } from '../store/emergencyStore';
+import { syncQueued } from '../offline/syncManager';
+import { demoDashboard } from '../services/demoData';
+import { useRiskStore } from '../store/riskStore';
+export default function Settings() { const { offlineForced, setOfflineForced } = useEmergencyStore(); const setDashboard = useRiskStore((s) => s.setDashboard); return <section className="panel" style={{ padding: 16, display: 'grid', gap: 12, maxWidth: 760 }}><h3 style={{ margin: 0 }}>Demo Mode</h3><button className="btn" onClick={() => setDashboard(demoDashboard())}>Load Flood Scenario</button><button className="btn secondary" onClick={() => setOfflineForced(!offlineForced)}>{offlineForced ? 'Restore Internet' : 'Simulate Internet Failure'}</button><button className="btn" onClick={() => syncQueued()}>Synchronize Queued Information</button><button className="btn warning" onClick={() => setDashboard(demoDashboard())}>Reset Scenario</button><p>Demo mode uses deterministic Kolkata data and does not require paid APIs or API keys.</p></section>; }
