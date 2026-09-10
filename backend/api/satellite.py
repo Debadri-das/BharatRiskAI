@@ -10,23 +10,22 @@ router = APIRouter()
 
 
 @router.get("/satellite/latest/{zone_id}")
-def latest_satellite_scene(zone_id: int, db: Session = Depends(get_db)):
+def latest_satellite_scene(zone_id: int, live: bool = False, db: Session = Depends(get_db)):
     zone = db.query(Zone).filter(Zone.id == zone_id).first()
     if not zone:
         raise HTTPException(status_code=404, detail="Zone not found")
-    settings = get_settings()
     try:
-        return get_satellite_provider(live=True).latest_scene(zone.latitude, zone.longitude)
+        return get_satellite_provider(live=live).latest_scene(zone.latitude, zone.longitude)
     except Exception as error:
         raise HTTPException(status_code=502, detail=str(error)) from error
 
 
 @router.post("/satellite/download/{zone_id}")
-def download_satellite_scene(zone_id: int, db: Session = Depends(get_db)):
+def download_satellite_scene(zone_id: int, live: bool = False, db: Session = Depends(get_db)):
     zone = db.query(Zone).filter(Zone.id == zone_id).first()
     if not zone:
         raise HTTPException(status_code=404, detail="Zone not found")
-    provider = get_satellite_provider(live=True)
+    provider = get_satellite_provider(live=live)
     try:
         scene = provider.latest_scene(zone.latitude, zone.longitude)
         if not scene.get("available"):
@@ -39,11 +38,11 @@ def download_satellite_scene(zone_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/satellite/process/{zone_id}")
-def process_satellite_zone(zone_id: int, db: Session = Depends(get_db)):
+def process_satellite_zone(zone_id: int, live: bool = False, db: Session = Depends(get_db)):
     zone = db.query(Zone).filter(Zone.id == zone_id).first()
     if not zone:
         raise HTTPException(status_code=404, detail="Zone not found")
     try:
-        return get_satellite_provider(live=True).process_zone(zone.latitude, zone.longitude)
+        return get_satellite_provider(live=live).process_zone(zone.latitude, zone.longitude)
     except Exception as error:
         raise HTTPException(status_code=502, detail=str(error)) from error

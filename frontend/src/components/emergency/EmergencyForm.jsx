@@ -1,41 +1,63 @@
 import React, { useState } from 'react';
-import api from '../../services/api';
+import { sendEmergency } from '../../services/emergencyApi';
 import { addToQueue } from '../../offline/indexedDB';
+import { useEmergencyStore } from '../../store/emergencyStore';
 
 export default function EmergencyForm({ onSubmitted }){
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
+  const [latitude, setLatitude] = useState('22.546');
+  const [longitude, setLongitude] = useState('88.438');
   const [people, setPeople] = useState(1);
-  const [type, setType] = useState('medical');
+  const [type, setType] = useState('MEDICAL');
   const [notes, setNotes] = useState('');
   const [sending, setSending] = useState(false);
 
   async function useGeolocation(){
     if (!navigator.geolocation) return alert('Geolocation not available');
     navigator.geolocation.getCurrentPosition(p => {
-      setLatitude(p.coords.latitude);
-      setLongitude(p.coords.longitude);
+      setLatitude(p.coords.latitude.toFixed(4));
+      setLongitude(p.coords.longitude.toFixed(4));
     }, () => alert('Unable to get location'));
   }
 
   async function submit(e){
     e.preventDefault();
-    const payload = { emergency_type: type, latitude: parseFloat(latitude), longitude: parseFloat(longitude), people: Number(people), description: notes };
+    const lat = parseFloat(latitude);
+    const lon = parseFloat(longitude);
+    if (isNaN(lat) || isNaN(lon)) {
+      alert('Please enter valid coordinates');
+      return;
+    }
+
+    const payload = {
+      emergency_type: type.toUpperCase(),
+      latitude: lat,
+      longitude: lon,
+      people: Number(people) || 1,
+      description: notes || undefined,
+    };
+    
     setSending(true);
-    try{
-      if (navigator.onLine){
-        const res = await api.postEmergency(payload);
-        alert('Emergency sent: ' + JSON.stringify(res));
+    const offlineForced = useEmergencyStore.getState().offlineForced;
+    const isOnline = navigator.onLine && !offlineForced;
+
+    try {
+      if (isOnline) {
+        const res = await sendEmergency(payload);
+        alert(`Emergency SOS received: ${res.message_id || res.id}`);
         onSubmitted && onSubmitted(res);
       } else {
-        await addToQueue({type:'emergency', payload});
-        alert('Offline: emergency queued locally');
+        await addToQueue({ type: 'emergency', payload });
+        alert('Offline mode: emergency SOS queued locally in IndexedDB');
       }
-    }catch(err){
-      console.error(err);
-      alert('Failed to send emergency: ' + err?.message);
-    }finally{setSending(false)}
+    } catch (err) {
+      console.warn('Network send failed, queueing locally:', err);
+      await addToQueue({ type: 'emergency', payload });
+      alert('Network unavailable: emergency SOS stored in offline queue');
+    } finally {
+      setSending(false);
+    }
   }
+
 
   return (
     <form className="card" onSubmit={submit} style={{marginTop:12}}>

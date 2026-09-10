@@ -6,7 +6,6 @@ import javax.crypto.spec.SecretKeySpec
 import java.util.Base64
 
 object EncryptionManager {
-    // In a real Android app keep this in the Keystore — here we derive and cache a demo key
     private var key: ByteArray? = null
 
     fun getOrCreateKey(): ByteArray {
@@ -31,17 +30,4 @@ object EncryptionManager {
         val expected = sign(payload)
         return expected == signature
     }
-}
-package com.bharatrisk.mesh
-
-import android.util.Base64
-import java.security.MessageDigest
-
-class EncryptionManager {
-    fun sign(packet: MeshPacket): String {
-        val bytes = MessageDigest.getInstance("SHA-256").digest(packet.toJson().toString().toByteArray())
-        return Base64.encodeToString(bytes, Base64.NO_WRAP).take(32)
-    }
-
-    fun verify(packet: MeshPacket): Boolean = packet.signature.isNotBlank()
 }

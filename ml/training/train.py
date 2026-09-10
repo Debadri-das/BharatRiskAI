@@ -9,10 +9,12 @@ from ml.preprocessing.clean import FEATURES, clean_frame
 from ml.preprocessing.features import split_features_target
 from ml.preprocessing.validation import validate_frame
 from ml.training.evaluate import evaluate_model
+from ml.nowcasting.model import WeatherNowcastModel
 
 ROOT = Path(__file__).resolve().parents[2]
 DATASET = ROOT / "ml" / "datasets" / "processed" / "flood_demo_training.csv"
 ARTIFACT = ROOT / "ml" / "artifacts" / "flood_risk_model.pkl"
+NOWCAST_ARTIFACT = ROOT / "ml" / "artifacts" / "weather_nowcast_model.pkl"
 
 
 def synthetic_dataset(rows: int = 900) -> pd.DataFrame:
@@ -52,7 +54,13 @@ def main():
     ARTIFACT.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, ARTIFACT)
     print({"artifact": str(ARTIFACT), "features": FEATURES, "metrics": metrics, "data": "deterministic synthetic demo dataset"})
+    
+    # Also train / initialize the Weather Nowcast Model artifact
+    nowcast_model = WeatherNowcastModel(artifact_path=NOWCAST_ARTIFACT)
+    joblib.dump(nowcast_model, NOWCAST_ARTIFACT)
+    print({"artifact": str(NOWCAST_ARTIFACT), "status": "Weather Nowcasting Model ready"})
 
 
 if __name__ == "__main__":
     main()
+

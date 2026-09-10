@@ -1,12 +1,25 @@
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
-import httpx
-import numpy as np
-import rasterio
-from rasterio.io import MemoryFile
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
+try:
+    import httpx
+except ImportError:
+    httpx = None
+
+try:
+    import rasterio
+    from rasterio.io import MemoryFile
+except ImportError:
+    rasterio = None
+    MemoryFile = None
 
 from backend.config.settings import get_settings
+
 
 
 class LiveSatelliteProvider:
@@ -170,9 +183,51 @@ function evaluatePixel(sample) { return [sample.VV, sample.VH, sample.dataMask];
 
 
 class DemoSatelliteProvider:
+    def latest_scene(self, latitude: float, longitude: float, lookback_days: int = 30) -> dict:
+        return {
+            "available": True,
+            "source": "copernicus-sentinel1-demo",
+            "product_id": "S1A_IW_GRDH_1SDV_DEMO_KOLKATA",
+            "name": "S1A_IW_GRDH_1SDV_20260909_KOLKATA.SAFE",
+            "content_date": datetime.now(timezone.utc).isoformat(),
+            "online": True,
+            "latitude": latitude,
+            "longitude": longitude,
+        }
+
+    def download_product(self, product: dict, output_dir: str = "data/satellite") -> dict:
+        return {
+            "path": "data/satellite/demo_sentinel1.zip",
+            "bytes": 10485760,
+            "source": "demo",
+            **product,
+        }
+
+    def process_zone(self, latitude: float, longitude: float, days: int = 14) -> dict:
+        now = datetime.now(timezone.utc)
+        return {
+            "source": "copernicus-process-api-demo",
+            "mode": "in-memory",
+            "observed_from": (now - timedelta(days=days)).isoformat(),
+            "observed_to": now.isoformat(),
+            "width": 128,
+            "height": 128,
+            "valid_pixels": 16384,
+            "vv_mean": -12.45,
+            "vh_mean": -18.92,
+            "water_fraction": 0.38,
+            "latitude": latitude,
+            "longitude": longitude,
+        }
+
     def water_extent(self, *_):
         return {"flood_extent_km2": 8.4, "confidence": 0.78, "source": "demo"}
 
 
 def get_satellite_provider(live: bool = False):
-    return LiveSatelliteProvider() if live else DemoSatelliteProvider()
+    settings = get_settings()
+    has_creds = bool((settings.copernicus_username and settings.copernicus_password) or (settings.copernicus_client_id and settings.copernicus_client_secret))
+    if live and has_creds:
+        return LiveSatelliteProvider()
+    return DemoSatelliteProvider()
+

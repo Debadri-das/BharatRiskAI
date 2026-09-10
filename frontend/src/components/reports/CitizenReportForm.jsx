@@ -1,41 +1,67 @@
 import React, { useState } from 'react';
-import api from '../../services/api';
+import { submitReport } from '../../services/reportApi';
 import { addToQueue } from '../../offline/indexedDB';
+import { useEmergencyStore } from '../../store/emergencyStore';
 
 export default function CitizenReportForm({ onSubmitted }){
-  const [latitude, setLatitude] = useState('');
-  const [longitude, setLongitude] = useState('');
-  const [water, setWater] = useState(10);
+  const [latitude, setLatitude] = useState('22.546');
+  const [longitude, setLongitude] = useState('88.438');
+  const [water, setWater] = useState(15);
   const [severity, setSeverity] = useState('MEDIUM');
-  const [description, setDescription] = useState('');
+  const [description, setDescription] = useState('Heavy water accumulation near road edge.');
   const [submitting, setSubmitting] = useState(false);
 
   async function useGeolocation(){
     if (!navigator.geolocation) return alert('Geolocation not available');
     navigator.geolocation.getCurrentPosition(p => {
-      setLatitude(p.coords.latitude);
-      setLongitude(p.coords.longitude);
+      setLatitude(p.coords.latitude.toFixed(4));
+      setLongitude(p.coords.longitude.toFixed(4));
     }, () => alert('Unable to get location'));
   }
 
   async function submit(e){
     e.preventDefault();
-    const payload = { latitude: parseFloat(latitude), longitude: parseFloat(longitude), water_level_cm: Number(water), severity, description };
+    const lat = parseFloat(latitude);
+    const lon = parseFloat(longitude);
+    if (isNaN(lat) || isNaN(lon)) {
+      alert('Please enter valid coordinates');
+      return;
+    }
+    if (!description || description.trim().length < 3) {
+      alert('Please enter at least 3 characters of description');
+      return;
+    }
+
+    const payload = {
+      latitude: lat,
+      longitude: lon,
+      water_level_cm: Number(water) || 0,
+      severity,
+      description: description.trim(),
+    };
+    
     setSubmitting(true);
-    try{
-      if (navigator.onLine){
-        const res = await api.postReport(payload);
-        alert('Report submitted: ' + JSON.stringify(res));
+    const offlineForced = useEmergencyStore.getState().offlineForced;
+    const isOnline = navigator.onLine && !offlineForced;
+
+    try {
+      if (isOnline) {
+        const res = await submitReport(payload);
+        alert(`Citizen Report submitted: Zone ${res.zone_name || res.zone_id} updated`);
         onSubmitted && onSubmitted(res);
       } else {
-        await addToQueue({type:'report', payload});
-        alert('Offline: report queued locally');
+        await addToQueue({ type: 'report', payload });
+        alert('Offline mode: report stored in local IndexedDB queue');
       }
-    }catch(err){
-      console.error(err);
-      alert('Failed to submit report: ' + err?.message);
-    }finally{setSubmitting(false)}
+    } catch (err) {
+      console.warn('Live submit failed, queueing locally:', err);
+      await addToQueue({ type: 'report', payload });
+      alert('Network unavailable: report saved to offline queue');
+    } finally {
+      setSubmitting(false);
+    }
   }
+
 
   return (
     <form className="card" onSubmit={submit} style={{marginTop:12}}>

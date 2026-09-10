@@ -1,3 +1,10 @@
+import sys
+from pathlib import Path
+
+ROOT_DIR = Path(__file__).resolve().parents[1]
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
+
 from worker.tasks.alert_processing import process_alerts
 from worker.tasks.report_processing import process_reports
 from worker.tasks.risk_update import update_risk
@@ -10,3 +17,4 @@ def run_once():
 
 if __name__ == "__main__":
     print(run_once())
+

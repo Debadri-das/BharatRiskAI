@@ -18,13 +18,15 @@ const pages = { Dashboard, 'Risk Analysis': RiskAnalysis, Simulation, Reports, '
 export default function App() {
   const load = useRiskStore((s) => s.load);
   const page = useUiStore((s) => s.page);
-  useEffect(() => { load(); }, [load]);
-    useEffect(() => {
-      load();
-      const refreshTimer = window.setInterval(load, 30000);
-      return () => window.clearInterval(refreshTimer);
-    }, [load]);
+
+  useEffect(() => {
+    load();
+    const refreshTimer = window.setInterval(load, 30000);
+    return () => window.clearInterval(refreshTimer);
+  }, [load]);
+
   const Page = pages[page] || Dashboard;
+
   return (
     <ErrorBoundary>
       <div className="app-shell">

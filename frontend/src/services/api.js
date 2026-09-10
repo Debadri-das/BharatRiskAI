@@ -1,23 +1,8 @@
-const BASE = (import.meta.env.VITE_API_URL) ? import.meta.env.VITE_API_URL : '';
-
-async function getJson(path){
-  const res = await fetch(BASE + path);
-  if(!res.ok) throw new Error(await res.text());
-  return res.json();
-}
-
-export default {
-  getDashboard: () => getJson('/api/dashboard'),
-  getZones: () => getJson('/api/zones'),
-  getRisk: (id) => getJson(`/api/risk/${id}`),
-  postSimulation: (payload) => fetch('/api/simulation', {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}).then(r=>r.json()),
-  postReport: (payload) => fetch('/api/report', {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}).then(r=>r.json()),
-  postEmergency: (payload) => fetch('/api/emergency', {method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(payload)}).then(r=>r.json()),
-}
-const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:8000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 export async function api(path, options = {}) {
-  const response = await fetch(`${API_BASE}${path}`, {
+  const url = path.startsWith('http') ? path : `${API_BASE}${path.startsWith('/') ? '' : '/'}${path}`;
+  const response = await fetch(url, {
     headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
     ...options,
   });
@@ -25,4 +10,14 @@ export async function api(path, options = {}) {
   return response.json();
 }
 
+export default {
+  getDashboard: () => api('/dashboard'),
+  getZones: () => api('/zones'),
+  getRisk: (id) => api(`/risk/${id}`),
+  postSimulation: (payload) => api('/simulation', { method: 'POST', body: JSON.stringify(payload) }),
+  postReport: (payload) => api('/report', { method: 'POST', body: JSON.stringify(payload) }),
+  postEmergency: (payload) => api('/emergency', { method: 'POST', body: JSON.stringify(payload) }),
+};
+
 export { API_BASE };
+

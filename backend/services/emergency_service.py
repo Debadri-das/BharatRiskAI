@@ -15,11 +15,19 @@ def calculate_priority(payload: EmergencyCreate) -> str:
     return "MEDIUM"
 
 
+import uuid
+
+
 def create_emergency(db: Session, payload: EmergencyCreate) -> dict:
     priority = calculate_priority(payload)
-    next_id = db.query(Emergency).count() + 1
+    message_id = payload.message_id or f"SOS-{uuid.uuid4().hex[:8].upper()}"
+    # Check if duplicate message_id exists (e.g. multi-path mesh delivery)
+    existing = db.query(Emergency).filter(Emergency.message_id == message_id).first()
+    if existing:
+        return emergency_payload(existing)
+
     emergency = Emergency(
-        message_id=f"SOS-{next_id:03d}",
+        message_id=message_id,
         emergency_type=payload.emergency_type.upper(),
         latitude=payload.latitude,
         longitude=payload.longitude,
@@ -34,6 +42,7 @@ def create_emergency(db: Session, payload: EmergencyCreate) -> dict:
     db.commit()
     db.refresh(emergency)
     return emergency_payload(emergency)
+
 
 
 def emergency_payload(emergency: Emergency) -> dict:

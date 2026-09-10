@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api import dashboard, emergencies, health, recommendations, reports, satellite, simulation, zones
+from backend.api import dashboard, emergencies, health, nowcast, recommendations, reports, satellite, simulation, zones
 from backend.config.settings import get_settings
 from backend.database.connection import Base, SessionLocal, engine
 from backend.database.seed_data import seed_demo
@@ -27,5 +27,6 @@ def startup() -> None:
         db.close()
 
 
-for router in [health.router, dashboard.router, zones.router, simulation.router, reports.router, emergencies.router, recommendations.router, satellite.router]:
+for router in [health.router, nowcast.router, dashboard.router, zones.router, simulation.router, reports.router, emergencies.router, recommendations.router, satellite.router]:
     app.include_router(router, prefix="/api")
+

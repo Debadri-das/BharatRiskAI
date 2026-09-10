@@ -34,12 +34,14 @@ class ReportCreate(BaseModel):
 
 
 class EmergencyCreate(BaseModel):
+    message_id: str | None = None
     emergency_type: str
     latitude: float
     longitude: float
     people: int = Field(ge=1, le=500)
     vulnerable: list[str] = Field(default_factory=list)
     description: str | None = None
+
 
 
 class SimulationRequest(BaseModel):
