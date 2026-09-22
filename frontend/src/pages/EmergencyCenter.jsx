@@ -1,6 +1,4 @@
+import EmergencyForm from '../components/emergency/EmergencyForm';
+import EmergencyList from '../components/emergency/EmergencyList';
 import { useState } from 'react';
-import EmergencyForm from '../components/mesh/EmergencyForm';
-import MeshStatus from '../components/mesh/MeshStatus';
-import MeshDevices from '../components/mesh/MeshDevices';
-import MessageQueue from '../components/mesh/MessageQueue';
-export default function EmergencyCenter() { const [route, setRoute] = useState([]); return <div style={{ display: 'grid', gridTemplateColumns: '360px 1fr', gap: 16 }}><EmergencyForm onRoute={setRoute} /><div style={{ display: 'grid', gap: 16 }}><MeshStatus route={route} /><MeshDevices /><MessageQueue /></div></div>; }
+export default function EmergencyCenter() { const [refreshKey, setRefreshKey] = useState(0); return <div className="records-page"><section className="page-intro"><div><span className="section-kicker">EMERGENCY OPERATIONS</span><h1>Emergency center</h1><p>Send help requests directly to the response database.</p></div></section><div className="emergency-layout"><EmergencyForm onSubmitted={() => setRefreshKey((key) => key + 1)} /><EmergencyList refreshKey={refreshKey} /></div></div>; }

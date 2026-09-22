@@ -24,6 +24,11 @@ class NowcastPredictionOut(BaseModel):
     squall_risk: str
     advisory: str
     timeline: List[NowcastIntervalOut]
+    hazard_probability_maps: Dict[str, List[List[List[float]]]]
+    map_shape: List[int]
+    forecast_window_hours: List[int]
+    forecast_horizons_hours: List[int]
+    xai_triggers: Dict[str, Dict[str, float]]
 
 
 class ZoneNowcastOut(BaseModel):

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { MapContainer, TileLayer, Popup, CircleMarker } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, CircleMarker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 function colorForCategory(cat){
@@ -11,11 +11,35 @@ function colorForCategory(cat){
   }
 }
 
+function MapViewport({ zones }) {
+  const map = useMap();
+
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver(() => map.invalidateSize({ animate: false }));
+    resizeObserver.observe(map.getContainer());
+    map.invalidateSize({ animate: false });
+    return () => resizeObserver.disconnect();
+  }, [map]);
+
+  useEffect(() => {
+    if (!zones?.length) return;
+    const bounds = zones.map((zone) => [zone.latitude, zone.longitude]);
+    map.fitBounds(bounds, { padding: [28, 28], maxZoom: 12, animate: false });
+  }, [map, zones]);
+
+  return null;
+}
+
 export default function RiskMap({ zones, location, selectedZoneId, onZoneSelect }){
   const center = zones && zones.length ? [zones[0].latitude, zones[0].longitude] : [22.57,88.36];
   return (
-    <MapContainer center={center} zoom={12} style={{ height: '100%', width: '100%' }}>
-      <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+    <MapContainer center={center} zoom={12} style={{ height: '100%', width: '100%' }} scrollWheelZoom>
+      <MapViewport zones={zones} />
+      <TileLayer
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        attribution="&copy; OpenStreetMap contributors"
+        eventHandlers={{ tileerror: () => console.warn('Map tiles could not be loaded') }}
+      />
       {zones && zones.map(z => (
         <CircleMarker
           key={z.id}
@@ -40,4 +64,3 @@ export default function RiskMap({ zones, location, selectedZoneId, onZoneSelect 
     </MapContainer>
   )
 }
-

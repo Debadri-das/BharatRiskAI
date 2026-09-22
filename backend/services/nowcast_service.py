@@ -5,9 +5,8 @@ and generates hyper-local 0-6h predictions, alert levels, and lead times.
 """
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
-from sqlalchemy.orm import Session
+from supabase import Client
 
-from backend.database.models import Zone
 from ingestion.weather import get_weather_provider
 from ml.nowcasting.model import WeatherNowcastModel
 
@@ -15,28 +14,29 @@ from ml.nowcasting.model import WeatherNowcastModel
 _nowcast_engine = WeatherNowcastModel()
 
 
-def get_zone_nowcast(db: Session, zone_id: int, live: bool = False) -> Optional[Dict[str, Any]]:
+def get_zone_nowcast(db: Client, zone_id: int, live: bool = False) -> Optional[Dict[str, Any]]:
     """Generate hyper-local 0-6h severe weather nowcast for a specific zone."""
-    zone = db.get(Zone, zone_id)
-    if not zone:
+    res = db.table("zones").select("*").eq("id", zone_id).execute()
+    if not res.data:
         return None
+    zone = res.data[0]
 
     weather_prov = get_weather_provider(live=live)
-    obs = weather_prov.latest(zone.latitude, zone.longitude)
+    obs = weather_prov.latest(zone["latitude"], zone["longitude"])
     
     # Merge zone physical parameters
-    obs["elevation"] = zone.elevation
-    obs["drainage_score"] = zone.drainage_score
-    obs["population"] = zone.population
-    obs["rainfall_24h"] = max(zone.rainfall_24h, obs.get("rainfall_24h", 0))
+    obs["elevation"] = zone["elevation"]
+    obs["drainage_score"] = zone["drainage_score"]
+    obs["population"] = zone["population"]
+    obs["rainfall_24h"] = max(zone["rainfall_24h"], obs.get("rainfall_24h", 0))
 
     prediction = _nowcast_engine.predict_nowcast(obs)
 
     return {
-        "zone_id": zone.id,
-        "zone_name": zone.name,
-        "latitude": zone.latitude,
-        "longitude": zone.longitude,
+        "zone_id": zone["id"],
+        "zone_name": zone["name"],
+        "latitude": zone["latitude"],
+        "longitude": zone["longitude"],
         "current_weather": {
             "rainfall_15m_rate": obs.get("rainfall_15m_rate", 24.0),
             "temperature_c": obs.get("temperature_c", 28.0),
@@ -50,9 +50,10 @@ def get_zone_nowcast(db: Session, zone_id: int, live: bool = False) -> Optional[
     }
 
 
-def get_citywide_nowcast(db: Session, live: bool = False) -> Dict[str, Any]:
+def get_citywide_nowcast(db: Client, live: bool = False) -> Dict[str, Any]:
     """Aggregate nowcasting across all monitored wards/zones with active early warnings."""
-    zones = db.query(Zone).all()
+    res = db.table("zones").select("*").execute()
+    zones = res.data
     zone_nowcasts = []
     active_alerts = []
     
@@ -61,7 +62,7 @@ def get_citywide_nowcast(db: Session, live: bool = False) -> Dict[str, Any]:
     alert_rank = {"GREEN": 0, "YELLOW": 1, "ORANGE": 2, "RED": 3}
 
     for zone in zones:
-        zn = get_zone_nowcast(db, zone.id, live=live)
+        zn = get_zone_nowcast(db, zone["id"], live=live)
         if not zn:
             continue
         zone_nowcasts.append(zn)
@@ -77,8 +78,8 @@ def get_citywide_nowcast(db: Session, live: bool = False) -> Dict[str, Any]:
 
         if alert in ("RED", "ORANGE", "YELLOW"):
             active_alerts.append({
-                "zone_id": zone.id,
-                "zone_name": zone.name,
+                "zone_id": zone["id"],
+                "zone_name": zone["name"],
                 "alert_level": alert,
                 "primary_hazard": ncast["primary_hazard"],
                 "lead_time_minutes": ncast["lead_time_minutes"],

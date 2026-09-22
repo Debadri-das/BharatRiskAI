@@ -2,8 +2,6 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend.api import dashboard, emergencies, health, nowcast, recommendations, reports, satellite, simulation, zones
 from backend.config.settings import get_settings
-from backend.database.connection import Base, SessionLocal, engine
-from backend.database.seed_data import seed_demo
 from backend.middleware.rate_limit import RateLimitMiddleware
 from backend.middleware.request_id import RequestIdMiddleware
 from starlette.middleware.gzip import GZipMiddleware
@@ -16,15 +14,15 @@ app.add_middleware(RequestIdMiddleware)
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+@app.get("/")
+def root() -> dict[str, str]:
+    return {"service": settings.app_name, "status": "ok", "docs": "/docs", "api": "/api"}
 
 @app.on_event("startup")
 def startup() -> None:
-    Base.metadata.create_all(bind=engine)
-    db = SessionLocal()
-    try:
-        seed_demo(db)
-    finally:
-        db.close()
+    # Supabase schemas are created via SQL script manually in the dashboard.
+    # Seeding can be done via SQL or a separate script.
+    pass
 
 
 for router in [health.router, nowcast.router, dashboard.router, zones.router, simulation.router, reports.router, emergencies.router, recommendations.router, satellite.router]:

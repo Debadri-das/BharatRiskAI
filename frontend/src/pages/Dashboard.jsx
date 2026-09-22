@@ -6,8 +6,11 @@ import EmergencyForm from '../components/emergency/EmergencyForm';
 import EarlyWarningBanner from '../components/nowcast/EarlyWarningBanner';
 import NowcastTimeline from '../components/nowcast/NowcastTimeline';
 import MultiHazardMatrix from '../components/nowcast/MultiHazardMatrix';
+import ProbabilityGrid from '../components/nowcast/ProbabilityGrid';
+import XaiTriggers from '../components/nowcast/XaiTriggers';
 import { useRiskStore } from '../store/riskStore';
 import { distanceKm } from '../utils/geo';
+import { usePreferencesStore } from '../store/preferencesStore';
 
 export default function Dashboard(){
   const dashboard = useRiskStore((state) => state.dashboard);
@@ -18,8 +21,10 @@ export default function Dashboard(){
   const [locationState, setLocationState] = useState('requesting');
   const [selectedZoneId, setSelectedZoneId] = useState(null);
   const [locationQuery, setLocationQuery] = useState('');
+  const locationSharing = usePreferencesStore((state) => state.locationSharing);
 
   useEffect(()=>{
+    if (!locationSharing) { setLocation(null); setLocationState('disabled'); return undefined; }
     if (!navigator.geolocation) { setLocationState('unsupported'); return undefined; }
     const watcher = navigator.geolocation.watchPosition(
       ({ coords }) => { setLocation({ latitude: coords.latitude, longitude: coords.longitude, accuracy: coords.accuracy }); setLocationState('located'); },
@@ -27,7 +32,7 @@ export default function Dashboard(){
       { enableHighAccuracy: true, maximumAge: 60000, timeout: 10000 },
     );
     return () => navigator.geolocation.clearWatch(watcher);
-  },[]);
+  },[locationSharing]);
 
   const nearestZone = useMemo(() => {
     if (!location || !dashboard.zones?.length) return null;
@@ -113,6 +118,14 @@ export default function Dashboard(){
 
       {selectedZoneNowcast && (
         <MultiHazardMatrix nowcastData={selectedZoneNowcast} />
+      )}
+
+      {selectedZoneNowcast && (
+        <ProbabilityGrid maps={selectedZoneNowcast.hazard_probability_maps} />
+      )}
+
+      {selectedZoneNowcast && (
+        <XaiTriggers triggers={selectedZoneNowcast.xai_triggers} />
       )}
 
       {/* Live Map & Location Browser */}

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
+import { CheckCircle2, Crosshair, FileText, LoaderCircle, MapPin, Send, TriangleAlert } from 'lucide-react';
 import { submitReport } from '../../services/reportApi';
-import { addToQueue } from '../../offline/indexedDB';
-import { useEmergencyStore } from '../../store/emergencyStore';
 
 export default function CitizenReportForm({ onSubmitted }){
   const [latitude, setLatitude] = useState('22.546');
@@ -10,13 +9,14 @@ export default function CitizenReportForm({ onSubmitted }){
   const [severity, setSeverity] = useState('MEDIUM');
   const [description, setDescription] = useState('Heavy water accumulation near road edge.');
   const [submitting, setSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
   async function useGeolocation(){
-    if (!navigator.geolocation) return alert('Geolocation not available');
+    if (!navigator.geolocation) { setFeedback({ type: 'error', message: 'Location is not available in this browser.' }); return; }
     navigator.geolocation.getCurrentPosition(p => {
       setLatitude(p.coords.latitude.toFixed(4));
       setLongitude(p.coords.longitude.toFixed(4));
-    }, () => alert('Unable to get location'));
+    }, () => setFeedback({ type: 'error', message: 'Unable to access your location. You can enter coordinates manually.' }));
   }
 
   async function submit(e){
@@ -24,11 +24,11 @@ export default function CitizenReportForm({ onSubmitted }){
     const lat = parseFloat(latitude);
     const lon = parseFloat(longitude);
     if (isNaN(lat) || isNaN(lon)) {
-      alert('Please enter valid coordinates');
+      setFeedback({ type: 'error', message: 'Enter valid latitude and longitude values.' });
       return;
     }
     if (!description || description.trim().length < 3) {
-      alert('Please enter at least 3 characters of description');
+      setFeedback({ type: 'error', message: 'Add at least 3 characters describing the situation.' });
       return;
     }
 
@@ -41,22 +41,15 @@ export default function CitizenReportForm({ onSubmitted }){
     };
     
     setSubmitting(true);
-    const offlineForced = useEmergencyStore.getState().offlineForced;
-    const isOnline = navigator.onLine && !offlineForced;
+    setFeedback(null);
 
     try {
-      if (isOnline) {
-        const res = await submitReport(payload);
-        alert(`Citizen Report submitted: Zone ${res.zone_name || res.zone_id} updated`);
-        onSubmitted && onSubmitted(res);
-      } else {
-        await addToQueue({ type: 'report', payload });
-        alert('Offline mode: report stored in local IndexedDB queue');
-      }
+      const res = await submitReport(payload);
+      setFeedback({ type: 'success', message: `Report saved for ${res.zone_name || `zone ${res.zone_id}`}.` });
+      onSubmitted && onSubmitted(res);
     } catch (err) {
-      console.warn('Live submit failed, queueing locally:', err);
-      await addToQueue({ type: 'report', payload });
-      alert('Network unavailable: report saved to offline queue');
+      console.warn('Report submission failed:', err);
+      setFeedback({ type: 'error', message: err.message?.startsWith('API ') ? `Report was not saved: ${err.message}` : 'Report was not saved. Check that the backend is running at 127.0.0.1:8000.' });
     } finally {
       setSubmitting(false);
     }
@@ -64,32 +57,19 @@ export default function CitizenReportForm({ onSubmitted }){
 
 
   return (
-    <form className="card" onSubmit={submit} style={{marginTop:12}}>
-      <h4>Citizen Report</h4>
-      <div style={{display:'flex',gap:8}}>
-        <input placeholder="Latitude" value={latitude} onChange={e=>setLatitude(e.target.value)} />
-        <input placeholder="Longitude" value={longitude} onChange={e=>setLongitude(e.target.value)} />
-        <button type="button" onClick={useGeolocation}>Use my location</button>
-      </div>
-      <div style={{marginTop:8}}>
-        <label>Water level (cm)</label>
-        <input type="number" value={water} onChange={e=>setWater(e.target.value)} />
-      </div>
-      <div style={{marginTop:8}}>
-        <label>Severity</label>
-        <select value={severity} onChange={e=>setSeverity(e.target.value)}>
+    <form className="field-form panel report-form" onSubmit={submit}>
+      <div className="form-heading"><span className="form-icon report"><FileText size={19} /></span><div><span className="section-kicker">GROUND INTELLIGENCE</span><h2>Report local conditions</h2><p>Help response teams see what the sensors cannot.</p></div></div>
+      <div className="form-grid two-col"><label className="field-label">Latitude<input inputMode="decimal" value={latitude} onChange={e=>setLatitude(e.target.value)} /></label><label className="field-label">Longitude<input inputMode="decimal" value={longitude} onChange={e=>setLongitude(e.target.value)} /></label></div>
+      <button className="location-button" type="button" onClick={useGeolocation}><Crosshair size={15} /> Use my current location</button>
+      <div className="form-grid two-col"><label className="field-label">Water level <span>(cm)</span><input type="number" min="0" value={water} onChange={e=>setWater(e.target.value)} /></label><label className="field-label">Severity<select value={severity} onChange={e=>setSeverity(e.target.value)}>
           <option>LOW</option>
           <option>MEDIUM</option>
           <option>HIGH</option>
           <option>CRITICAL</option>
-        </select>
-      </div>
-      <div style={{marginTop:8}}>
-        <textarea placeholder="Description" value={description} onChange={e=>setDescription(e.target.value)} rows={3} style={{width:'100%'}} />
-      </div>
-      <div style={{marginTop:8}}>
-        <button className="btn" type="submit" disabled={submitting}>{submitting ? 'Sending...' : 'Submit Report'}</button>
-      </div>
+        </select></label></div>
+      <label className="field-label">What are you seeing?<textarea placeholder="Describe water depth, blocked roads, or damage..." value={description} onChange={e=>setDescription(e.target.value)} rows={4} /></label>
+      {feedback && <div className={`form-feedback ${feedback.type}`}>{feedback.type === 'success' ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}{feedback.message}</div>}
+      <button className="btn form-submit" type="submit" disabled={submitting}>{submitting ? <><LoaderCircle className="spin" size={16} /> Sending report</> : <><Send size={16} /> Submit report</>}</button>
     </form>
   )
 }

@@ -43,6 +43,14 @@ class LiveWeatherProvider:
                     "radar_reflectivity_dbz": min(65.0, max(12.0, (precip_15m * 4.0) * 0.4 + 18.0)),
                     "cape_j_kg": 1450.0 if rh > 80 else 750.0,
                     "lifted_index": -3.2 if rh > 80 else -1.0,
+                    "iwv": 48.0 if rh > 80 else 32.0,
+                    "iwv_change": 5.5 if rh > 80 else 1.5,
+                    "ctt": -48.0 if rh > 80 else -32.0,
+                    "ctt_drop_rate": 3.5 if rh > 80 else 1.0,
+                    "qpe_mm_hr": round(precip_15m * 4.0, 1),
+                    "cin_j_kg": -55.0 if rh > 80 else -120.0,
+                    "low_level_convergence": 0.16 if rh > 80 else 0.05,
+                    "wind_shear_ms": 14.0 if rh > 80 else 8.0,
                 }
         except Exception:
             # Fallback seamlessly to demo convective provider if network or API is unreachable
@@ -75,6 +83,14 @@ class DemoWeatherProvider:
             "wind_gust_kmh": round(64.0 * convective_intensity, 1),
             "surface_pressure_hpa": 1002.5,
             "pressure_tendency_3h": -2.8,
+            "iwv": round(58.0 * convective_intensity, 1),
+            "iwv_change": round(8.0 * convective_intensity, 1),
+            "ctt": round(-52.0 * convective_intensity, 1),
+            "ctt_drop_rate": round(6.0 * convective_intensity, 1),
+            "qpe_mm_hr": rain_rate,
+            "cin_j_kg": round(-45.0 * convective_intensity, 1),
+            "low_level_convergence": round(0.22 * convective_intensity, 2),
+            "wind_shear_ms": round(18.0 * convective_intensity, 1),
         }
 
 

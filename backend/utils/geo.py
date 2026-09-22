@@ -9,5 +9,11 @@ def haversine_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     return 2 * radius * asin(sqrt(a))
 
 
+def get_lat(item):
+    return item["latitude"] if isinstance(item, dict) else item.latitude
+
+def get_lon(item):
+    return item["longitude"] if isinstance(item, dict) else item.longitude
+
 def nearest(items, latitude: float, longitude: float):
-    return min(items, key=lambda item: haversine_km(latitude, longitude, item.latitude, item.longitude))
+    return min(items, key=lambda item: haversine_km(latitude, longitude, get_lat(item), get_lon(item)))

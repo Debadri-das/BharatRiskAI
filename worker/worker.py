@@ -9,6 +9,8 @@ from worker.tasks.alert_processing import process_alerts
 from worker.tasks.report_processing import process_reports
 from worker.tasks.risk_update import update_risk
 from worker.tasks.weather_sync import sync_weather
+from backend.config.settings import get_settings
+import time
 
 
 def run_once():
@@ -16,5 +18,8 @@ def run_once():
 
 
 if __name__ == "__main__":
-    print(run_once())
+    settings = get_settings()
+    while True:
+        print(run_once())
+        time.sleep(settings.ingestion_interval_minutes * 60)
 

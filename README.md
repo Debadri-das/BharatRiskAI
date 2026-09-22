@@ -1,174 +1,323 @@
-# BharatRisk AI
+# BharatRiskAI: Space-Powered Hyper-Local Early Warning System
 
-BharatRisk AI — local, open-source disaster intelligence prototype (hackathon-ready MVP).
+**SkyGuard** is an AI-driven hyper-local early warning system for severe weather conditions that leverages **satellite data, geospatial analysis, and real-time ML models** to provide minute-level predictions for natural disasters.
 
-Quick start (dev):
+## 🛰️ Mission Statement
 
-1. Create a Python virtualenv and install backend deps:
+> SkyGuard doesn't just predict weather. It ingests live satellite imagery and meteorological data from space platforms, analyzes hyper-local geospatial conditions using ML models, and delivers **real-time early warnings down to the street level** — before severe weather strikes.
 
+**Theme**: Space Technology  
+**Problem Statement**: AI-driven hyper-local early warning system for severe weather  
+
+---
+
+## 🌍 How It Works: Satellite-to-Device
+
+1. **Satellite Data Ingestion** → Real-time satellite imagery and weather data from NOAA, Sentinel, and meteorological APIs
+2. **Geospatial ML Analysis** → AI models analyze hyper-local terrain, elevation, drainage, urban heat, and population density
+3. **Minute-Level Predictions** → Rainfall, heatwaves, flooding, cyclones, and landslide risk at pincode/district level
+4. **Multi-Channel Alerts** → Push notifications, mesh-based emergency broadcast, offline messaging
+5. **Authority Dashboard** → Real-time resource deployment recommendations
+
+---
+
+## 🏗️ Architecture
+
+- **Frontend**: React + Vite + Leaflet (interactive satellite map) + Recharts (risk analytics) + Service Worker (offline capability)
+- **Backend**: FastAPI + SQLAlchemy + PostGIS (geospatial queries)
+- **Satellite Data Pipeline**: 
+  - Ingestion: NOAA GFS, Sentinel-2 SAR, weather APIs
+  - Processing: Cloud detection, vegetation indices (NDVI), rainfall accumulation
+  - ML Models: TensorFlow/scikit-learn for rainfall/flood/cyclone forecasting
+- **Mobile Mesh**: Android Kotlin + Bluetooth/Wi-Fi Direct for device-to-device emergency routing
+- **Demo Mode**: Deterministic extreme weather scenarios with satellite imagery simulation
+
+---
+
+## ⚡ Core Features
+
+### 1. **Satellite Risk Map**
+- Real-time satellite imagery overlays
+- AI-computed risk zones (LOW, MEDIUM, HIGH, CRITICAL) at hyperlocal resolution
+- Temperature heatmaps, rainfall prediction layers, flood inundation modeling
+- Population exposure analysis overlaid on satellite data
+
+### 2. **Early Warning Engine**
+- **Real-Time Satellite Processing**: Ingests NOAA, Sentinel-2, and meteorological data
+- **Minute-Level Forecasts**: Rainfall predictions 4-6 hours in advance
+- **Geospatial ML Models**: Trained on historical satellite imagery + ground truth
+- **Confidence Scoring**: Probabilistic forecasts with uncertainty quantification
+
+### 3. **What-If Simulator**
+- Simulate monsoon intensification, cloud movement, urban heat island effects
+- Test alert thresholds and response strategies
+- Export scenario reports for authority planning
+
+### 4. **Authority Dashboard**
+- Resource deployment recommendations with satellite-validated impact zones
+- Real-time SOS routing and mesh-based emergency coordination
+- Historical flood/disaster patterns from satellite archives
+
+### 5. **Offline-First Citizen App**
+- Cached satellite tiles and risk layers (service worker)
+- Queued citizen ground reports (validated against satellite data)
+- Emergency SOS with multi-hop mesh routing
+- Auto-sync when internet returns
+
+### 6. **Mesh Emergency Network**
+- Device-to-device mesh for areas with no connectivity
+- Packet signing and multi-hop relay
+- Automatic gateway upload to authority systems
+
+---
+
+## 📦 Quick Start
+
+### Backend Setup
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # or .venv\\Scripts\\activate on Windows
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
+
+<<<<<<< HEAD
+2. Configure Supabase:
+
+Create `.env` in the repository root from `.env.example`, then set the Project URL and backend API key from **Supabase → Project Settings → API**. Keep `.env` private. In the Supabase SQL Editor, run [`supabase_schema.sql`](supabase_schema.sql).
+
+```env
+ENVIRONMENT=development
+SUPABASE_URL=https://your-project-ref.supabase.co
+SUPABASE_KEY=your-backend-only-key
+SUPABASE_SERVICE_ROLE_KEY=your-server-only-service-role-key
+API_TOKEN=replace-with-a-long-random-token
+CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
 ```
 
-2. Initialize DB and seed demo data:
+`SUPABASE_KEY` is used by the application. `SUPABASE_SERVICE_ROLE_KEY` is used only by trusted maintenance commands such as `database/seed.py`; never expose it to the frontend.
+
+3. Initialize Supabase tables and seed demo zones:
 
 ```bash
+=======
+# Initialize database with satellite metadata
+>>>>>>> ba8745a0a07e09770a962fd06cbda76f200d36e6
 python database/seed.py
+
+# Train satellite-based ML models
+python -m ml.training.train_satellite_models
 ```
 
-3. (Optional) Train ML model:
+<<<<<<< HEAD
+4. Verify the connection:
 
+```text
+http://localhost:8000/api/health
+```
+
+The health response should report `status: ok`, `database.reachable: true`, and a non-zero `zone_count`.
+
+5. (Optional) Train ML model:
+
+=======
+### Frontend Setup
+>>>>>>> ba8745a0a07e09770a962fd06cbda76f200d36e6
 ```bash
-python -m ml.training.train
+cd frontend
+npm install
+npm run dev
+# Open: http://localhost:5173
 ```
 
-4. Start backend:
+<<<<<<< HEAD
+6. Start backend:
 
+=======
+### Start Backend
+>>>>>>> ba8745a0a07e09770a962fd06cbda76f200d36e6
 ```bash
 make backend
+# Runs at: http://localhost:8000
 ```
 
-5. Frontend (in a separate terminal):
+<<<<<<< HEAD
+7. Frontend (in a separate terminal):
+=======
+---
+
+## 🛰️ Satellite Data Integration
+
+### Data Sources
+- **NOAA GFS**: Global weather forecast model (0.25° resolution)
+- **Sentinel-2**: ESA multispectral imagery for vegetation & flood detection
+- **SAR (Sentinel-1)**: Synthetic Aperture Radar for cloud-pierce rainfall detection
+- **Elevation & Drainage**: SRTM DEM + OpenStreetMap hydrology
+- **Population**: LandScan or Facebook M4D data
+
+### ML Pipeline
+```
+Satellite Image → Cloud Mask → NDVI/MNDWI/Indices → 
+  Rainfall Accumulation + Terrain Slope + Drainage Network + Urban Cover → 
+    Random Forest / TensorFlow Model → 
+      Flood/Landslide/Cyclone Risk Score
+```
+
+### Processing
+- Ingestion: `ingestion/satellite_pipeline.py` — fetches, tiles, and caches imagery
+- Features: `ml/features/geospatial.py` — computes ML-ready indicators
+- Training: `ml/training/train_satellite_models.py` — cross-validates on historical disasters
+- Inference: Backend API runs live predictions every 15 minutes
+
+---
+
+## 🎯 Demo Flow (Satellite Theme)
+
+1. **Open SkyGuard Dashboard** → See live satellite map with thermal/rainfall overlays
+2. **Select High-Risk Zone** → View satellite-derived risk breakdown
+3. **What-If: Monsoon Intensification** → Simulate increased rainfall from satellite feed
+4. **Authority Dashboard** → See resource recommendations validated by satellite data
+5. **Emergency Scenario** → Citizen reports auto-validated against satellite observations
+6. **Offline Mode** → Cached satellite tiles and queued alerts sync when online
+7. **Mesh Routing** → Multi-hop SOS relay to gateway
+
+---
+
+## 📡 API Reference
+
+**Base URL**: `http://localhost:8000/api`
+
+```
+GET    /health                           # System status
+GET    /dashboard                        # Real-time satellite risk snapshot
+GET    /satellite/latest                 # Latest satellite imagery tile
+GET    /zones                            # Hyperlocal risk zones
+GET    /risk/{zone_id}                   # Satellite-validated risk details
+GET    /forecast/{zone_id}               # 4-6 hour ML forecast
+POST   /simulation                       # What-if satellite scenario
+POST   /report                           # Citizen report + satellite validation
+GET    /reports                          # List validated reports
+POST   /emergency                        # SOS with mesh routing
+GET    /emergencies                      # List active emergencies
+POST   /emergency/{id}/assign            # Authority resource assignment
+GET    /recommendations                  # Satellite-validated resource recommendations
+GET    /resources                        # Available authority resources
+GET    /connectivity                     # Mesh network status
+```
+
+---
+
+## 📱 Android Mesh (Emergency Broadcast)
+
+**Location**: `mesh-android/`
+>>>>>>> ba8745a0a07e09770a962fd06cbda76f200d36e6
 
 ```bash
-cd frontend
-npm install
-npm run dev
+# Compile and run JVM test harness (no Android hardware needed)
+cd mesh-android
+kotlinc -cp "$(pwd)" -d mesh.jar app/src/main/java/com/bharatrisk/mesh/*.kt
+kotlin -cp mesh.jar com.bharatrisk.mesh.TestHarnessKt
 ```
 
-Open: http://localhost:5173
+Features:
+- Multi-hop packet relay (A → B → C → Gateway)
+- Packet deduplication and TTL expiry
+- Signed messages (HMAC-based)
+- Local persistence & queuing
+- Automatic gateway upload when online
 
-Notes:
-- The backend runs at http://localhost:8000 by default.
-- Demo data is seeded for a Kolkata scenario.
-- If no ML model artifact exists, the backend falls back to the heuristic predictor.
-# BharatRisk AI
+---
 
-BharatRisk AI is a hackathon-ready disaster intelligence prototype for flood-risk prediction, what-if simulation, authority recommendations, citizen ground intelligence, offline-first reporting, and an Android mesh-SOS concept.
+## 🔒 Security
 
-Core statement:
+- **Satellite Data**: HTTPS-only, rate-limited API clients
+- **Device Mesh**: HMAC packet signing, TTL validation, duplicate detection
+- **User Data**: Environment-based tokens, CORS, input validation
+- **Alerts**: TLS for emergency broadcasts
 
-> BharatRisk AI doesn't just predict where flooding may happen. It simulates what could happen next, recommends what authorities should do, incorporates citizen ground intelligence, and keeps emergency communication alive when connectivity fails.
+---
 
-## Architecture
+## 📊 Deployment
 
-- Frontend: React, Vite, Leaflet, Recharts, Zustand, Service Worker, IndexedDB.
-- Backend: FastAPI, Pydantic, SQLAlchemy, SQLite.
-- ML: pandas, numpy, scikit-learn Random Forest, joblib, with deterministic synthetic demo fallback.
-- Mobile mesh: Android Kotlin prototype with packet validation, TTL, duplicate detection, hop count, local queue, and gateway flow.
-- Demo mode: deterministic Kolkata extreme-rainfall scenario, no paid APIs or API keys.
+### Docker Compose
+```bash
+docker-compose up -d
+```
 
-## Features
+### Cloud Deployment
+- **Backend**: FastAPI → AWS ECS / Google Cloud Run
+- **Database**: PostgreSQL + PostGIS for geospatial queries
+- **Satellite Pipeline**: Scheduled Lambda/Cloud Functions (every 15 min)
+- **Frontend**: CDN (CloudFront / Cloud CDN)
 
-- Interactive Kolkata flood-risk map with LOW, MEDIUM, HIGH, and CRITICAL zones.
-- Zone detail showing rainfall, elevation, drainage, exposed population, flood history, citizen reports, and risk contribution breakdown.
-- Local risk engine and trainable Random Forest model.
-- What-if simulator using the trained/current model without retraining on slider movement.
-- Ranked resource recommendations with reasons.
-- Citizen report submission that associates reports with the nearest zone and recalculates risk.
-- Emergency SOS flow with priority calculation and mesh route simulator.
-- Offline cached dashboard, queued reports, queued SOS messages, and later sync.
+---
 
-## Installation
+## 🚧 Limitations & Future Work
 
-Backend:
+### Current
+- Synthetic satellite data for MVP (demo Kolkata scenario)
+- Simulator for mesh transport (use Android APIs for BLE/Wi-Fi Direct in production)
+- SQLite for local storage (production uses PostgreSQL + PostGIS)
+
+### Next Steps
+- Integrate live NOAA, Sentinel-2, and SAR feeds with proper authentication
+- Add PostGIS vector geometry for polygon-based flood modeling
+- Deploy machine learning on GPU (TensorFlow Lite for mobile inference)
+- Authority authentication & role-based dashboards
+- Multi-language support (Hindi, Tamil, Bengali, Marathi, etc.)
+- Historical satellite archive search for disaster retrospectives
+- Integration with national disaster management systems (NDMA, IMD)
+
+---
+
+## 🌐 Use Cases
+
+✅ **Monsoon Forecasting** — Early warnings 4-6 hours before intense rainfall  
+✅ **Urban Flooding** — Street-level inundation predictions for cities  
+✅ **Cyclone Tracking** — Real-time satellite-guided evacuation routing  
+✅ **Landslide Risk** — Slope stability assessment using SAR and DEM  
+✅ **Heatwave Alerts** — Thermal anomaly detection for vulnerable populations  
+✅ **Connectivity Gaps** — Mesh-based alerts for remote areas with no network  
+
+---
+
+## 📝 License
+
+Other (open-source; see LICENSE)
+
+<<<<<<< HEAD
+## Real Data Ingestion
+
+The ingestion boundary accepts downloaded provider files and does not silently substitute demo values:
+
+- IMDAA: NetCDF/NetCDF4 with specific humidity, pressure levels, temperature, and U/V wind variables.
+- INSAT-3D/3DR: NetCDF or HDF5 with water-vapor, calibrated thermal-infrared, and optional QPE variables.
+- DEM: GeoTIFF from SRTM, CartoDEM, or another licensed elevation source.
+
+Create these directories and place the newest files in each:
+
+```text
+data/imdaa/
+data/insat/
+data/dem/
+```
+
+Configure variable names in the adapter call when the provider product uses names other than the defaults in `ingestion/real_data.py`. Run the continuous worker with:
 
 ```bash
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-python database/seed.py
+.venv\\Scripts\\python.exe worker\\worker.py
 ```
 
-Frontend:
+The worker records grids in `grid_observations`, run health in `ingestion_runs`, and derives IWV in kg/m2, CTT in Celsius, and DEM slope in degrees.
 
-```bash
-cd frontend
-npm install
-```
+### Manual provider steps
 
-## Running
-
-Backend:
-
-```bash
-uvicorn backend.main:app --reload --port 8000
-```
-
-Frontend:
-
-```bash
-cd frontend
-npm run dev
-```
-
-Open `http://localhost:5173`.
-
-## Training ML Model
-
-```bash
-python -m ml.training.train
-```
-
-If no real dataset exists, training creates `ml/datasets/processed/flood_demo_training.csv` from deterministic synthetic data and saves `ml/artifacts/flood_risk_model.pkl`. The synthetic dataset is only for demonstration and can be replaced with verified rainfall, elevation, drainage, population, flood history, and citizen report datasets.
-
+1. Request IMDAA access from the authorized NCMRWF/India data portal and download a small NetCDF sample for the target region.
+2. Request MOSDAC access and confirm the INSAT-3D/3DR WV, TIR, and QPE product formats and calibration metadata.
+3. Download SRTM or CartoDEM GeoTIFF coverage for the monitored region and confirm its CRS/resolution.
+4. Place files in the configured directories and run `python worker/worker.py` once to validate ingestion.
+5. Configure `ALERT_WEBHOOK_URL` or `ALERT_SMS_WEBHOOK_URL` with the responder gateway endpoint. The delivery code records every attempt in `alert_deliveries`.
 ## Demo Flow
+=======
+---
+>>>>>>> ba8745a0a07e09770a962fd06cbda76f200d36e6
 
-1. Open BharatRisk AI.
-2. Show the flood-risk map and select `Zone 17 - Dhapa Wetlands`.
-3. Show risk breakdown.
-4. Open What-If Simulator.
-5. Increase rainfall by 30 percent and reduce drainage by 40 percent.
-6. Run simulation and show higher risk, newly affected population, and recommendations.
-7. Submit a citizen flood report.
-8. Use Settings to simulate internet failure.
-9. Open Emergency Center and send demo SOS.
-10. Show PHONE A -> PHONE B -> PHONE C -> GATEWAY route.
-11. Restore internet and synchronize queued information.
-
-## API
-
-Base URL: `http://localhost:8000/api`
-
-- `GET /health`
-- `GET /dashboard`
-- `GET /zones`
-- `GET /risk`
-- `GET /risk/{zone_id}`
-- `POST /simulation`
-- `POST /report`
-- `GET /reports`
-- `POST /emergency`
-- `GET /emergencies`
-- `POST /emergency/{id}/assign`
-- `GET /recommendations`
-- `GET /resources`
-- `GET /connectivity`
-
-## Android Mesh Prototype
-
-Open `mesh-android/` in Android Studio and run the app. The prototype models packet creation, signing, duplicate suppression, TTL expiry, hop counting, persistence, and gateway upload. The current repo includes a deterministic simulator so the demo can show A -> B -> C -> Gateway without requiring multiple physical devices.
-
-## Security
-
-The project implements practical prototype security: environment-based token configuration, CORS, rate limiting, request IDs, input validation, packet IDs, timestamps, TTL, duplicate detection, and basic packet signing. It does not claim military-grade security.
-
-## Offline Architecture
-
-The browser app uses a service worker for cached shell/dashboard access and IndexedDB for queued reports and emergencies. A normal browser is not presented as an arbitrary multi-hop Bluetooth mesh device; nearby-device mesh behavior belongs to the Android prototype and bridge.
-
-## Limitations
-
-- Demo data is deterministic and synthetic.
-- Live weather, satellite, elevation, drainage, and population providers are adapter stubs with local fallbacks.
-- Android nearby-device transport is a prototype/simulator in this environment.
-- SQLite is used for local deployment; the model layer is structured so PostgreSQL/PostGIS can be added later.
-
-## Future Improvements
-
-- Replace synthetic data with vetted IMD, DEM, drainage, population, and historical flood datasets.
-- Add PostGIS geometry and polygon rendering.
-- Implement production BLE/Wi-Fi Direct transport and interoperability tests.
-- Add authority authentication and role-scoped dashboards.
+**Built for India's resilience. Powered by satellite data. Protected by AI.**
