@@ -86,7 +86,7 @@ def build_spatiotemporal_features(
     sequence *= np.linspace(0.96, 1.04, time_steps, dtype=np.float32)[:, None, None, None]
     baseline_values = [scalar[4], derived[3], scalar[5], derived[4], derived[5], derived[6]]
     baseline = np.stack([np.full((grid_size, grid_size), value, dtype=np.float32) * spatial for value in baseline_values])
-    return sequence, baseline
+    return sequence.astype(np.float32), baseline.astype(np.float32)
 
 
 def compute_convective_severity(features: Dict[str, float]) -> Dict[str, Any]:

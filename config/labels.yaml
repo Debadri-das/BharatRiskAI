@@ -1,0 +1,20 @@
+cloudburst:
+  source: INSAT_QPE
+  rainfall_window_hours: 1
+  threshold_mm: 100
+  threshold_definition: "Conventional cloudburst definition used in Indian hazard literature (IMD/ICIMOD convention): >= 100 mm of rain in 1 hour over a small area (~20-30 km2). Applied pixel-wise to the INSAT QPE rate field (mm/hr) as a 1-hour accumulation proxy."
+  threshold_status: "proxy_definition_pending_authoritative_confirmation"
+  label_type: proxy
+  justification: "No official cloudburst event database is present. Positive labels are CLOUDBURST_PROXY only and must not be treated as a calibrated operational event target until an authoritative definition is confirmed. QPE is available only at 2024-06-18 and does not overlap the 2023-07-01 L1C sequence."
+thunderstorm:
+  source: INSAT_L1C_TIR1_WV
+  label_type: proxy
+  ctt_proxy_max_c: -40
+  ctt_cooling_min_c_per_hr: 2.0
+  spatial_rule: "Pixel is proxy positive when CTT proxy (TIR1 10.8 um brightness temperature) <= ctt_proxy_max_c AND CTT-proxy cooling rate >= ctt_cooling_min_c_per_hr over the elapsed observed interval. Pixels with non-finite TIR1 are unknown, never negative."
+  threshold_status: "satellite_signature_proxy_rule"
+  justification: "No lightning, radar, or official thunderstorm event observations are present. Satellite-signature candidates remain THUNDERSTORM_PROXY only and are never reported as confirmed thunderstorms."
+flash_flood:
+  source: null
+  label_type: risk_proxy
+  justification: "No flood extent, gauge, or disaster-report observations are present. Rainfall plus terrain may only form FLASH_FLOOD_RISK_PROXY, but QPE does not overlap the L1C date, so no contemporaneous rainfall+terrain input exists; flash-flood labels stay unknown until official observations or overlapping QPE+terrain inputs are available. Rainfall alone is never treated as confirmed flood truth."

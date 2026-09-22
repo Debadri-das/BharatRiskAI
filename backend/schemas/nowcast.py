@@ -63,9 +63,3 @@ class CityNowcastOut(BaseModel):
     zones_nowcast: List[ZoneNowcastOut]
 
 
-class NowcastSimulationRequest(BaseModel):
-    cloudburst_intensity: float = Field(default=1.0, ge=0.0, le=3.0, description="Multiplier for cloudburst downpour")
-    convective_cape: float = Field(default=1800.0, ge=200.0, le=4000.0, description="Convective Available Potential Energy (J/kg)")
-    radar_dbz_boost: float = Field(default=0.0, ge=-20.0, le=30.0, description="Radar reflectivity modifier")
-    storm_speed_kmh: float = Field(default=25.0, ge=5.0, le=80.0, description="Storm movement velocity")
-    zone_ids: Optional[List[int]] = None

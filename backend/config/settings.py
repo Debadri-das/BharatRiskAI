@@ -24,6 +24,18 @@ try:
         insat_data_dir: str = "data/insat"
         dem_data_dir: str = "data/dem"
         ingestion_interval_minutes: int = 15
+        mosdac_api_url: str = ""
+        mosdac_api_token: str = ""
+        imdaa_api_url: str = ""
+        imdaa_api_token: str = ""
+        satellite_refresh_minutes: int = 15
+        alert_email_to: str = ""
+        alert_email_from: str = ""
+        smtp_host: str = ""
+        smtp_port: int = 587
+        smtp_username: str = ""
+        smtp_password: str = ""
+        smtp_use_tls: bool = True
         alert_webhook_url: str = ""
         alert_webhook_token: str = ""
         alert_sms_webhook_url: str = ""
@@ -52,6 +64,18 @@ except ImportError:
             self.insat_data_dir = os.getenv("INSAT_DATA_DIR", "data/insat")
             self.dem_data_dir = os.getenv("DEM_DATA_DIR", "data/dem")
             self.ingestion_interval_minutes = int(os.getenv("INGESTION_INTERVAL_MINUTES", "15"))
+            self.mosdac_api_url = os.getenv("MOSDAC_API_URL", "")
+            self.mosdac_api_token = os.getenv("MOSDAC_API_TOKEN", "")
+            self.imdaa_api_url = os.getenv("IMDAA_API_URL", "")
+            self.imdaa_api_token = os.getenv("IMDAA_API_TOKEN", "")
+            self.satellite_refresh_minutes = int(os.getenv("SATELLITE_REFRESH_MINUTES", "15"))
+            self.alert_email_to = os.getenv("ALERT_EMAIL_TO", "")
+            self.alert_email_from = os.getenv("ALERT_EMAIL_FROM", self.alert_email_to)
+            self.smtp_host = os.getenv("SMTP_HOST", "")
+            self.smtp_port = int(os.getenv("SMTP_PORT", "587"))
+            self.smtp_username = os.getenv("SMTP_USERNAME", "")
+            self.smtp_password = os.getenv("SMTP_PASSWORD", "")
+            self.smtp_use_tls = os.getenv("SMTP_USE_TLS", "true").lower() == "true"
             self.alert_webhook_url = os.getenv("ALERT_WEBHOOK_URL", "")
             self.alert_webhook_token = os.getenv("ALERT_WEBHOOK_TOKEN", "")
             self.alert_sms_webhook_url = os.getenv("ALERT_SMS_WEBHOOK_URL", "")

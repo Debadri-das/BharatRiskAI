@@ -1,0 +1,5 @@
+{
+  "status": "blocked",
+  "reason": "data/datasets/final/index.csv does not exist; build known-label event-split sequences first.",
+  "generated_at": "2026-09-22T17:32:58.825371+00:00"
+}

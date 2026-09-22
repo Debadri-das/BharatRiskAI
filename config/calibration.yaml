@@ -1,0 +1,3 @@
+method: temperature
+fit_split: validation
+min_samples: 20

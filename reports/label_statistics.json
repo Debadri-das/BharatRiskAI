@@ -1,0 +1,67 @@
+{
+  "generated_at": "2026-09-22T17:48:40.289644+00:00",
+  "timestamps": 49,
+  "hazards": {
+    "thunderstorm": {
+      "confirmed_positive": 0,
+      "confirmed_negative": 0,
+      "proxy_positive": 47,
+      "proxy_negative": 0,
+      "unknown": 2,
+      "label_types": [
+        "proxy",
+        "unavailable"
+      ],
+      "spatial_grids": 48
+    },
+    "cloudburst": {
+      "confirmed_positive": 0,
+      "confirmed_negative": 0,
+      "proxy_positive": 0,
+      "proxy_negative": 1,
+      "unknown": 48,
+      "label_types": [
+        "proxy",
+        "unavailable"
+      ],
+      "spatial_grids": 1
+    },
+    "flash_flood": {
+      "confirmed_positive": 0,
+      "confirmed_negative": 0,
+      "proxy_positive": 0,
+      "proxy_negative": 0,
+      "unknown": 49,
+      "label_types": [
+        "unavailable"
+      ],
+      "spatial_grids": 0
+    }
+  },
+  "event_count": 1,
+  "confirmed_event_count": 0,
+  "proxy_event_dates": {
+    "thunderstorm": [
+      "2023-07-01"
+    ],
+    "cloudburst": [],
+    "flash_flood": []
+  },
+  "thresholds_configured": {
+    "thunderstorm": {
+      "ctt_proxy_max_c": "-40",
+      "ctt_cooling_min_c_per_hr": 2.0,
+      "source_file": "config/labels.yaml"
+    },
+    "cloudburst": {
+      "threshold_mm": 100,
+      "window_hours": 1,
+      "source_file": "config/labels.yaml"
+    },
+    "flash_flood": {
+      "threshold": null,
+      "reason": "no configured threshold and no overlapping observations"
+    }
+  },
+  "provenance": "Proxy labels are deterministic rules on observed fields configured in config/labels.yaml; they are never confirmed observations and never model outputs. Unknown labels remain null."
+}

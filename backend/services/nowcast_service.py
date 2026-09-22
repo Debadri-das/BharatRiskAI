@@ -7,22 +7,22 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 from supabase import Client
 
-from ingestion.weather import get_weather_provider
+from ingestion.satellite_feeds import latest_satellite_observation
 from ml.nowcasting.model import WeatherNowcastModel
 
 
 _nowcast_engine = WeatherNowcastModel()
 
 
-def get_zone_nowcast(db: Client, zone_id: int, live: bool = False) -> Optional[Dict[str, Any]]:
+def get_zone_nowcast(db: Client, zone_id: int, live: bool = True) -> Optional[Dict[str, Any]]:
     """Generate hyper-local 0-6h severe weather nowcast for a specific zone."""
     res = db.table("zones").select("*").eq("id", zone_id).execute()
     if not res.data:
         return None
     zone = res.data[0]
 
-    weather_prov = get_weather_provider(live=live)
-    obs = weather_prov.latest(zone["latitude"], zone["longitude"])
+    # Satellite products are refreshed by the worker and decoded for this request path.
+    obs = latest_satellite_observation()
     
     # Merge zone physical parameters
     obs["elevation"] = zone["elevation"]
@@ -50,7 +50,7 @@ def get_zone_nowcast(db: Client, zone_id: int, live: bool = False) -> Optional[D
     }
 
 
-def get_citywide_nowcast(db: Client, live: bool = False) -> Dict[str, Any]:
+def get_citywide_nowcast(db: Client, live: bool = True) -> Dict[str, Any]:
     """Aggregate nowcasting across all monitored wards/zones with active early warnings."""
     res = db.table("zones").select("*").execute()
     zones = res.data

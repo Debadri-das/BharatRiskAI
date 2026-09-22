@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api import dashboard, emergencies, health, nowcast, recommendations, reports, satellite, simulation, zones
+from backend.api import dashboard, emergencies, health, nowcast, recommendations, reports, satellite, zones
 from backend.config.settings import get_settings
 from backend.middleware.rate_limit import RateLimitMiddleware
 from backend.middleware.request_id import RequestIdMiddleware
@@ -25,6 +25,6 @@ def startup() -> None:
     pass
 
 
-for router in [health.router, nowcast.router, dashboard.router, zones.router, simulation.router, reports.router, emergencies.router, recommendations.router, satellite.router]:
+for router in [health.router, nowcast.router, dashboard.router, zones.router, reports.router, emergencies.router, recommendations.router, satellite.router]:
     app.include_router(router, prefix="/api")
 

@@ -4,11 +4,13 @@ All endpoints are prefixed with `/api`.
 
 `GET /dashboard` returns statistics, zones, recommendations, reports, emergencies, and risk trend.
 
-`POST /simulation` accepts:
+The simulation endpoint has been removed. Live nowcast data is read from the
+latest decoded MOSDAC/INSAT-3D and IMDAA products:
 
-```json
-{"rainfall_percentage":30,"drainage_efficiency_delta":-40,"duration_hours":24,"zone_ids":[1]}
-```
+- `GET /nowcast/city?live=true`
+- `GET /nowcast/zone/{zone_id}?live=true`
+- `GET /nowcast/alerts?live=true`
+- `GET /satellite/status`
 
 `POST /report` accepts citizen latitude, longitude, water level, severity, description, and optional photo URL. The backend attaches it to the nearest zone and recalculates risk.
 

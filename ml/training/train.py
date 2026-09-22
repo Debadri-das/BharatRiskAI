@@ -55,10 +55,10 @@ def main():
     joblib.dump(model, ARTIFACT)
     print({"artifact": str(ARTIFACT), "features": FEATURES, "metrics": metrics, "data": "deterministic synthetic demo dataset"})
     
-    # Also train / initialize the Weather Nowcast Model artifact
-    nowcast_model = WeatherNowcastModel(artifact_path=NOWCAST_ARTIFACT)
+    # Persist the initialized nowcast wrapper until supervised training is available.
+    nowcast_model = WeatherNowcastModel()
     joblib.dump(nowcast_model, NOWCAST_ARTIFACT)
-    print({"artifact": str(NOWCAST_ARTIFACT), "status": "Weather Nowcasting Model ready"})
+    print({"artifact": str(NOWCAST_ARTIFACT), "status": "Weather Nowcasting Model initialized; supervised training pending"})
 
 
 if __name__ == "__main__":

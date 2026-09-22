@@ -8,7 +8,6 @@ import RiskAnalysis from './pages/RiskAnalysis';
 import Reports from './pages/Reports';
 import EmergencyCenter from './pages/EmergencyCenter';
 import Settings from './pages/Settings';
-import MeshSimulator from './pages/MeshSimulator';
 import ProjectDetails from './pages/ProjectDetails';
 import { useRiskStore } from './store/riskStore';
 import { useUiStore } from './store/uiStore';
@@ -16,7 +15,7 @@ import { usePreferencesStore } from './store/preferencesStore';
 import { useNotificationStore } from './store/notificationStore';
 import { getNowcastAlerts } from './services/nowcastApi';
 
-const pages = { Dashboard, 'Risk Analysis': RiskAnalysis, Reports, 'Emergency Center': EmergencyCenter, 'Mesh Simulator': MeshSimulator, Settings, 'Project Details': ProjectDetails };
+const pages = { Dashboard, 'Risk Analysis': RiskAnalysis, Reports, 'Emergency Center': EmergencyCenter, Settings, 'Project Details': ProjectDetails };
 
 export default function App() {
   const load = useRiskStore((s) => s.load);

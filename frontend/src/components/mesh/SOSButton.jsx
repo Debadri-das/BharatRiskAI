@@ -1,1 +1,0 @@
-export default function SOSButton({ onClick }) { return <button onClick={onClick} className="btn warning" style={{ width: 180, height: 180, borderRadius: 999, fontSize: 38, letterSpacing: 0 }}>SOS</button>; }

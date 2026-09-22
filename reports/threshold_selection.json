@@ -1,0 +1,7 @@
+{
+  "status": "blocked",
+  "generated_at": "2026-09-22T17:36:58.536166+00:00",
+  "reason": "No validation predictions exist (no trained model, no validation split). Thresholds must never default to 0.5 without evidence; config/alerts.yaml thresholds remain null.",
+  "fit_split": "validation",
+  "test_split_used": false
+}

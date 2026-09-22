@@ -1,8 +1,8 @@
-import { Activity, AlertTriangle, BarChart3, BookOpen, Network, RadioTower, Settings } from 'lucide-react';
+import { Activity, AlertTriangle, BarChart3, BookOpen, RadioTower, Settings } from 'lucide-react';
 import { useUiStore } from '../../store/uiStore';
 
 const items = [
-  ['Dashboard', Activity], ['Risk Analysis', BarChart3], ['Reports', AlertTriangle], ['Emergency Center', RadioTower], ['Mesh Simulator', Network], ['Settings', Settings], ['Project Details', BookOpen],
+  ['Dashboard', Activity], ['Risk Analysis', BarChart3], ['Reports', AlertTriangle], ['Emergency Center', RadioTower], ['Settings', Settings], ['Project Details', BookOpen],
 ];
 
 export default function Sidebar() {

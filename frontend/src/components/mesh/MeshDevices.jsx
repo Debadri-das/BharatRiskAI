@@ -1,1 +1,0 @@
-export default function MeshDevices() { return <section className="panel" style={{ padding: 16 }}><h3 style={{ marginTop: 0 }}>Nearby Devices</h3><p>PHONE A, PHONE B, PHONE C, Gateway node online in simulator.</p></section>; }

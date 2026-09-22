@@ -1,0 +1,20 @@
+study_region:
+  west: 85.7
+  south: 21.5
+  east: 89.9
+  north: 27.2
+paths:
+  dem: data/dem/kolkata_dem.tif
+  imdaa: data/imdaa
+  insat_l1c: data/insat/l1c
+  insat_qpe: data/insat/qpe
+  insat_cmv: data/insat/cmv
+  derived: data/derived
+  labels: data/datasets/labels
+  sequences: data/datasets/sequences
+  final: data/datasets/final
+common_grid:
+  target_crs: EPSG:4326
+  resolution_degrees: 0.05
+  temporal_interval_minutes: 30
+  rationale: "Approximately 4-8 km satellite source resolution; do not use the 30 m DEM pixel grid for ML."

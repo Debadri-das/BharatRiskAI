@@ -1,0 +1,5 @@
+selection_metric: csi
+fit_split: validation
+thunderstorm: {"+2h": null, "+3h": null, "+4h": null, "+5h": null, "+6h": null}
+cloudburst: {"+2h": null, "+3h": null, "+4h": null, "+5h": null, "+6h": null}
+flash_flood: {"+2h": null, "+3h": null, "+4h": null, "+5h": null, "+6h": null}

@@ -1,6 +1,7 @@
 from datetime import datetime
 from supabase import Client
 from backend.schemas.common import EmergencyCreate
+from backend.services.alert_delivery import deliver_email
 import uuid
 
 def calculate_priority(payload: EmergencyCreate) -> str:
@@ -37,7 +38,18 @@ def create_emergency(db: Client, payload: EmergencyCreate) -> dict:
     }
     
     insert_res = db.table("emergencies").insert(data).execute()
-    return emergency_payload(insert_res.data[0])
+    result = emergency_payload(insert_res.data[0])
+    try:
+        result["email_delivery"] = deliver_email(
+            f"SOS {priority}: {message_id}",
+            "An emergency request was received.\n\n"
+            f"Type: {payload.emergency_type}\nPeople: {payload.people}\n"
+            f"Location: {payload.latitude}, {payload.longitude}\n"
+            f"Details: {payload.description or 'No additional details provided.'}",
+        )
+    except Exception as error:
+        result["email_delivery"] = {"channel": "email", "status": "FAILED", "error": str(error)}
+    return result
 
 
 def emergency_payload(emergency: dict) -> dict:

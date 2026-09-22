@@ -1,0 +1,9 @@
+input_channels: []
+sequence_length: 7
+forecast_horizons_hours: [2, 3, 4, 5, 6]
+hidden_channels: 32
+dropout: 0.1
+loss:
+  thunderstorm: {type: focal, weight: 1.0}
+  cloudburst: {type: focal, weight: 1.0}
+  flash_flood: {type: focal, weight: 1.0}

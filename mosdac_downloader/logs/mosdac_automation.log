@@ -1,0 +1,8 @@
+2026-09-20 12:41:26,511 [INFO] Logging initialized successfully.
+2026-09-20 12:41:26,512 [WARNING] Credentials are empty. Continuing unauthenticated (may fail if dataset requires login).
+2026-09-20 12:41:26,512 [INFO] Searching dataset '3RIMG_L2B_SST' from 2024-01-01 to 2024-01-01
+2026-09-20 12:41:26,513 [INFO] Search completed. Found 2 items.
+2026-09-20 12:41:29,775 [INFO] Starting download: 3RIMG_L2B_SST_sample_1.h5
+2026-09-20 12:41:29,846 [INFO] Successfully saved 3RIMG_L2B_SST_sample_1.h5 to mosdac_data_downloads\3RIMG_L2B_SST_sample_1.h5
+2026-09-20 12:41:29,906 [INFO] Starting download: 3RIMG_L2B_SST_sample_2.h5
+2026-09-20 12:41:29,953 [INFO] Successfully saved 3RIMG_L2B_SST_sample_2.h5 to mosdac_data_downloads\3RIMG_L2B_SST_sample_2.h5

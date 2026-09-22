@@ -24,8 +24,8 @@ class WeatherNowcastModel:
     def predict_grid(self, observation: Dict[str, Any]) -> Dict[str, Any]:
         sequence, baseline = build_spatiotemporal_features(observation)
         outputs = self.model(
-            torch.from_numpy(sequence).unsqueeze(0).to(self.device),
-            torch.from_numpy(baseline).unsqueeze(0).to(self.device),
+            torch.from_numpy(sequence).unsqueeze(0).to(self.device, dtype=torch.float32),
+            torch.from_numpy(baseline).unsqueeze(0).to(self.device, dtype=torch.float32),
         )
         return {
             name: tensor.squeeze(0).cpu().numpy().round(4).tolist()

@@ -2,12 +2,33 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from email.message import EmailMessage
+import smtplib
 from typing import Any
 
 import httpx
 
 from backend.config.settings import get_settings
 from backend.database.connection import get_supabase_admin_client
+
+
+def deliver_email(subject: str, body: str) -> dict[str, str]:
+    """Send email through configured SMTP and return an explicit status."""
+    settings = get_settings()
+    if not all((settings.smtp_host, settings.alert_email_to, settings.alert_email_from)):
+        return {"channel": "email", "status": "NOT_CONFIGURED"}
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = settings.alert_email_from
+    message["To"] = settings.alert_email_to
+    message.set_content(body)
+    with smtplib.SMTP(settings.smtp_host, settings.smtp_port, timeout=10) as server:
+        if settings.smtp_use_tls:
+            server.starttls()
+        if settings.smtp_username:
+            server.login(settings.smtp_username, settings.smtp_password)
+        server.send_message(message)
+    return {"channel": "email", "destination": settings.alert_email_to, "status": "DELIVERED"}
 
 
 def deliver_alert(alert: dict[str, Any], destinations: list[dict[str, str]]) -> list[dict[str, Any]]:

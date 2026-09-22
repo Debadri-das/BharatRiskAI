@@ -1,0 +1,2 @@
+status,reason
+blocked,"test_predictions.npz is missing: no trained checkpoint, no held-out test split, and no observed test labels exist. Test metrics cannot be fabricated."

@@ -1,0 +1,328 @@
+{
+  "status": "failed",
+  "file_count": 49,
+  "duplicate_timestamps": 0,
+  "missing_timestamp_slots": [],
+  "temporal_gaps": [
+    {
+      "from": "2023-07-01T23:45:28+00:00",
+      "to": "2024-06-18T12:00:00+00:00",
+      "minutes": 507614.5333333333
+    }
+  ],
+  "corrupt_files": [
+    {
+      "path": "data\\insat\\ir\\raw\\3RIMG_L1C_ASIA_MER\\2023\\01JUL\\3RIMG_01JUL2023_1915_L1C_ASIA_MER_V01R00.h5",
+      "error": "Unable to synchronously open file (truncated file: eof = 6291456, sblock->base_addr = 0, stored_eof = 22966932)",
+      "recorded_by": "audit"
+    },
+    {
+      "path": "data\\insat\\ir\\raw\\3RIMG_L1C_ASIA_MER\\2023\\01JUL\\3RIMG_01JUL2023_2045_L1C_ASIA_MER_V01R00.h5",
+      "error": "Unable to synchronously open file (truncated file: eof = 6291456, sblock->base_addr = 0, stored_eof = 22398422)",
+      "recorded_by": "audit"
+    },
+    {
+      "path": "data\\insat\\ir\\raw\\3RIMG_L1C_ASIA_MER\\2023\\01JUL\\3RIMG_01JUL2023_2115_L1C_ASIA_MER_V01R00.h5",
+      "error": "Unable to synchronously open file (truncated file: eof = 9437184, sblock->base_addr = 0, stored_eof = 22394809)",
+      "recorded_by": "audit"
+    },
+    {
+      "path": "data\\insat\\ir\\raw\\3RIMG_L1C_ASIA_MER\\2023\\01JUL\\3RIMG_01JUL2023_2145_L1C_ASIA_MER_V01R00.h5",
+      "error": "Unable to synchronously open file (truncated file: eof = 8388608, sblock->base_addr = 0, stored_eof = 22484426)",
+      "recorded_by": "audit"
+    },
+    {
+      "path": "data\\insat\\ir\\raw\\3RIMG_L1C_ASIA_MER\\2023\\01JUL\\3RIMG_01JUL2023_2215_L1C_ASIA_MER_V01R00.h5",
+      "error": "Unable to synchronously open file (truncated file: eof = 7340032, sblock->base_addr = 0, stored_eof = 22723486)",
+      "recorded_by": "audit"
+    },
+    {
+      "path": "data\\insat\\ir\\raw\\3RIMG_L1C_ASIA_MER\\2023\\01JUL\\3RIMG_01JUL2023_2245_L1C_ASIA_MER_V01R00.h5",
+      "error": "Unable to synchronously open file (truncated file: eof = 9437184, sblock->base_addr = 0, stored_eof = 23146086)",
+      "recorded_by": "audit"
+    },
+    {
+      "path": "data\\insat\\ir\\raw\\3RIMG_L1C_ASIA_MER\\2023\\01JUL\\3RIMG_01JUL2023_2315_L1C_ASIA_MER_V01R00.h5",
+      "error": "Unable to synchronously open file (truncated file: eof = 8388608, sblock->base_addr = 0, stored_eof = 23742797)",
+      "recorded_by": "audit"
+    }
+  ],
+  "grid_checks": [],
+  "unknown_label_records": 99,
+  "label_counts": {
+    "thunderstorm": {
+      "positive": 47,
+      "negative": 0,
+      "unknown": 2
+    },
+    "cloudburst": {
+      "positive": 0,
+      "negative": 1,
+      "unknown": 48
+    },
+    "flash_flood": {
+      "positive": 0,
+      "negative": 0,
+      "unknown": 49
+    }
+  },
+  "label_imbalance": [
+    "thunderstorm: 0 negatives among 47 known labels",
+    "cloudburst: 0 positives among 1 known labels",
+    "flash_flood: no known labels (all 49 unknown)"
+  ],
+  "positive_label_records": 47,
+  "negative_label_records": 1,
+  "checks": [
+    {
+      "path": "data\\derived\\satellite\\20230701_0015.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0045.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0115.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0145.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0215.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0245.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0315.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0345.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0415.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0445.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0515.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0545.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0615.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0645.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0715.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0745.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0815.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0845.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0915.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_0945.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1015.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1045.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1115.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1145.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1215.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1245.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1315.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1345.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1415.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1445.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1515.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1545.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1615.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1645.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1715.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1745.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1815.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1845.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1915.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_1945.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_2015.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_2045.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_2115.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_2145.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_2215.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_2245.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_2315.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20230701_2345.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240618_1200.npz",
+      "errors": [],
+      "warnings": []
+    }
+  ],
+  "critical_missing": [
+    "IMDAA",
+    "CMV",
+    "observed hazard ground truth"
+  ]
+}

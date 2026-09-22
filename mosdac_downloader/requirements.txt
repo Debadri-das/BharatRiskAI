@@ -1,0 +1,7 @@
+requests==2.31.0
+tqdm==4.66.1
+streamlit>=1.30.0
+pandas>=2.0.0
+numpy>=1.24.0
+plotly>=5.18.0
+h5py>=3.10.0

@@ -14,7 +14,6 @@ export default {
   getDashboard: () => api('/dashboard'),
   getZones: () => api('/zones'),
   getRisk: (id) => api(`/risk/${id}`),
-  postSimulation: (payload) => api('/simulation', { method: 'POST', body: JSON.stringify(payload) }),
   postReport: (payload) => api('/report', { method: 'POST', body: JSON.stringify(payload) }),
   postEmergency: (payload) => api('/emergency', { method: 'POST', body: JSON.stringify(payload) }),
 };

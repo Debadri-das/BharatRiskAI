@@ -43,7 +43,7 @@ const sections = [
   {
     icon: WifiOff,
     title: 'Offline resilience',
-    text: 'The WebRTC mesh mode allows nearby devices to exchange nowcast snapshots and SOS packets directly over local Wi-Fi after pairing. An internet-connected gateway can forward an offline peer’s SOS to the response API while peers continue receiving the latest shared risk snapshot.',
+    text: 'SOS requests are stored in the response queue and can be routed by email to the configured response address. Delivery status is returned with each request so operators can act on failures.',
   },
   {
     icon: Activity,
@@ -73,7 +73,7 @@ export default function ProjectDetails() {
 
       <section className="project-architecture panel">
         <div className="project-section-heading"><span className="section-kicker"><GitBranch size={14} /> END-TO-END PIPELINE</span><h2>One connected response loop</h2></div>
-        <div className="project-pipeline">{['IMDAA baseline', 'INSAT observations', 'IWV + CTT + QPE', 'MTL inference', 'Risk map + XAI', 'Alerts + SOS'].map((item, index) => <div className="project-pipeline-step" key={item}><span>{String(index + 1).padStart(2, '0')}</span><strong>{item}</strong>{index < 5 && <b>→</b>}</div>)}</div>
+        <div className="project-pipeline">{['MOSDAC products', 'INSAT-3D signals', 'IMDAA atmosphere', 'ML inference', 'Risk map + XAI', 'Alerts + SOS'].map((item, index) => <div className="project-pipeline-step" key={item}><span>{String(index + 1).padStart(2, '0')}</span><strong>{item}</strong>{index < 5 && <b>→</b>}</div>)}</div>
       </section>
 
       <section className="project-section">
@@ -81,7 +81,7 @@ export default function ProjectDetails() {
         <div className="team-grid">{team.map((member) => <article className="team-card panel" key={member}><div className="team-image-placeholder"><Users size={24} /><span>Add image</span></div><h3>{member}</h3><p>CaffineCoders</p></article>)}</div>
       </section>
 
-      <section className="project-note panel"><span className="project-detail-icon"><CloudRain size={19} /></span><div><h3>Prototype status</h3><p>The dashboard, Supabase persistence, real-data adapter boundary, DEM ingestion, alerts, and mesh demonstration are implemented. IMDAA access and provider-specific production credentials remain configuration steps before operational deployment.</p></div></section>
+      <section className="project-note panel"><span className="project-detail-icon"><CloudRain size={19} /></span><div><h3>Operational status</h3><p>The dashboard consumes decoded INSAT-3D and IMDAA products refreshed by the worker. Provider credentials and product download endpoints remain deployment configuration, and the API reports readiness when both products are current.</p></div></section>
     </div>
   );
 }

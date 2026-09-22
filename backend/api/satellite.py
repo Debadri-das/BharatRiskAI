@@ -4,8 +4,21 @@ from supabase import Client
 from backend.database.connection import get_db
 from backend.database.crud import get_zone
 from ingestion.satellite import get_satellite_provider
+from ingestion.satellite_feeds import configured_product_endpoints, latest_satellite_observation
 
 router = APIRouter()
+
+
+@router.get("/satellite/status")
+def satellite_status():
+    """Show configured provider endpoints and the latest local product bundle."""
+    status = {"providers": configured_product_endpoints()}
+    try:
+        observation = latest_satellite_observation()
+        status.update({"ready": True, "source": observation["source"], "observed_at": observation["observed_at"]})
+    except FileNotFoundError as error:
+        status.update({"ready": False, "error": str(error)})
+    return status
 
 
 @router.get("/satellite/latest/{zone_id}")

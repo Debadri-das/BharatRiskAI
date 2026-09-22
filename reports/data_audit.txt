@@ -1,0 +1,102 @@
+BharatRiskAI dataset audit
+
+Files: 76
+File types: {'HDF5': 75, 'GeoTIFF': 1}
+Timestamps: 49
+Time range: ['2023-07-01T00:15:28+00:00', '2024-06-18T12:00:04+00:00']
+IMDAA available: False
+CMV available: False
+
+Missing/blocked sources:
+- IMDAA
+- CMV
+- official thunderstorm/lightning events
+- official cloudburst events
+- official flood observations or inundation maps
+
+Files inspected:
+- data\dem\kolkata_dem.tif (GeoTIFF, 6651169 bytes, 1 variables)
+- data\insat\3DIMG_18JUN2024_1200_L1B_STD_V01R00_B346.h5 (HDF5, 50595401 bytes, 24 variables)
+- data\insat\ir\raw\3DIMG_18JUN2024_1200_L1B_STD_V01R00_B346.h5 (HDF5, 50595401 bytes, 24 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1615_L1C_ASIA_MER_V01R00.h5 (HDF5, 22709731 bytes, 27 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1645_L1C_ASIA_MER_V01R00.h5 (HDF5, 22821798 bytes, 27 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1715_L1C_ASIA_MER_V01R00.h5 (HDF5, 22865378 bytes, 27 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1745_L1C_ASIA_MER_V01R00.h5 (HDF5, 22982856 bytes, 27 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1815_L1C_ASIA_MER_V01R00.h5 (HDF5, 23107873 bytes, 27 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1845_L1C_ASIA_MER_V01R00.h5 (HDF5, 23109262 bytes, 27 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1945_L1C_ASIA_MER_V01R00.h5 (HDF5, 22860274 bytes, 27 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2015_L1C_ASIA_MER_V01R00.h5 (HDF5, 22584920 bytes, 27 variables)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2345_L1C_ASIA_MER_V01R00.h5 (HDF5, 24273439 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0015_L1C_ASIA_MER_V01R00.h5 (HDF5, 24866335 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0045_L1C_ASIA_MER_V01R00.h5 (HDF5, 25449207 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0115_L1C_ASIA_MER_V01R00.h5 (HDF5, 26178599 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0145_L1C_ASIA_MER_V01R00.h5 (HDF5, 26792068 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0215_L1C_ASIA_MER_V01R00.h5 (HDF5, 27289438 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0245_L1C_ASIA_MER_V01R00.h5 (HDF5, 27685102 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0315_L1C_ASIA_MER_V01R00.h5 (HDF5, 28088707 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0345_L1C_ASIA_MER_V01R00.h5 (HDF5, 28477620 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0415_L1C_ASIA_MER_V01R00.h5 (HDF5, 28904008 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0445_L1C_ASIA_MER_V01R00.h5 (HDF5, 29267197 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0515_L1C_ASIA_MER_V01R00.h5 (HDF5, 29651886 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0545_L1C_ASIA_MER_V01R00.h5 (HDF5, 29929123 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0615_L1C_ASIA_MER_V01R00.h5 (HDF5, 30131763 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0645_L1C_ASIA_MER_V01R00.h5 (HDF5, 30200175 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0715_L1C_ASIA_MER_V01R00.h5 (HDF5, 30223571 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0745_L1C_ASIA_MER_V01R00.h5 (HDF5, 30121432 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0815_L1C_ASIA_MER_V01R00.h5 (HDF5, 29893480 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0845_L1C_ASIA_MER_V01R00.h5 (HDF5, 29581728 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0915_L1C_ASIA_MER_V01R00.h5 (HDF5, 29257895 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0945_L1C_ASIA_MER_V01R00 (1).h5 (HDF5, 28880888 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_0945_L1C_ASIA_MER_V01R00.h5 (HDF5, 28880888 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1015_L1C_ASIA_MER_V01R00 (1).h5 (HDF5, 28496555 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1015_L1C_ASIA_MER_V01R00.h5 (HDF5, 28496555 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1045_L1C_ASIA_MER_V01R00 (1).h5 (HDF5, 28066319 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1045_L1C_ASIA_MER_V01R00.h5 (HDF5, 28066319 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1115_L1C_ASIA_MER_V01R00.h5 (HDF5, 27500534 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1145_L1C_ASIA_MER_V01R00.h5 (HDF5, 26901703 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1215_L1C_ASIA_MER_V01R00.h5 (HDF5, 26206365 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1245_L1C_ASIA_MER_V01R00.h5 (HDF5, 25478287 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1315_L1C_ASIA_MER_V01R00.h5 (HDF5, 24796716 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1345_L1C_ASIA_MER_V01R00.h5 (HDF5, 24240560 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1415_L1C_ASIA_MER_V01R00.h5 (HDF5, 23736297 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1445_L1C_ASIA_MER_V01R00.h5 (HDF5, 23217525 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1515_L1C_ASIA_MER_V01R00.h5 (HDF5, 22835605 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1545_L1C_ASIA_MER_V01R00.h5 (HDF5, 22686669 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1615_L1C_ASIA_MER_V01R00.h5 (HDF5, 22709731 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1645_L1C_ASIA_MER_V01R00.h5 (HDF5, 22821798 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1715_L1C_ASIA_MER_V01R00.h5 (HDF5, 22865378 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1745_L1C_ASIA_MER_V01R00.h5 (HDF5, 22982856 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1815_L1C_ASIA_MER_V01R00.h5 (HDF5, 23107873 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1915_L1C_ASIA_MER_V01R00.h5 (HDF5, 22966932 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_1945_L1C_ASIA_MER_V01R00.h5 (HDF5, 22860274 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_2015_L1C_ASIA_MER_V01R00.h5 (HDF5, 22584920 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_2045_L1C_ASIA_MER_V01R00.h5 (HDF5, 22398422 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_2115_L1C_ASIA_MER_V01R00.h5 (HDF5, 22394809 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_2145_L1C_ASIA_MER_V01R00.h5 (HDF5, 22484426 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_2215_L1C_ASIA_MER_V01R00.h5 (HDF5, 22723486 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_2245_L1C_ASIA_MER_V01R00.h5 (HDF5, 23146086 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_2315_L1C_ASIA_MER_V01R00.h5 (HDF5, 23742797 bytes, 27 variables)
+- data\insat\l1c\3RIMG_01JUL2023_2345_L1C_ASIA_MER_V01R00.h5 (HDF5, 24273439 bytes, 27 variables)
+- data\insat\l1c\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2315_L1C_ASIA_MER_V01R00.h5 (HDF5, 23742797 bytes, 27 variables)
+- data\insat\l1c\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2345_L1C_ASIA_MER_V01R00.h5 (HDF5, 24273439 bytes, 27 variables)
+- data\insat\qpe\3DIMG_18JUN2024_1200_L2B_HEM_V01R00.h5 (HDF5, 10720697 bytes, 6 variables)
+- data\insat\qpe\raw\3DIMG_18JUN2024_1200_L2B_HEM_V01R00.h5 (HDF5, 10720697 bytes, 6 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1915_L1C_ASIA_MER_V01R00.h5 (HDF5, 22966932 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1945_L1C_ASIA_MER_V01R00.h5 (HDF5, 22860274 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2015_L1C_ASIA_MER_V01R00.h5 (HDF5, 22584920 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2045_L1C_ASIA_MER_V01R00.h5 (HDF5, 22398422 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2115_L1C_ASIA_MER_V01R00.h5 (HDF5, 22394809 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2145_L1C_ASIA_MER_V01R00.h5 (HDF5, 22484426 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2215_L1C_ASIA_MER_V01R00.h5 (HDF5, 22723486 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2245_L1C_ASIA_MER_V01R00.h5 (HDF5, 23146086 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2315_L1C_ASIA_MER_V01R00.h5 (HDF5, 23742797 bytes, 27 variables)
+- data\insat\wv\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2345_L1C_ASIA_MER_V01R00.h5 (HDF5, 24273439 bytes, 27 variables)
+
+Inspection errors:
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_1915_L1C_ASIA_MER_V01R00.h5: Unable to synchronously open file (truncated file: eof = 6291456, sblock->base_addr = 0, stored_eof = 22966932)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2045_L1C_ASIA_MER_V01R00.h5: Unable to synchronously open file (truncated file: eof = 6291456, sblock->base_addr = 0, stored_eof = 22398422)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2115_L1C_ASIA_MER_V01R00.h5: Unable to synchronously open file (truncated file: eof = 9437184, sblock->base_addr = 0, stored_eof = 22394809)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2145_L1C_ASIA_MER_V01R00.h5: Unable to synchronously open file (truncated file: eof = 8388608, sblock->base_addr = 0, stored_eof = 22484426)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2215_L1C_ASIA_MER_V01R00.h5: Unable to synchronously open file (truncated file: eof = 7340032, sblock->base_addr = 0, stored_eof = 22723486)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2245_L1C_ASIA_MER_V01R00.h5: Unable to synchronously open file (truncated file: eof = 9437184, sblock->base_addr = 0, stored_eof = 23146086)
+- data\insat\ir\raw\3RIMG_L1C_ASIA_MER\2023\01JUL\3RIMG_01JUL2023_2315_L1C_ASIA_MER_V01R00.h5: Unable to synchronously open file (truncated file: eof = 8388608, sblock->base_addr = 0, stored_eof = 23742797)

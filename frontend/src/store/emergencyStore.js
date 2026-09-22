@@ -1,2 +1,2 @@
 import { create } from 'zustand';
-export const useEmergencyStore = create((set) => ({ meshConnected: true, offlineForced: false, setMeshConnected: (value) => set({ meshConnected: value }), setOfflineForced: (value) => set({ offlineForced: value }) }));
+export const useEmergencyStore = create((set) => ({ offlineForced: false, setOfflineForced: (value) => set({ offlineForced: value }) }));

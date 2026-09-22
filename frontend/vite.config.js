@@ -25,5 +25,5 @@ export default defineConfig({
       },
     },
   },
-  test: { environment: 'jsdom', globals: true, include: ['../tests/frontend/**/*.{test,spec}.jsx', '../tests/mesh/**/*.{test,spec}.js'] },
+  test: { environment: 'jsdom', globals: true, include: ['../tests/frontend/**/*.{test,spec}.jsx'] },
 })

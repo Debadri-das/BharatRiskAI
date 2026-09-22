@@ -1,0 +1,5 @@
+{
+  "status": "blocked",
+  "reason": "test_predictions.npz is missing: no trained checkpoint, no held-out test split, and no observed test labels exist. Test metrics cannot be fabricated.",
+  "generated_at": "2026-09-22T17:49:59.787724+00:00"
+}

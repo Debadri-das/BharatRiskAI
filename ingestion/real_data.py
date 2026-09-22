@@ -18,6 +18,9 @@ except ImportError:  # pragma: no cover
 
 try:
     import rasterio
+    from rasterio.enums import Resampling
+    from rasterio.transform import from_bounds
+    from rasterio.warp import reproject
 except ImportError:  # pragma: no cover
     rasterio = None
 
@@ -30,9 +33,9 @@ DEFAULT_IMDAA_VARIABLES = {
     "v_wind": "va",
 }
 DEFAULT_INSAT_VARIABLES = {
-    "water_vapor": "water_vapor",
-    "thermal_ir": "thermal_ir",
-    "qpe": "qpe",
+    "water_vapor": "IMG_WV",
+    "thermal_ir": "IMG_TIR1",
+    "qpe": "HEM",
 }
 
 
@@ -52,6 +55,8 @@ def _timestamp(dataset: Any, fallback: datetime | None = None) -> datetime:
     for name in ("time", "valid_time", "observation_time"):
         if name in dataset.coords and dataset[name].size:
             value = dataset[name].values.reshape(-1)[0]
+            if isinstance(value, np.datetime64):
+                value = value.astype("datetime64[us]").astype(datetime)
             if hasattr(value, "item"):
                 value = value.item()
             if isinstance(value, datetime):
@@ -91,6 +96,84 @@ def temporal_change(current: np.ndarray, previous: np.ndarray | None, hours: flo
     return (current - previous) / hours
 
 
+def _geo(dataset: Any, name: str, scale: float = 1.0) -> np.ndarray:
+    values = _array(dataset, name)
+    if np.nanmax(np.abs(values)) > 180:
+        values = values * scale
+    return values
+
+
+def _lut_temperature(counts: np.ndarray, lut: np.ndarray) -> np.ndarray:
+    result = np.full(counts.shape, np.nan, dtype=np.float64)
+    valid = np.isfinite(counts) & (counts >= 0) & (counts < len(lut)) & (counts != 1023)
+    result[valid] = np.asarray(lut)[counts[valid].astype(np.int64)]
+    return result
+
+
+def target_grid(dem_path: str | Path) -> dict[str, Any]:
+    if rasterio is None:
+        raise RuntimeError("rasterio is required for grid alignment")
+    with rasterio.open(dem_path) as dataset:
+        return {"crs": dataset.crs, "transform": dataset.transform, "width": dataset.width, "height": dataset.height, "shape": (dataset.height, dataset.width)}
+
+
+def align_to_grid(values: np.ndarray, latitude: np.ndarray, longitude: np.ndarray, grid: dict[str, Any], *, nearest: bool = False) -> np.ndarray:
+    """Reproject a geolocated product onto the DEM grid."""
+    if rasterio is None:
+        raise RuntimeError("rasterio is required for grid alignment")
+    source = np.asarray(values, dtype=np.float32)
+    source_lat = np.asarray(latitude, dtype=np.float64)
+    source_lon = np.asarray(longitude, dtype=np.float64)
+    valid = np.isfinite(source_lat) & np.isfinite(source_lon) & (np.abs(source_lat) <= 90) & (np.abs(source_lon) <= 180)
+    if not np.any(valid):
+        raise ValueError("Product has no valid geolocation")
+    source_transform = from_bounds(float(np.nanmin(source_lon[valid])), float(np.nanmin(source_lat[valid])), float(np.nanmax(source_lon[valid])), float(np.nanmax(source_lat[valid])), source.shape[1], source.shape[0])
+    destination = np.full(grid["shape"], np.nan, dtype=np.float32)
+    reproject(source, destination, src_transform=source_transform, src_crs="EPSG:4326", dst_transform=grid["transform"], dst_crs=grid["crs"], src_nodata=np.nan, dst_nodata=np.nan, resampling=Resampling.nearest if nearest else Resampling.bilinear)
+    return destination
+
+
+def wind_diagnostics(u_wind: np.ndarray, v_wind: np.ndarray, latitude: np.ndarray, longitude: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Return horizontal convergence (1/s) and vertical shear magnitude (m/s)."""
+    earth_radius = 6_371_000.0
+    lat = np.asarray(latitude, dtype=np.float64)
+    dx = np.gradient(np.asarray(longitude, dtype=np.float64), axis=-1) * np.pi / 180.0 * earth_radius * np.cos(np.deg2rad(lat))
+    dy = np.gradient(lat, axis=-2) * np.pi / 180.0 * earth_radius
+    dx = np.where(np.abs(dx) < 1.0, np.nan, dx)
+    dy = np.where(np.abs(dy) < 1.0, np.nan, dy)
+    du_dx = np.gradient(np.asarray(u_wind, dtype=np.float64), axis=-1) / dx
+    dv_dy = np.gradient(np.asarray(v_wind, dtype=np.float64), axis=-2) / dy
+    convergence = -(du_dx + dv_dy)
+    shear = np.hypot(np.gradient(np.asarray(u_wind, dtype=np.float64), axis=-2), np.gradient(np.asarray(v_wind, dtype=np.float64), axis=-2))
+    return convergence, shear
+
+
+def cape_cin(temperature_k: np.ndarray, specific_humidity: np.ndarray, pressure_pa: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Compute parcel CAPE and CIN for each IMDAA vertical profile."""
+    try:
+        from metpy.calc import cape_cin as metpy_cape_cin, dewpoint_from_specific_humidity, parcel_profile
+        from metpy.units import units
+    except ImportError as error:  # pragma: no cover
+        raise RuntimeError("metpy is required to compute CAPE/CIN from IMDAA profiles") from error
+    temperature = np.asarray(temperature_k, dtype=np.float64)
+    humidity = np.asarray(specific_humidity, dtype=np.float64)
+    pressure = np.asarray(pressure_pa, dtype=np.float64)
+    if pressure.ndim != 1:
+        raise ValueError("pressure_pa must be one-dimensional")
+    cape = np.full(temperature.shape[1:], np.nan, dtype=np.float64)
+    cin = np.full(temperature.shape[1:], np.nan, dtype=np.float64)
+    for index in np.ndindex(cape.shape):
+        profile_pressure = pressure * units.pascal
+        profile_temperature = temperature[(slice(None),) + index] * units.kelvin
+        profile_humidity = humidity[(slice(None),) + index] * units.dimensionless
+        dewpoint = dewpoint_from_specific_humidity(profile_pressure, profile_temperature, profile_humidity)
+        parcel = parcel_profile(profile_pressure, profile_temperature[0], dewpoint[0])
+        cape_value, cin_value = metpy_cape_cin(profile_pressure, profile_temperature, dewpoint, parcel)
+        cape[index] = cape_value.to("joule / kilogram").magnitude
+        cin[index] = cin_value.to("joule / kilogram").magnitude
+    return cape, cin
+
+
 def read_imdaa(path: str | Path, variables: dict[str, str] | None = None) -> dict[str, Any]:
     dataset = _require_xarray().open_dataset(path)
     names = {**DEFAULT_IMDAA_VARIABLES, **(variables or {})}
@@ -104,6 +187,10 @@ def read_imdaa(path: str | Path, variables: dict[str, str] | None = None) -> dic
         "temperature": _array(dataset, names["temperature"]),
         "u_wind": _array(dataset, names["u_wind"]),
         "v_wind": _array(dataset, names["v_wind"]),
+        "latitude": _array(dataset, "lat" if "lat" in dataset else "latitude"),
+        "longitude": _array(dataset, "lon" if "lon" in dataset else "longitude"),
+        "pressure_pa": pressure,
+        "specific_humidity": q,
         "metadata": {"path": str(path), "variables": names},
     }
 
@@ -112,11 +199,26 @@ def read_insat(path: str | Path, variables: dict[str, str] | None = None, tir_sc
     dataset = _require_xarray().open_dataset(path, engine="h5netcdf" if str(path).lower().endswith((".h5", ".hdf5")) else None)
     names = {**DEFAULT_INSAT_VARIABLES, **(variables or {})}
     result = {"source": "INSAT-3D/3DR", "observed_at": _timestamp(dataset).isoformat(), "metadata": {"path": str(path), "variables": names}}
-    result["iwv"] = _array(dataset, names["water_vapor"])
-    result["ctt"] = cloud_top_temperature(_array(dataset, names["thermal_ir"]), tir_scale, tir_offset)
+    result["latitude"] = _geo(dataset, "Latitude", 0.01)
+    result["longitude"] = _geo(dataset, "Longitude", 0.01)
+    result["ctt"] = _lut_temperature(_array(dataset, names["thermal_ir"])[0], _array(dataset, "IMG_TIR1_TEMP"))
+    result["wv_bt"] = _lut_temperature(_array(dataset, names["water_vapor"])[0], _array(dataset, "IMG_WV_TEMP"))
+    result["metadata"]["calibration"] = "INSAT lookup-table brightness temperature; WV is not IWV"
     if names["qpe"] in dataset:
-        result["qpe"] = _array(dataset, names["qpe"])
+        result["qpe"] = _array(dataset, names["qpe"])[0]
     return result
+
+
+def read_qpe(path: str | Path) -> dict[str, Any]:
+    dataset = _require_xarray().open_dataset(path, engine="h5netcdf" if str(path).lower().endswith((".h5", ".hdf5")) else None)
+    return {
+        "source": "INSAT-3D/3DR-QPE",
+        "observed_at": _timestamp(dataset).isoformat(),
+        "latitude": _geo(dataset, "Latitude", 0.01),
+        "longitude": _geo(dataset, "Longitude", 0.01),
+        "qpe": _array(dataset, "HEM")[0],
+        "metadata": {"path": str(path), "units": "mm/hr"},
+    }
 
 
 def read_dem(path: str | Path) -> dict[str, Any]:

@@ -7,12 +7,11 @@ export const useRiskStore = create((set, get) => ({
   dashboard: demoDashboard(),
   nowcast: null,
   selectedZoneId: 1,
-  simulated: null,
   load: async () => {
     try {
       const [dashboard, nowcast] = await Promise.all([
         api('/dashboard'),
-        getCitywideNowcast(false).catch(() => null),
+        getCitywideNowcast(true).catch(() => null),
       ]);
       set({ dashboard, nowcast, isLive: true, lastUpdated: new Date(), liveError: null });
       return dashboard;
@@ -25,7 +24,6 @@ export const useRiskStore = create((set, get) => ({
   selectedZone: () => get().dashboard.zones.find((zone) => zone.id === get().selectedZoneId) || get().dashboard.zones[0],
   setDashboard: (dashboard) => set({ dashboard }),
   setNowcast: (nowcast) => set({ nowcast }),
-  setSimulated: (simulated) => set({ simulated }),
   isLive: false,
   lastUpdated: null,
   liveError: null,
