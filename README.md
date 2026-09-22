@@ -77,50 +77,35 @@
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+2. Configure Environment:
 
-<<<<<<< HEAD
-2. Configure Supabase:
-
-Create `.env` in the repository root from `.env.example`, then set the Project URL and backend API key from **Supabase → Project Settings → API**. Keep `.env` private. In the Supabase SQL Editor, run [`supabase_schema.sql`](supabase_schema.sql).
+Create `.env` in the repository root from `.env.example`:
 
 ```env
-ENVIRONMENT=development
-SUPABASE_URL=https://your-project-ref.supabase.co
-SUPABASE_KEY=your-backend-only-key
-SUPABASE_SERVICE_ROLE_KEY=your-server-only-service-role-key
-API_TOKEN=replace-with-a-long-random-token
+APP_NAME=BharatRisk AI
+ENVIRONMENT=demo
+DATABASE_URL=sqlite:///./bharatrisk.db
+API_TOKEN=demo-authority-token
 CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+IMDAA_DATA_DIR=data/imdaa
+INSAT_DATA_DIR=data/insat
+DEM_DATA_DIR=data/dem
 ```
 
-`SUPABASE_KEY` is used by the application. `SUPABASE_SERVICE_ROLE_KEY` is used only by trusted maintenance commands such as `database/seed.py`; never expose it to the frontend.
-
-3. Initialize Supabase tables and seed demo zones:
+3. Initialize database with satellite metadata & seed demo zones:
 
 ```bash
-=======
-# Initialize database with satellite metadata
->>>>>>> ba8745a0a07e09770a962fd06cbda76f200d36e6
 python database/seed.py
-
-# Train satellite-based ML models
-python -m ml.training.train_satellite_models
 ```
 
-<<<<<<< HEAD
-4. Verify the connection:
-
-```text
-http://localhost:8000/api/health
+### Start Backend
+```bash
+uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
+# Runs at: http://localhost:8000
 ```
 
-The health response should report `status: ok`, `database.reachable: true`, and a non-zero `zone_count`.
-
-5. (Optional) Train ML model:
-
-=======
 ### Frontend Setup
->>>>>>> ba8745a0a07e09770a962fd06cbda76f200d36e6
+In a separate terminal:
 ```bash
 cd frontend
 npm install
@@ -128,20 +113,6 @@ npm run dev
 # Open: http://localhost:5173
 ```
 
-<<<<<<< HEAD
-6. Start backend:
-
-=======
-### Start Backend
->>>>>>> ba8745a0a07e09770a962fd06cbda76f200d36e6
-```bash
-make backend
-# Runs at: http://localhost:8000
-```
-
-<<<<<<< HEAD
-7. Frontend (in a separate terminal):
-=======
 ---
 
 ## 🛰️ Satellite Data Integration
