@@ -139,7 +139,7 @@ export default function Dashboard(){
             <span className="map-legend"><i className="legend-dot critical" /> Critical <i className="legend-dot high" /> High</span>
           </div>
           <div className="map-container">
-            <RiskMap zones={dashboard.zones} location={location} selectedZoneId={selectedZone?.id} onZoneSelect={setSelectedZoneId} />
+            <RiskMap zones={dashboard.zones} location={location} selectedZoneId={selectedZone?.id} onZoneSelect={setSelectedZoneId} nowcastData={selectedZoneNowcast} />
           </div>
           <div className="location-browser">
             <div className="panel-heading">
