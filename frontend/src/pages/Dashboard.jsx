@@ -8,6 +8,7 @@ import NowcastTimeline from '../components/nowcast/NowcastTimeline';
 import MultiHazardMatrix from '../components/nowcast/MultiHazardMatrix';
 import ProbabilityGrid from '../components/nowcast/ProbabilityGrid';
 import XaiTriggers from '../components/nowcast/XaiTriggers';
+import TeamSection from '../components/common/TeamSection';
 import { useRiskStore } from '../store/riskStore';
 import { distanceKm } from '../utils/geo';
 import { usePreferencesStore } from '../store/preferencesStore';
@@ -230,6 +231,9 @@ export default function Dashboard(){
         <CitizenReportForm onSubmitted={refresh} />
         <EmergencyForm onSubmitted={refresh} />
       </section>
+
+      {/* Team CaffineCoders */}
+      <TeamSection />
     </div>
   );
 }

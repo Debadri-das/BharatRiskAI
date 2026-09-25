@@ -76,10 +76,7 @@ export default function ProjectDetails() {
         <div className="project-pipeline">{['MOSDAC products', 'INSAT-3D signals', 'IMDAA atmosphere', 'ML inference', 'Risk map + XAI', 'Alerts + SOS'].map((item, index) => <div className="project-pipeline-step" key={item}><span>{String(index + 1).padStart(2, '0')}</span><strong>{item}</strong>{index < 5 && <b>→</b>}</div>)}</div>
       </section>
 
-      <section className="project-section">
-        <div className="project-section-heading"><span className="section-kicker"><Users size={14} /> TEAM</span><h2>CaffineCoders</h2><p>The team building a practical early-warning experience for India’s local disaster-response needs.</p></div>
-        <div className="team-grid">{team.map((member) => <article className="team-card panel" key={member}><div className="team-image-placeholder"><Users size={24} /><span>Add image</span></div><h3>{member}</h3><p>CaffineCoders</p></article>)}</div>
-      </section>
+      <TeamSection />
 
       <section className="project-note panel"><span className="project-detail-icon"><CloudRain size={19} /></span><div><h3>Operational status</h3><p>The dashboard consumes decoded INSAT-3D and IMDAA products refreshed by the worker. Provider credentials and product download endpoints remain deployment configuration, and the API reports readiness when both products are current.</p></div></section>
     </div>
