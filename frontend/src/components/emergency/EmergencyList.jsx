@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { AlertOctagon, Clock3, MapPin, RefreshCw, Users } from 'lucide-react';
-import { getEmergencies } from '../../services/emergencyApi';
+import { getEmergencies } from '../../services/api';
 
 const statusClass = (status = '') => status.toLowerCase().replace(/\s+/g, '-');
 

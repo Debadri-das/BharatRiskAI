@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CheckCircle2, Crosshair, FileText, LoaderCircle, MapPin, Send, TriangleAlert } from 'lucide-react';
-import { submitReport } from '../../services/reportApi';
+import { submitReport } from '../../services/api';
 
 export default function CitizenReportForm({ onSubmitted }){
   const [latitude, setLatitude] = useState('22.546');

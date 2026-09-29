@@ -1,3 +1,12 @@
+from supabase import create_client
+from backend.config.settings import get_settings
+
+settings = get_settings()
+
+
+def get_supabase_admin_client():
+    """Create a Supabase client for admin operations."""
+    return create_client(settings.supabase_url, settings.supabase_service_role_key)
 from functools import lru_cache
 
 from supabase import create_client, Client

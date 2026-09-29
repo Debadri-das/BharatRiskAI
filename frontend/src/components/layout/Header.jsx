@@ -4,7 +4,10 @@ import { Radio } from 'lucide-react';
 import NotificationCenter from './NotificationCenter';
 
 export default function Header() {
-  const { dashboard, isLive, lastUpdated } = useRiskStore();
+  const storeDashboard = useRiskStore((state) => state.dashboard);
+  const dashboard = storeDashboard || { title: 'BHARATRISK AI', subtitle: 'Disaster Intelligence & Emergency Response Platform', zones: [] };
+  const isLive = useRiskStore((state) => state.isLive);
+  const lastUpdated = useRiskStore((state) => state.lastUpdated);
   const online = navigator.onLine;
   const updatedLabel = lastUpdated ? `Updated ${lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Waiting for feed';
   return <header className="topbar">

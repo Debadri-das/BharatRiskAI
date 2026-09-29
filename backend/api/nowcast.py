@@ -3,10 +3,15 @@ from supabase import Client
 
 from backend.database.connection import get_db
 from backend.services.nowcast_service import get_citywide_nowcast, get_zone_nowcast
-from backend.schemas.nowcast import CityNowcastOut, ZoneNowcastOut
+from backend.schemas.nowcast import (
+    CityNowcastOut,
+    ZoneNowcastOut,
+    NowcastPredictionOut,
+    NowcastIntervalOut,
+)
 
 
-router = APIRouter()
+router = APIRouter(prefix="/api")
 
 
 @router.get("/nowcast/city", response_model=CityNowcastOut)
@@ -24,6 +29,17 @@ def zone_nowcast(zone_id: int, live: bool = Query(True), db: Client = Depends(ge
     return nowcast
 
 
+@router.get("/nowcast/zone/{zone_id}/xai", response_model=NowcastPredictionOut)
+def zone_nowcast_xai(zone_id: int, live: bool = Query(True)):
+    """Retrieve detailed XAI triggers for a specific zone's nowcast."""
+    try:
+        # Fetch data from the database
+        zn = get_zone_nowcast(zone_id=zone_id, live=live)
+        if not zn:
+            raise HTTPException(status_code=404, detail="Zone not found")
+        return zn["nowcast"]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 @router.get("/nowcast/alerts")
 def nowcast_alerts(live: bool = Query(True), db: Client = Depends(get_db)):
     """Retrieve active early warning alerts prioritized by severity and lead time."""

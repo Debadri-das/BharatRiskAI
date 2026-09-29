@@ -195,18 +195,25 @@ def read_imdaa(path: str | Path, variables: dict[str, str] | None = None) -> dic
     }
 
 
-def read_insat(path: str | Path, variables: dict[str, str] | None = None, tir_scale: float = 1.0, tir_offset: float = 0.0) -> dict[str, Any]:
-    dataset = _require_xarray().open_dataset(path, engine="h5netcdf" if str(path).lower().endswith((".h5", ".hdf5")) else None)
-    names = {**DEFAULT_INSAT_VARIABLES, **(variables or {})}
-    result = {"source": "INSAT-3D/3DR", "observed_at": _timestamp(dataset).isoformat(), "metadata": {"path": str(path), "variables": names}}
-    result["latitude"] = _geo(dataset, "Latitude", 0.01)
-    result["longitude"] = _geo(dataset, "Longitude", 0.01)
-    result["ctt"] = _lut_temperature(_array(dataset, names["thermal_ir"])[0], _array(dataset, "IMG_TIR1_TEMP"))
-    result["wv_bt"] = _lut_temperature(_array(dataset, names["water_vapor"])[0], _array(dataset, "IMG_WV_TEMP"))
-    result["metadata"]["calibration"] = "INSAT lookup-table brightness temperature; WV is not IWV"
-    if names["qpe"] in dataset:
-        result["qpe"] = _array(dataset, names["qpe"])[0]
-    return result
+def read_insat(path: str | Path, variables: dict[str, str] | None = None) -> dict[str, Any]:
+    """Read standardized INSAT-3DR L1C products from the extraction pipeline."""
+    with np.load(path, allow_pickle=False) as data:
+        return {
+            "source": "INSAT-3DR",
+            "observed_at": str(data["timestamp"]),
+            "latitude": data["latitude"],
+            "longitude": data["longitude"],
+            "wv_radiance": data["wv_radiance"],
+            "tir1_bt_k": data["tir1_bt_k"],
+            "tir2_bt_k": data["tir2_bt_k"],
+            "vis_radiance": data["vis_radiance"],
+            "vis_albedo_percent": data.get("vis_albedo_percent"),
+            "metadata": {
+                "path": str(path),
+                "contract": "reports/insat_l1c_contract.md",
+                "calibration": "Radiance uses lab_radiance_quad + scale_factor*count + add_offset; TIR uses provider temperature LUT; WV remains radiance, not IWV."
+            }
+        }
 
 
 def read_qpe(path: str | Path) -> dict[str, Any]:

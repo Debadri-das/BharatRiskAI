@@ -8,7 +8,6 @@ import NowcastTimeline from '../components/nowcast/NowcastTimeline';
 import MultiHazardMatrix from '../components/nowcast/MultiHazardMatrix';
 import ProbabilityGrid from '../components/nowcast/ProbabilityGrid';
 import XaiTriggers from '../components/nowcast/XaiTriggers';
-import TeamSection from '../components/common/TeamSection';
 import { useRiskStore } from '../store/riskStore';
 import { distanceKm } from '../utils/geo';
 import { usePreferencesStore } from '../store/preferencesStore';
@@ -140,7 +139,7 @@ export default function Dashboard(){
             <span className="map-legend"><i className="legend-dot critical" /> Critical <i className="legend-dot high" /> High</span>
           </div>
           <div className="map-container">
-            <RiskMap zones={dashboard.zones} location={location} selectedZoneId={selectedZone?.id} onZoneSelect={setSelectedZoneId} nowcastData={selectedZoneNowcast} />
+            <RiskMap zones={dashboard.zones} location={location} selectedZoneId={selectedZone?.id} onZoneSelect={setSelectedZoneId} />
           </div>
           <div className="location-browser">
             <div className="panel-heading">
@@ -231,9 +230,6 @@ export default function Dashboard(){
         <CitizenReportForm onSubmitted={refresh} />
         <EmergencyForm onSubmitted={refresh} />
       </section>
-
-      {/* Team CaffineCoders */}
-      <TeamSection />
     </div>
   );
 }

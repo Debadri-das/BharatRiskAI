@@ -18,6 +18,9 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    fs: {
+      allow: ['..'],
+    },
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',
@@ -25,5 +28,5 @@ export default defineConfig({
       },
     },
   },
-  test: { environment: 'jsdom', globals: true, include: ['../tests/frontend/**/*.{test,spec}.jsx'] },
+  test: { environment: 'jsdom', globals: true, include: ['src/**/*.test.{js,jsx}'] },
 })

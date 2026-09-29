@@ -7,28 +7,40 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime, timezone
 from supabase import Client
 
-from ingestion.satellite_feeds import latest_satellite_observation
+from ingestion.pipeline import UnifiedFeaturePipeline
 from ml.nowcasting.model import WeatherNowcastModel
 
 
 _nowcast_engine = WeatherNowcastModel()
 
 
-def get_zone_nowcast(db: Client, zone_id: int, live: bool = True) -> Optional[Dict[str, Any]]:
+def get_zone_nowcast(zone_id: int, live: bool = True) -> Optional[Dict[str, Any]]:
     """Generate hyper-local 0-6h severe weather nowcast for a specific zone."""
+    from backend.database.connection import get_supabase_admin_client
+    db = get_supabase_admin_client()
     res = db.table("zones").select("*").eq("id", zone_id).execute()
     if not res.data:
         return None
     zone = res.data[0]
 
-    # Satellite products are refreshed by the worker and decoded for this request path.
-    obs = latest_satellite_observation()
+    # Extract features using the unified feature pipeline
+    bbox = [zone["longitude"] - 0.1, zone["latitude"] - 0.1, zone["longitude"] + 0.1, zone["latitude"] + 0.1]
+    start_time = datetime.now(timezone.utc)
+    end_time = start_time
+    
+    pipeline = UnifiedFeaturePipeline(bbox, start_time, end_time)
+    features = pipeline.extract_features()
+    
+    # Convert features to a dictionary for model input
+    obs = {}
+    for channel in features.data_vars:
+        obs[channel] = features[channel].mean().item()
     
     # Merge zone physical parameters
     obs["elevation"] = zone["elevation"]
     obs["drainage_score"] = zone["drainage_score"]
     obs["population"] = zone["population"]
-    obs["rainfall_24h"] = max(zone["rainfall_24h"], obs.get("rainfall_24h", 0))
+
 
     prediction = _nowcast_engine.predict_nowcast(obs)
 
@@ -38,12 +50,12 @@ def get_zone_nowcast(db: Client, zone_id: int, live: bool = True) -> Optional[Di
         "latitude": zone["latitude"],
         "longitude": zone["longitude"],
         "current_weather": {
-            "rainfall_15m_rate": obs.get("rainfall_15m_rate", 24.0),
+            "rainfall_15m_rate": obs.get("rainfall", 24.0),
             "temperature_c": obs.get("temperature_c", 28.0),
             "humidity_percent": obs.get("humidity_percent", 88.0),
             "wind_speed_kmh": obs.get("wind_speed_kmh", 25.0),
             "radar_reflectivity_dbz": obs.get("radar_reflectivity_dbz", 35.0),
-            "cape_j_kg": obs.get("cape_j_kg", 1500.0),
+            "cape_j_kg": obs.get("cape", 1500.0),
         },
         "nowcast": prediction,
         "generated_at": datetime.now(timezone.utc).isoformat(),

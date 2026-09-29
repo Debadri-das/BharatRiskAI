@@ -1,7 +1,6 @@
 import { create } from 'zustand';
-import { demoDashboard } from '../services/demoData';
 import { api } from '../services/api';
-import { getCitywideNowcast } from '../services/nowcastApi';
+import { demoDashboard } from '../services/demoData';
 
 export const useRiskStore = create((set, get) => ({
   dashboard: demoDashboard(),
@@ -11,7 +10,7 @@ export const useRiskStore = create((set, get) => ({
     try {
       const [dashboard, nowcast] = await Promise.all([
         api('/dashboard'),
-        getCitywideNowcast(true).catch(() => null),
+        api('/nowcast/city?live=true').catch(() => null),
       ]);
       set({ dashboard, nowcast, isLive: true, lastUpdated: new Date(), liveError: null });
       return dashboard;

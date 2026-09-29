@@ -1,1 +1,27 @@
-{"type":"module","scripts":{"dev":"vite --host 0.0.0.0","build":"vite build","preview":"vite preview --host 0.0.0.0","test":"vitest run"},"dependencies":{"@vitejs/plugin-react":"latest","vite":"latest","react":"latest","react-dom":"latest","leaflet":"latest","react-leaflet":"latest","recharts":"latest","zustand":"latest","lucide-react":"latest"},"devDependencies":{"vitest":"latest","jsdom":"latest","@testing-library/react":"latest"}}
+{
+  "name": "bharatrisk-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "vite": "^5.0.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "leaflet": "latest",
+    "lucide-react": "latest",
+    "react-leaflet": "latest",
+    "recharts": "latest",
+    "zustand": "latest"
+  },
+  "devDependencies": {
+    "@testing-library/react": "latest",
+    "jsdom": "latest",
+    "vitest": "latest"
+  }
+}

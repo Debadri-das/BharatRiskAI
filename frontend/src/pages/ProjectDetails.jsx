@@ -1,12 +1,12 @@
 import { Activity, Bell, BrainCircuit, CloudRain, Database, GitBranch, Globe2, Layers3, Map, Radio, ShieldCheck, Users, WifiOff } from 'lucide-react';
 
 const team = [
-  'Anu Kumari Singh',
-  'Anuj Dutta',
-  'Debadri das',
-  'Sharanya Bagchi',
-  'Priya Maity',
-  'Rituraj pandey',
+  { name: 'Anu Kumari Singh', role: 'Backend Developer', image: '/images/IMG_20260911_120019408_HDR_PORTRAIT.jpg' },
+  { name: 'Anuj Dutta', role: 'Leader', image: '/images/IMG_20260730_173309589.jpg' },
+  { name: 'Debadri das', role: 'Backend Developer', image: '/images/IMG-20260925-WA0017.jpg' },
+  { name: 'Sharanya Bagchi', role: 'AI/ML', image: '/images/IMG_20260923_140217769_HDR.jpg' },
+  { name: 'Priya Maity', role: 'Frontend Developer', image: '/images/IMG-20250916-WA0096.jpg' },
+  { name: 'Rituraj pandey', role: 'Frontend Developer', image: '/images/IMG_20260723_175448670_HDR.jpg' },
 ];
 
 const sections = [
@@ -76,7 +76,10 @@ export default function ProjectDetails() {
         <div className="project-pipeline">{['MOSDAC products', 'INSAT-3D signals', 'IMDAA atmosphere', 'ML inference', 'Risk map + XAI', 'Alerts + SOS'].map((item, index) => <div className="project-pipeline-step" key={item}><span>{String(index + 1).padStart(2, '0')}</span><strong>{item}</strong>{index < 5 && <b>→</b>}</div>)}</div>
       </section>
 
-      <TeamSection />
+      <section className="project-section">
+        <div className="project-section-heading"><span className="section-kicker"><Users size={14} /> TEAM</span><h2>CaffineCoders</h2><p>The team building a practical early-warning experience for India’s local disaster-response needs.</p></div>
+        <div className="team-grid">{team.map((member) => <article className="team-card panel" key={member.name}>{member.image ? <img className="team-image" src={member.image} alt={member.name} /> : <div className="team-image-placeholder"><Users size={24} /><span>Add image</span></div>}<h3>{member.name}</h3><p>{member.role}</p></article>)}</div>
+      </section>
 
       <section className="project-note panel"><span className="project-detail-icon"><CloudRain size={19} /></span><div><h3>Operational status</h3><p>The dashboard consumes decoded INSAT-3D and IMDAA products refreshed by the worker. Provider credentials and product download endpoints remain deployment configuration, and the API reports readiness when both products are current.</p></div></section>
     </div>

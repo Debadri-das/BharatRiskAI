@@ -1,0 +1,24 @@
+{
+  "method": "training-only per-channel standardization",
+  "channels": [
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0},
+    {"mean": 0.0, "std": 1.0}
+  ]
+}

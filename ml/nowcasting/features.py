@@ -19,11 +19,11 @@ GRID_CHANNELS = [
 ]
 
 RAW_FEATURES = [
-    "rainfall_15m_rate",      # mm/hr
+    "rainfall",      # mm/hr
     "rainfall_1h_accum",      # mm
     "rainfall_3h_accum",      # mm
     "radar_reflectivity_dbz", # dBZ proxy
-    "cape_j_kg",              # Convective Available Potential Energy (J/kg)
+    "cape",              # Convective Available Potential Energy (J/kg)
     "lifted_index",           # Stability (°C, negative = unstable)
     "dew_point_spread",       # Temp - Dew point (°C)
     "wind_speed_kmh",         # km/h
@@ -41,7 +41,36 @@ def extract_features(data: Dict[str, Any]) -> List[float]:
         float(data.get("rainfall_1h_accum", data.get("rainfall_24h", 0) / 4.0)),
         float(data.get("rainfall_3h_accum", data.get("rainfall_24h", 0) / 2.0)),
         float(data.get("radar_reflectivity_dbz", min(65.0, max(10.0, float(data.get("rainfall_24h", 10)) * 0.25 + 15.0)))),
-        float(data.get("cape_j_kg", 1200.0)),
+        # Updated to use unified feature schema
+        float(data.get("cape", 1200.0)),
+        float(data.get("lifted_index", -2.5)),
+        float(data.get("cape", 1200.0)),
+
+        float(data.get("lifted_index", -2.5)),
+        float(data.get("dew_point_spread", 1.8)),
+        float(data.get("wind_speed_kmh", 25.0)),
+        float(data.get("wind_gust_kmh", 42.0)),
+        float(data.get("pressure_tendency_3h", -1.8)),
+        float(data.get("elevation_m", data.get("elevation", 6.0))),
+        float(data.get("drainage_score", 45.0)),
+        float(data.get("iwv", 45.0)),
+        float(data.get("iwv_change", data.get("iwv_delta", 4.0))),
+        float(data.get("ctt", -45.0)),
+        float(data.get("ctt_drop_rate", 2.5)),
+        float(data.get("qpe_mm_hr", data.get("qpe", 20.0))),
+        float(data.get("cin_j_kg", -80.0)),
+        float(data.get("low_level_convergence", 0.12)),
+        float(data.get("wind_shear_ms", 12.0)),
+        float(data.get("slope_degrees", 3.0)),
+        float(data.get("rainfall", 24.0)),
+        float(data.get("rainfall_1h_accum", data.get("rainfall_24h", 0) / 4.0)),
+        float(data.get("rainfall_3h_accum", data.get("rainfall_24h", 0) / 2.0)),
+        float(data.get("radar_reflectivity_dbz", min(65.0, max(10.0, float(data.get("rainfall_24h", 10)) * 0.25 + 15.0)))),
+        float(data.get("elevation_m", data.get("elevation", 6.0))),
+        float(data.get("drainage_score", 45.0)),
+        
+        float(data.get("cape", 1200.0)),
+        float(data.get("cape", 1200.0)),
         float(data.get("lifted_index", -2.5)),
         float(data.get("dew_point_spread", 1.8)),
         float(data.get("wind_speed_kmh", 25.0)),
@@ -54,28 +83,33 @@ def extract_features(data: Dict[str, Any]) -> List[float]:
 
 
 def build_spatiotemporal_features(
-    data: Dict[str, Any], time_steps: int = 4, grid_size: int = 16
+    observation: Dict[str, Any], time_steps: int = 7, grid_size: int = 16
 ) -> tuple["np.ndarray", "np.ndarray"]:
     """Create deterministic satellite/reanalysis-like grids for inference."""
     if np is None:
         raise RuntimeError("numpy is required to build nowcast tensors")
-    scalar = extract_features(data)
+    
+    # Validate sequence length
+    if time_steps != 7:
+        raise ValueError(f"Expected sequence length 7, got {time_steps}. Training and inference must use the same sequence length.")
+    
+    scalar = extract_features(observation)
     y, x = np.mgrid[0:grid_size, 0:grid_size]
     spatial = 1.0 + 0.12 * np.sin(x / max(grid_size, 1) * np.pi) * np.cos(y / max(grid_size, 1) * np.pi)
     values = np.array([
-        float(data.get("iwv", 45.0)), float(data.get("ctt", -45.0)), scalar[0],
+        float(observation.get("iwv", 45.0)), float(observation.get("ctt", -45.0)), scalar[0],
         scalar[3], scalar[4], scalar[11],
     ], dtype=np.float32)
     derived = [
-        float(data.get("iwv_change", data.get("iwv_delta", 4.0))),
-        float(data.get("ctt_drop_rate", 2.5)),
-        float(data.get("qpe_mm_hr", scalar[0])),
-        float(data.get("cin_j_kg", -80.0)),
-        float(data.get("low_level_convergence", 0.12)),
-        float(data.get("wind_shear_ms", 12.0)),
-        float(data.get("elevation_m", scalar[10])),
-        float(data.get("slope_degrees", 3.0)),
-        float(data.get("drainage_score", scalar[11])),
+        float(observation.get("iwv_change", observation.get("iwv_delta", 4.0))),
+        float(observation.get("ctt_drop_rate", 2.5)),
+        float(observation.get("qpe_mm_hr", scalar[0])),
+        float(observation.get("cin_j_kg", -80.0)),
+        float(observation.get("low_level_convergence", 0.12)),
+        float(observation.get("wind_shear_ms", 12.0)),
+        float(observation.get("elevation_m", scalar[10])),
+        float(observation.get("slope_degrees", 3.0)),
+        float(observation.get("drainage_score", scalar[11])),
     ]
     values = np.array([values[0], derived[0], values[1], derived[1], derived[2], scalar[0],
                        values[2], derived[3], derived[4], derived[5], derived[6], derived[7], derived[8]], dtype=np.float32)
@@ -91,7 +125,7 @@ def build_spatiotemporal_features(
 
 def compute_convective_severity(features: Dict[str, float]) -> Dict[str, Any]:
     """Compute physical instability and severe weather probability indicators."""
-    cape = float(features.get("cape_j_kg", 1200.0))
+    cape = float(features.get("cape", 1200.0))
     li = float(features.get("lifted_index", -2.0))
     dbz = float(features.get("radar_reflectivity_dbz", 35.0))
     rain_rate = float(features.get("rainfall_15m_rate", 20.0))

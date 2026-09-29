@@ -40,4 +40,4 @@ export default function ProbabilityGrid({ maps }) {
       <small style={{ display: 'block', marginTop: 8, color: '#657871' }}>Probability intensity from the shared satellite and thermodynamic feature surface.</small>
     </section>
   );
-}
+}

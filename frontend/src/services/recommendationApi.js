@@ -1,2 +1,1 @@
-import { api } from './api';
-export const getRecommendations = (zoneId) => api(`/recommendations${zoneId ? `?zone_id=${zoneId}` : ''}`);
+export { getRecommendations, getResources } from './api';

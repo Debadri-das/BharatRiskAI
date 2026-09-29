@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Legend } from 'recharts';
-import { CloudRain, Radio, Zap, Wind, ShieldAlert } from 'lucide-react';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { CloudRain, Radio, Zap, ShieldAlert } from 'lucide-react';
 
 export default function NowcastTimeline({ timeline = [], zoneName = 'Zone' }) {
   const [selectedIndex, setSelectedIndex] = useState(1); // default to +30m
@@ -108,4 +108,4 @@ export default function NowcastTimeline({ timeline = [], zoneName = 'Zone' }) {
       </div>
     </section>
   );
-}
+}

@@ -1,9 +1,12 @@
 __pycache__/
+*.py[cod]
 *.pyc
 .pytest_cache/
 .venv/
 node_modules/
 dist/
+.vite/
+*.log
 **/.gradle/
 **/build/
 *.db

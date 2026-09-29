@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AlertOctagon, CheckCircle2, Crosshair, LoaderCircle, MapPin, Send, TriangleAlert } from 'lucide-react';
-import { sendEmergency } from '../../services/emergencyApi';
+import { sendEmergency } from '../../services/api';
 
 export default function EmergencyForm({ onSubmitted }){
   const [latitude, setLatitude] = useState('22.546');

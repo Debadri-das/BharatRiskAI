@@ -55,7 +55,7 @@ export function demoDashboard() {
   return {
     title: 'BHARATRISK AI',
     subtitle: 'Disaster Intelligence & Emergency Response Platform',
-    status: navigator.onLine ? 'ONLINE' : 'OFFLINE',
+    status: typeof navigator !== 'undefined' && navigator.onLine ? 'ONLINE' : 'OFFLINE',
     stats: {
       overall_risk: overall,
       critical_zones: dz.filter((z) => z.risk_category === 'CRITICAL').length,
@@ -69,4 +69,4 @@ export function demoDashboard() {
     emergencies: [],
     risk_trend: [{ time: '06:00', risk: 52 }, { time: '09:00', risk: 61 }, { time: '12:00', risk: overall }, { time: '15:00', risk: 77 }, { time: '18:00', risk: 84 }],
   };
-}
+}
