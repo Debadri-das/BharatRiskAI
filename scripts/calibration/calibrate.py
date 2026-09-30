@@ -11,6 +11,10 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 def fit_temperature(logits: np.ndarray, targets: np.ndarray) -> float:
+    if logits.shape != targets.shape or logits.size == 0:
+        raise ValueError("temperature fitting requires non-empty, shape-matched arrays")
+    if not np.isfinite(logits).all() or not np.isfinite(targets).all() or not np.isin(targets, (0, 1)).all():
+        raise ValueError("temperature fitting requires finite binary known labels")
     candidates = np.exp(np.linspace(-2.0, 2.0, 81))
     scores = []
     for temperature in candidates:
@@ -59,7 +63,7 @@ def main() -> None:
     with np.load(validation, allow_pickle=False) as data:
         logits = np.asarray(data["logits"], dtype=np.float64).ravel()
         targets = np.asarray(data["targets"], dtype=np.float64).ravel()
-    finite = np.isfinite(logits) & np.isfinite(targets)
+    finite = np.isfinite(logits) & np.isfinite(targets) & np.isin(targets, (0, 1))
     logits, targets = logits[finite], targets[finite]
     if not targets.size:
         report = {"status": "blocked", "generated_at": datetime.now(timezone.utc).isoformat(), "reason": "validation predictions contain no finite known-label samples."}

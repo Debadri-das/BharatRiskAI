@@ -48,3 +48,21 @@ class UnifiedFeaturePipeline:
 
         print("Channels in combined dataset:", list(unified_dataset.data_vars.keys()))
         return unified_dataset
+
+    def extract_features(self) -> xr.Dataset:
+        """Fetch and align the canonical feature dataset without aggregation.
+
+        The model consumes seven temporal frames on a common 16x16 grid.  A
+        caller that has fewer frames or mismatched spatial dimensions must fix
+        ingestion upstream; silently averaging or padding here changes the
+        meaning of the trained model inputs.
+        """
+        insat = extract_insat_features(self.bbox, self.start_time, self.end_time)
+        imdaa = extract_imdaa_features(self.bbox, self.start_time, self.end_time)
+        dem = extract_dem_features(self.bbox)
+        qpe = extract_qpe_features(self.bbox, self.start_time, self.end_time)
+        dataset = self._combine_features(insat, imdaa, dem, qpe)
+        missing = [name for name in self.feature_schema["insat"] + self.feature_schema["imdaa"] + self.feature_schema["dem"] + self.feature_schema["qpe"] if name not in dataset]
+        if missing:
+            raise ValueError(f"Unified feature dataset is missing required channels: {missing}")
+        return dataset

@@ -60,12 +60,7 @@ export default function Dashboard(){
 
   function refresh(){ load(); }
 
-  const primaryAlert = nowcast?.alerts?.[0] || {
-    alert_level: nowcast?.overall_alert_level || 'ORANGE',
-    primary_hazard: 'SEVERE CONVECTIVE DOWNPOUR & SQUALL',
-    lead_time_minutes: nowcast?.earliest_lead_time_minutes || 35,
-    advisory: 'Move to elevated ground, secure outdoor assets, keep communication lines open.',
-  };
+  const primaryAlert = nowcast?.alerts?.[0];
 
   return (
     <div className="dashboard-page">
@@ -82,11 +77,11 @@ export default function Dashboard(){
 
       {/* Proactive Early Warning Alert Banner */}
       <EarlyWarningBanner
-        alertLevel={primaryAlert.alert_level}
-        primaryHazard={primaryAlert.primary_hazard}
-        leadTimeMinutes={primaryAlert.lead_time_minutes}
-        advisory={primaryAlert.advisory}
-        zoneName={primaryAlert.zone_name || 'Metropolitan Risk Corridor'}
+        alertLevel={primaryAlert?.alert_level || nowcast?.overall_alert_level || 'GREEN'}
+        primaryHazard={primaryAlert?.primary_hazard || 'No model-derived alert available'}
+        leadTimeMinutes={primaryAlert?.lead_time_minutes || 0}
+        advisory={primaryAlert?.advisory || (nowcast?.status === 'BLOCKED' ? 'Nowcast is not ready; no alert is being issued.' : 'No active model-derived alert.')}
+        zoneName={primaryAlert?.zone_name || 'Monitored zones'}
       />
 
       {/* Metric Cards */}
@@ -100,8 +95,8 @@ export default function Dashboard(){
         <article className="metric-card">
           <div className="metric-icon amber"><CloudRain size={18} /></div>
           <span>Peak Predicted Rain Rate</span>
-          <strong>{nowcast?.max_predicted_rain_rate_mm_hr || 58.4}<small> mm/h</small></strong>
-          <em>{nowcast?.active_alerts_count || 3} zones under active alert</em>
+          <strong>{nowcast?.max_predicted_rain_rate_mm_hr ?? '—'}<small>{nowcast ? ' mm/h' : ''}</small></strong>
+          <em>{nowcast?.active_alerts_count ?? 0} zones under active alert</em>
         </article>
         <article className="metric-card">
           <div className="metric-icon coral"><Users size={18} /></div>
@@ -121,7 +116,7 @@ export default function Dashboard(){
       )}
 
       {selectedZoneNowcast && (
-        <ProbabilityGrid maps={selectedZoneNowcast.hazard_probability_maps} />
+        <ProbabilityGrid maps={selectedZoneNowcast.hazard_probability_maps} layers={selectedZoneNowcast.probability_layers} />
       )}
 
       {selectedZoneNowcast && (
@@ -139,7 +134,7 @@ export default function Dashboard(){
             <span className="map-legend"><i className="legend-dot critical" /> Critical <i className="legend-dot high" /> High</span>
           </div>
           <div className="map-container">
-            <RiskMap zones={dashboard.zones} location={location} selectedZoneId={selectedZone?.id} onZoneSelect={setSelectedZoneId} />
+            <RiskMap zones={dashboard.zones} location={location} selectedZoneId={selectedZone?.id} onZoneSelect={setSelectedZoneId} probabilityLayers={selectedZoneNowcast?.probability_layers} />
           </div>
           <div className="location-browser">
             <div className="panel-heading">

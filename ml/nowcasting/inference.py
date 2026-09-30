@@ -4,7 +4,7 @@ from typing import Dict, Any, Optional, Tuple, List
 import json
 import numpy as np
 import torch
-from ml.nowcasting.architecture import SpatiotemporalMTLNet
+from models.historical_multitask import HistoricalMultiTaskNet
 from ml.nowcasting.features import (
     NOWCAST_INTERVALS,
     build_spatiotemporal_features,
@@ -38,8 +38,7 @@ class NowcastingInferenceEngine:
 
     def __init__(self, device: str = "cpu") -> None:
         self.device = torch.device(device)
-        self.model = SpatiotemporalMTLNet().to(self.device)
-        self.model.eval()
+        self.model: Optional[HistoricalMultiTaskNet] = None
         self._loaded_checkpoint_path: str | None = None
         self._normalization_stats: Optional[Dict[str, Any]] = None
 
@@ -55,20 +54,35 @@ class NowcastingInferenceEngine:
         """
         if not path:
             raise ValueError("Checkpoint path must be a non-empty string")
-        checkpoint = torch.load(path, map_location=self.device)
+        checkpoint = torch.load(path, map_location=self.device, weights_only=False)
         
         # Validate checkpoint contract
         from reports.checkpoint_contract import validate_checkpoint
         validate_checkpoint(checkpoint)
         
-        # Load model state_dict
+        # Validate embedded normalization before touching model state.  A
+        # checkpoint without it is valid when a sidecar scaler is supplied.
+        normalization = checkpoint.get("normalization")
+        if normalization is not None:
+            self._validate_normalization(normalization)
+
+        # Load model state_dict only after all artifact validation succeeds.
         if isinstance(checkpoint, dict) and "model" in checkpoint:
             state_dict = checkpoint["model"]
+            input_channels = checkpoint.get("input_channels", 6)
         else:
             state_dict = checkpoint
-        
+            input_channels = 6
+
+        self.model = HistoricalMultiTaskNet(input_channels).to(self.device)
         self.model.load_state_dict(state_dict)
+        self.model.eval()
         self._loaded_checkpoint_path = path
+        # Prefer embedded training statistics.  Otherwise retain a scaler
+        # explicitly loaded by the caller; _assert_ready still blocks use if
+        # neither source is available.
+        if normalization is not None:
+            self._normalization_stats = normalization
 
     @property
     def checkpoint_path(self) -> str | None:
@@ -92,17 +106,32 @@ class NowcastingInferenceEngine:
         with open(path, encoding="utf-8") as f:
             normalization_stats = json.load(f)
             
-        # Validate normalization schema
+        self._validate_normalization(normalization_stats)
+        self._normalization_stats = normalization_stats
+
+    @staticmethod
+    def _validate_normalization(normalization_stats: Dict[str, Any]) -> None:
+        """Validate the persisted training-only scaler contract."""
+        if not isinstance(normalization_stats, dict):
+            raise ValueError("Normalization statistics must be a dictionary")
         if normalization_stats.get("method") != "training-only per-channel standardization":
             raise ValueError("Normalization method must be 'training-only per-channel standardization'")
             
         # Ensure we have the correct number of channels
         expected_channels = 19  # 13 dynamic + 6 baseline
-        if len(normalization_stats["channels"]) != expected_channels:
-            raise ValueError(f"Expected {expected_channels} channels, got {len(normalization_stats['channels'])}")
-            
-        # Store normalization parameters
-        self._normalization_stats = normalization_stats
+        channels = normalization_stats.get("channels")
+        if not isinstance(channels, list) or len(channels) != expected_channels:
+            count = len(channels) if isinstance(channels, list) else 0
+            raise ValueError(f"Expected {expected_channels} channels, got {count}")
+        for index, stats in enumerate(normalization_stats["channels"]):
+            try:
+                valid = (isinstance(stats, dict)
+                         and np.isfinite(float(stats.get("mean")))
+                         and np.isfinite(float(stats.get("std"))))
+            except (TypeError, ValueError):
+                valid = False
+            if not valid:
+                raise ValueError(f"Invalid normalization statistics for channel {index}")
 
     @property
     def normalization_stats(self) -> Optional[Dict[str, Any]]:
@@ -141,6 +170,7 @@ class NowcastingInferenceEngine:
     @torch.inference_mode()
     def predict_grid(self, observation: Dict[str, Any]) -> Dict[str, Any]:
         """Generate multi-task hazard probability maps from observation."""
+        self._assert_ready()
         sequence, baseline = build_spatiotemporal_features(observation)
         sequence, baseline = self._normalize_features(sequence, baseline)
         outputs = self.model(
@@ -152,6 +182,12 @@ class NowcastingInferenceEngine:
             for name, tensor in outputs.items()
         }
 
+    def _assert_ready(self) -> None:
+        if not self.is_loaded:
+            raise RuntimeError("Nowcast inference is unavailable: load a trained checkpoint explicitly")
+        if self._normalization_stats is None:
+            raise RuntimeError("Nowcast inference is unavailable: load training normalization statistics")
+
     def compute_feature_attribution(self, observation: Dict[str, Any]) -> Dict[str, float]:
         """
         Calculate feature importance scores using gradient-based attribution.
@@ -159,6 +195,7 @@ class NowcastingInferenceEngine:
         Returns:
             Dictionary of feature names and their normalized contribution scores.
         """
+        self._assert_ready()
         sequence, baseline = build_spatiotemporal_features(observation)
         sequence, baseline = self._normalize_features(sequence, baseline)
         sequence_tensor = torch.from_numpy(sequence).unsqueeze(0).to(self.device, dtype=torch.float32).requires_grad_(True)
@@ -193,8 +230,13 @@ class NowcastingInferenceEngine:
             - Forecast timeline
             - Alert level and advisory
         """
-        feats = extract_features(observation)
-        convective = compute_convective_severity(observation)
+        scalar_observation = {
+            key: (float(value.values.reshape(-1)[-1]) if hasattr(value, "values") else
+                  float(value.reshape(-1)[-1]) if isinstance(value, np.ndarray) and value.ndim else value)
+            for key, value in observation.items()
+        }
+        feats = extract_features(scalar_observation)
+        convective = compute_convective_severity(scalar_observation)
         grids = self.predict_grid(observation)
         hazards = {name: float(np.max(values) * 100.0) for name, values in grids.items()}
 
@@ -236,27 +278,27 @@ class NowcastingInferenceEngine:
 
         xai_triggers = {
             "moisture": {
-                "iwv": float(observation.get("iwv", 45.0)),
+                 "iwv": float(scalar_observation.get("iwv", 45.0)),
                 "attribution": float(attribution["iwv"]),
                 "trigger": "Critical moisture accumulation" if attribution["iwv"] > 0.15 else "Normal moisture levels",
             },
             "instability": {
-                "cape": float(observation.get("cape", 1200.0)),
+                "cape": float(scalar_observation.get("cape", scalar_observation.get("cape_j_kg", 1200.0))),
                 "attribution": float(attribution["cape"]),
                 "trigger": "Extreme instability" if attribution["cape"] > 0.12 else "Moderate instability",
             },
             "lift_and_structure": {
-                "cape": float(observation.get("cape", 1200.0)),
+                "cape": float(scalar_observation.get("cape", scalar_observation.get("cape_j_kg", 1200.0))),
                 "attribution": float(attribution.get("cape", 0.0)),
                 "trigger": "Strong instability" if attribution.get("cape", 0.0) > 0.1 else "Weak instability",
             },
             "cloud_growth": {
-                "ctt_drop_rate": float(observation.get("ctt_drop_rate", 2.5)),
+                "ctt_drop_rate": float(scalar_observation.get("ctt_drop_rate", 2.5)),
                 "attribution": float(attribution["ctt_drop_rate"]),
                 "trigger": "Explosive updraft" if attribution["ctt_drop_rate"] > 0.1 else "Normal cloud growth",
             },
             "flood_catalyst": {
-                "elevation_m": float(observation.get("elevation_m", elevation)),
+                "elevation_m": float(scalar_observation.get("elevation_m", elevation)),
                 "attribution": float(attribution["elevation"]),
                 "trigger": "High flood risk" if attribution["elevation"] > 0.1 else "Low flood risk",
             },
@@ -281,5 +323,3 @@ class NowcastingInferenceEngine:
             "xai_triggers": xai_triggers,
             "feature_attribution": attribution,
         }
-
-        return dict(zip(feature_names, map(float, feature_importance)))

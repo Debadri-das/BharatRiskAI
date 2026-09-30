@@ -12,7 +12,7 @@ def test_mtl_probability_maps_have_expected_shapes():
         torch.from_numpy(baseline).unsqueeze(0),
     )
 
-    assert sequence.shape == (4, 13, 16, 16)
+    assert sequence.shape == (7, 13, 16, 16)
     assert baseline.shape == (6, 16, 16)
     assert set(outputs) == {"thunderstorms", "cloudbursts", "flash_floods"}
     assert all(value.shape == (1, 5, 16, 16) for value in outputs.values())

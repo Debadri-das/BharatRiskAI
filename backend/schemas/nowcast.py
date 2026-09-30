@@ -13,6 +13,9 @@ class NowcastIntervalOut(BaseModel):
 
 
 class NowcastPredictionOut(BaseModel):
+    status: str = "READY"
+    calibration_status: Optional[str] = None
+    blocked_reason: Optional[str] = None
     alert_level: str
     primary_hazard: str
     lead_time_minutes: int
@@ -28,7 +31,12 @@ class NowcastPredictionOut(BaseModel):
     map_shape: List[int]
     forecast_window_hours: List[int]
     forecast_horizons_hours: List[int]
-    xai_triggers: Dict[str, Dict[str, float]]
+    # Trigger payloads intentionally mix numeric measurements, attribution
+    # scores, and human-readable explanations.
+    xai_triggers: Dict[str, Dict[str, Any]]
+    # Raster-like layers retain the model grid and its geographic extent.  A
+    # consumer can render these without mistaking a zone marker for a raster.
+    probability_layers: Optional[List[Dict[str, Any]]] = None
 
 
 class ZoneNowcastOut(BaseModel):
@@ -37,7 +45,9 @@ class ZoneNowcastOut(BaseModel):
     latitude: float
     longitude: float
     current_weather: Dict[str, Any]
-    nowcast: NowcastPredictionOut
+    nowcast: Optional[NowcastPredictionOut] = None
+    status: str = "READY"
+    blocked_reason: Optional[str] = None
     generated_at: str
 
 

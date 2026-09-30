@@ -117,9 +117,9 @@ def main() -> None:
         for horizon_index, horizon in enumerate(HORIZONS):
             probs = probabilities[:, horizon_index, hazard_index].ravel()
             truth = targets[:, horizon_index, hazard_index].ravel()
-            finite = np.isfinite(truth)
+            finite = np.isfinite(truth) & np.isfinite(probs) & np.isin(truth, (0, 1))
             if not finite.any():
-                blocked(f"no finite known test labels for {hazard} at {horizon}.")
+                blocked(f"no finite binary known test labels and probabilities for {hazard} at {horizon}.")
             horizon_threshold = thresholds[hazard][horizon]
             if horizon_threshold is None:
                 blocked(f"threshold for {hazard} at {horizon} is null.")

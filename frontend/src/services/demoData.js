@@ -22,9 +22,16 @@ export function score(zone) {
 }
 
 export function breakdown(zone) {
-  return {
-    rainfall: 34, weekly_saturation: 14, low_elevation: 13, poor_drainage: 22, population_exposure: 12, history_and_reports: 5,
+  const contributions = {
+    rainfall: Math.min(zone.rainfall_24h / 220, 1) * 35,
+    weekly_saturation: Math.min(zone.rainfall_7d / 650, 1) * 15,
+    low_elevation: Math.max(0, (20 - zone.elevation) / 20) * 15,
+    poor_drainage: Math.max(0, (100 - zone.drainage_score) / 100) * 20,
+    population_exposure: Math.min(zone.population_density / 32000, 1) * 10,
+    history_and_reports: Math.min((zone.historical_flood_count * 2 + zone.citizen_report_count * 5) / 40, 1) * 5,
   };
+  const total = Object.values(contributions).reduce((sum, value) => sum + value, 0) || 1;
+  return Object.fromEntries(Object.entries(contributions).map(([key, value]) => [key, Math.round(value * 1000 / total) / 10]));
 }
 
 export function demoZones() {
@@ -69,4 +76,4 @@ export function demoDashboard() {
     emergencies: [],
     risk_trend: [{ time: '06:00', risk: 52 }, { time: '09:00', risk: 61 }, { time: '12:00', risk: overall }, { time: '15:00', risk: 77 }, { time: '18:00', risk: 84 }],
   };
-}
+}

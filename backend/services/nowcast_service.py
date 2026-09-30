@@ -4,6 +4,8 @@ Integrates live weather observation ingestion, convective instability models,
 and generates hyper-local 0-6h predictions, alert levels, and lead times.
 """
 from typing import Dict, Any, List, Optional
+import os
+import numpy as np
 from datetime import datetime, timezone
 from supabase import Client
 
@@ -12,12 +14,16 @@ from ml.nowcasting.model import WeatherNowcastModel
 
 
 _nowcast_engine = WeatherNowcastModel()
+_checkpoint = os.getenv("NOWCAST_CHECKPOINT")
+_normalization = os.getenv("NOWCAST_NORMALIZATION")
+if _checkpoint:
+    _nowcast_engine.load_artifact(_checkpoint)
+if _normalization:
+    _nowcast_engine.load_normalization(_normalization)
 
 
-def get_zone_nowcast(zone_id: int, live: bool = True) -> Optional[Dict[str, Any]]:
+def get_zone_nowcast(db: Client, zone_id: int, live: bool = True) -> Optional[Dict[str, Any]]:
     """Generate hyper-local 0-6h severe weather nowcast for a specific zone."""
-    from backend.database.connection import get_supabase_admin_client
-    db = get_supabase_admin_client()
     res = db.table("zones").select("*").eq("id", zone_id).execute()
     if not res.data:
         return None
@@ -31,18 +37,41 @@ def get_zone_nowcast(zone_id: int, live: bool = True) -> Optional[Dict[str, Any]
     pipeline = UnifiedFeaturePipeline(bbox, start_time, end_time)
     features = pipeline.extract_features()
     
-    # Convert features to a dictionary for model input
-    obs = {}
-    for channel in features.data_vars:
-        obs[channel] = features[channel].mean().item()
+    # Preserve the temporal/spatial tensors.  Reducing these to scalar means
+    # destroys storm structure and makes the multitask model ineffective.
+    obs = {channel: features[channel].values for channel in features.data_vars}
     
     # Merge zone physical parameters
-    obs["elevation"] = zone["elevation"]
-    obs["drainage_score"] = zone["drainage_score"]
+    # Zone metadata is not a model grid; only use it for API context and for
+    # legacy scalar diagnostic calculations where a canonical grid is absent.
     obs["population"] = zone["population"]
 
 
-    prediction = _nowcast_engine.predict_nowcast(obs)
+    try:
+        prediction = _nowcast_engine.predict_nowcast(obs)
+        validation_error = validate_nowcast_output(prediction)
+    except Exception as error:
+        prediction = None
+        validation_error = f"nowcast inference failed: {error}"
+
+    if validation_error:
+        return _zone_status(zone, "BLOCKED", validation_error)
+
+    prediction["status"] = "READY"
+    # Calibration is deliberately explicit.  The current inference contract
+    # does not supply a calibration artifact, so downstream code must not call
+    # these values calibrated unless a future model does so.
+    prediction.setdefault("calibration_status", "UNSPECIFIED")
+    prediction["probability_layers"] = build_probability_layers(
+        prediction["hazard_probability_maps"], bbox, prediction.get("forecast_horizons_hours")
+    )
+
+    def latest_value(name: str):
+        value = obs.get(name)
+        if value is None:
+            return None
+        array = np.asarray(value)
+        return float(array.reshape(-1)[-1])
 
     return {
         "zone_id": zone["id"],
@@ -50,15 +79,57 @@ def get_zone_nowcast(zone_id: int, live: bool = True) -> Optional[Dict[str, Any]
         "latitude": zone["latitude"],
         "longitude": zone["longitude"],
         "current_weather": {
-            "rainfall_15m_rate": obs.get("rainfall", 24.0),
-            "temperature_c": obs.get("temperature_c", 28.0),
-            "humidity_percent": obs.get("humidity_percent", 88.0),
-            "wind_speed_kmh": obs.get("wind_speed_kmh", 25.0),
-            "radar_reflectivity_dbz": obs.get("radar_reflectivity_dbz", 35.0),
-            "cape_j_kg": obs.get("cape", 1500.0),
+            "rainfall_15m_rate": latest_value("rainfall"),
+            "temperature_c": latest_value("temperature_c"),
+            "humidity_percent": latest_value("humidity_percent"),
+            "wind_speed_kmh": latest_value("wind_speed_kmh"),
+            "radar_reflectivity_dbz": latest_value("radar_reflectivity_dbz"),
+            "cape_j_kg": latest_value("cape"),
         },
         "nowcast": prediction,
+        "status": "READY",
         "generated_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+def validate_nowcast_output(output: Optional[Dict[str, Any]]) -> Optional[str]:
+    """Validate the minimum model contract before alert/risk consumers use it."""
+    if not isinstance(output, dict):
+        return "missing nowcast output"
+    required = ("alert_level", "primary_hazard", "timeline", "hazard_probability_maps")
+    missing = [key for key in required if key not in output]
+    if missing:
+        return f"nowcast output missing required fields: {', '.join(missing)}"
+    if output.get("status") == "BLOCKED":
+        return output.get("blocked_reason") or "nowcast output is blocked"
+    if not output["timeline"] or not isinstance(output["hazard_probability_maps"], dict):
+        return "nowcast output has no usable forecast data"
+    return None
+
+
+def build_probability_layers(maps: Dict[str, Any], bounds: List[float], horizons: Optional[List[int]] = None) -> List[Dict[str, Any]]:
+    """Describe model grids as geographic raster layers without changing values."""
+    layers = []
+    for hazard, horizon_values in maps.items():
+        for index, values in enumerate(horizon_values):
+            rows = len(values)
+            columns = len(values[0]) if rows else 0
+            layers.append({
+                "id": f"{hazard}-{index}", "hazard": hazard, "horizon_index": index,
+                "horizon_hours": (horizons[index] if horizons and index < len(horizons) else None),
+                "type": "raster", "crs": "EPSG:4326",
+                "bounds": {"west": bounds[0], "south": bounds[1], "east": bounds[2], "north": bounds[3]},
+                "width": columns, "height": rows, "values": values,
+            })
+    return layers
+
+
+def _zone_status(zone: Dict[str, Any], status: str, reason: str) -> Dict[str, Any]:
+    return {
+        "zone_id": zone["id"], "zone_name": zone["name"],
+        "latitude": zone["latitude"], "longitude": zone["longitude"],
+        "current_weather": {}, "nowcast": None, "status": status,
+        "blocked_reason": reason, "generated_at": datetime.now(timezone.utc).isoformat(),
     }
 
 
@@ -78,7 +149,8 @@ def get_citywide_nowcast(db: Client, live: bool = True) -> Dict[str, Any]:
         if not zn:
             continue
         zone_nowcasts.append(zn)
-        
+        if zn.get("status") != "READY" or not zn.get("nowcast"):
+            continue
         ncast = zn["nowcast"]
         alert = ncast["alert_level"]
         
@@ -115,4 +187,9 @@ def get_citywide_nowcast(db: Client, live: bool = True) -> Dict[str, Any]:
         "active_alerts_count": len(active_alerts),
         "alerts": active_alerts,
         "zones_nowcast": zone_nowcasts,
+        "status": "READY" if any(z.get("status") == "READY" for z in zone_nowcasts) else "BLOCKED",
+        "blocked_zones": [
+            {"zone_id": z["zone_id"], "reason": z.get("blocked_reason", "not ready")}
+            for z in zone_nowcasts if z.get("status") != "READY"
+        ],
     }

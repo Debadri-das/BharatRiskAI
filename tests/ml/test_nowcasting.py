@@ -1,5 +1,6 @@
 from ml.nowcasting.features import extract_features, compute_convective_severity, NOWCAST_INTERVALS
 from ml.nowcasting.model import WeatherNowcastModel
+import pytest
 
 
 def test_convective_severity_calculation():
@@ -26,8 +27,5 @@ def test_nowcast_timeline_generation():
         "elevation": 4.5,
         "drainage_score": 35.0,
     }
-    pred = engine.predict_nowcast(obs)
-    assert pred["alert_level"] in ("ORANGE", "RED")
-    assert len(pred["timeline"]) == len(NOWCAST_INTERVALS)
-    assert pred["lead_time_minutes"] > 0
-    assert pred["max_rain_rate_mm_hr"] > 0
+    with pytest.raises(RuntimeError, match="load a trained checkpoint explicitly"):
+        engine.predict_nowcast(obs)

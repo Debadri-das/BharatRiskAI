@@ -1,4 +1,4 @@
-# Unified Feature Schema for BharatRiskAI
+"""Unified Feature Schema for BharatRiskAI.
 
 ## Overview
 This document defines the exact 13 model channels required by the `SpatiotemporalMTLNet` architecture and their mapping to real INSAT, IMDAA, and DEM data sources.
@@ -39,9 +39,9 @@ This document defines the exact 13 model channels required by the `Spatiotempora
 
 ### 6. Rainfall
 - **Unified ID**: `rainfall`
-- **Source**: IMDAA pressure-level data
+- **Source**: IMDAA pressure-level data when a provider rainfall variable is present
 - **Unit**: mm/hr
-- **Processing**: Reanalysis-based surface rainfall rate.
+- **Processing**: Reanalysis-based surface rainfall rate. No rainfall field is fabricated when absent.
 
 ### 7. Convective Available Potential Energy (CAPE)
 - **Unified ID**: `cape`
@@ -83,7 +83,7 @@ This document defines the exact 13 model channels required by the `Spatiotempora
 - **Unified ID**: `drainage`
 - **Source**: DEM data
 - **Unit**: score (0-100)
-- **Processing**: Terrain drainage/accumulation score from `scripts/features/dem_features.py`.
+- **Processing**: Requires a hydrologically conditioned drainage/flow product. The current DEM extractor emits no drainage score and records it as unavailable.
 
 ---
 
@@ -119,5 +119,70 @@ BASELINE_ORDER = [
     "elevation",
 ]
 ```
+
+"""
+
+# Feature groups consumed by ingestion.pipeline.UnifiedFeaturePipeline.
+# These are required model inputs, not claims that every source is currently
+# available.  Producers must fail/report missing groups rather than filling
+# them with synthetic values.
+GRID_CONTRACT = {
+    "crs": "EPSG:4326",
+    "extent": {"west": 85.7, "south": 21.5, "east": 89.9, "north": 27.2},
+    "resolution_degrees": [0.05, 0.05],
+    "shape": [114, 84],
+}
+TEMPORAL_INTERVAL_MINUTES = 30
+INPUT_FRAME_COUNT = 7
+TARGET_HORIZON_OFFSETS = [4, 6, 8, 10, 12]
+
+FEATURE_SCHEMA = {
+    "insat": ["ctt", "ctt_drop_rate"],
+    "imdaa": [
+        "iwv",
+        "iwv_change",
+        "rainfall",
+        "cape",
+        "cin",
+        "convergence",
+        "wind_shear",
+    ],
+    "dem": ["elevation", "slope", "drainage"],
+    "qpe": ["qpe"],
+}
+
+CHANNEL_ORDER = [
+    "iwv",
+    "iwv_change",
+    "ctt",
+    "ctt_drop_rate",
+    "qpe",
+    "rainfall",
+    "cape",
+    "cin",
+    "convergence",
+    "wind_shear",
+    "elevation",
+    "slope",
+    "drainage",
+]
+
+BASELINE_ORDER = ["qpe", "cin", "rainfall", "convergence", "wind_shear", "elevation"]
+
+
+def validate_channel_order(channels: list[str] | tuple[str, ...]) -> None:
+    """Raise when a tensor's channels are ambiguous or incomplete."""
+    actual = list(channels)
+    if actual != CHANNEL_ORDER:
+        raise ValueError(f"Expected canonical channels {CHANNEL_ORDER}, got {actual}")
+
+
+def source_contract() -> dict[str, dict[str, str]]:
+    """Describe availability requirements without inventing fallback data."""
+    return {
+        "IMDAA": {"path": "data/imdaa", "status": "required"},
+        "ground_truth": {"path": "data/datasets/labels/labels.jsonl", "status": "required"},
+        "drainage": {"path": "data/derived/terrain/dem_features.json", "status": "unavailable_without_hydrology"},
+    }
 
 

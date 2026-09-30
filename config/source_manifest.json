@@ -1,0 +1,128 @@
+{
+  "contract": "tier-1-2-data-plan",
+  "version": 1,
+  "principles": [
+    "Presence is checked locally from configured paths only.",
+    "A missing source is never replaced with a fabricated file or fallback value.",
+    "Optional sources improve validation or features but do not block the baseline."
+  ],
+  "sources": [
+    {
+      "id": "insat_3dr_wv",
+      "name": "INSAT-3DR WV",
+      "tier": 1,
+      "role": "dynamic_predictor",
+      "required": true,
+      "paths": ["data/insat/l1c", "data/derived/satellite/*.npz"],
+      "description": "Water-vapour channel features from INSAT-3DR."
+    },
+    {
+      "id": "insat_3dr_tir",
+      "name": "INSAT-3DR TIR",
+      "tier": 1,
+      "role": "dynamic_predictor",
+      "required": true,
+      "paths": ["data/insat/l1c", "data/derived/satellite/*.npz"],
+      "description": "TIR brightness-temperature and cloud-top-temperature proxy features."
+    },
+    {
+      "id": "insat_3dr_qpe",
+      "name": "INSAT-3DR QPE",
+      "tier": 1,
+      "role": "dynamic_predictor",
+      "required": true,
+      "paths": ["data/insat/qpe", "data/derived/satellite/qpe_*.npz"],
+      "description": "Hydro-estimator precipitation features."
+    },
+    {
+      "id": "imdaa",
+      "name": "IMDAA",
+      "tier": 1,
+      "role": "atmospheric_baseline",
+      "required": true,
+      "paths": ["data/imdaa/**/*.nc", "data/imdaa/**/*.nc4"],
+      "description": "Pressure-level atmospheric baseline for thermodynamic and wind-derived predictors."
+    },
+    {
+      "id": "static_terrain",
+      "name": "SRTM/NASADEM",
+      "tier": 1,
+      "role": "static_terrain",
+      "required": true,
+      "paths": ["data/terrain/**/*", "data/dem/**/*", "data/elevation/**/*"],
+      "description": "Elevation and derived terrain features; SRTM or NASADEM is acceptable."
+    },
+    {
+      "id": "cmv",
+      "name": "CMV",
+      "tier": 2,
+      "role": "optional_validation_or_enhancement",
+      "required": false,
+      "paths": ["data/insat/cmv/**/*"],
+      "description": "Cloud-motion vectors for optional atmospheric-motion enhancement."
+    },
+    {
+      "id": "imerg",
+      "name": "IMERG",
+      "tier": 2,
+      "role": "optional_validation_or_enhancement",
+      "required": false,
+      "paths": ["data/imerg/**/*"],
+      "description": "Independent precipitation validation or enhancement source."
+    },
+    {
+      "id": "imd",
+      "name": "IMD",
+      "tier": 2,
+      "role": "optional_validation_or_enhancement",
+      "required": false,
+      "paths": ["data/imd/**/*"],
+      "description": "Official weather/event observations for validation."
+    },
+    {
+      "id": "lightning",
+      "name": "Lightning",
+      "tier": 2,
+      "role": "optional_validation_or_enhancement",
+      "required": false,
+      "paths": ["data/lightning/**/*"],
+      "description": "Authoritative lightning observations for thunderstorm validation."
+    },
+    {
+      "id": "sentinel_1",
+      "name": "Sentinel-1",
+      "tier": 2,
+      "role": "optional_validation_or_enhancement",
+      "required": false,
+      "paths": ["data/sentinel-1/**/*", "data/sentinel1/**/*"],
+      "description": "Radar backscatter for optional flood/inundation validation."
+    },
+    {
+      "id": "land_cover",
+      "name": "Land cover",
+      "tier": 2,
+      "role": "optional_validation_or_enhancement",
+      "required": false,
+      "paths": ["data/land_cover/**/*", "data/landcover/**/*"],
+      "description": "Static land-cover covariates for optional enhancement."
+    },
+    {
+      "id": "soil_moisture",
+      "name": "Soil moisture",
+      "tier": 2,
+      "role": "optional_validation_or_enhancement",
+      "required": false,
+      "paths": ["data/soil_moisture/**/*", "data/soil-moisture/**/*"],
+      "description": "Antecedent wetness enhancement or validation source."
+    },
+    {
+      "id": "era5",
+      "name": "ERA5",
+      "tier": 2,
+      "role": "optional_validation_or_enhancement",
+      "required": false,
+      "paths": ["data/era5/**/*"],
+      "description": "Independent reanalysis validation or enhancement source."
+    }
+  ]
+}

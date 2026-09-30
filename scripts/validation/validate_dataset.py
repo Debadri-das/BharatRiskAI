@@ -8,9 +8,13 @@ from pathlib import Path
 
 import numpy as np
 
+from reports.unified_feature_schema import GRID_CONTRACT, source_contract
+from reports.source_manifest import manifest_summary
+from scripts.labels.contracts import LabelContractError, validate_ground_truth
+
 ROOT = Path(__file__).resolve().parents[2]
-EXPECTED_SHAPE = (114, 84)
-EXPECTED_GRID = {"crs": "EPSG:4326", "resolution_degrees": [0.05, 0.05], "shape": [114, 84]}
+EXPECTED_SHAPE = tuple(GRID_CONTRACT["shape"])
+EXPECTED_GRID = {key: GRID_CONTRACT[key] for key in ("crs", "resolution_degrees", "shape")}
 SATELLITE_CHANNELS = {"wv_radiance", "wv_change", "wv_rate", "wv_spatial_gradient", "tir1_bt_c", "tir2_bt_c", "ctt_change", "ctt_cooling_rate", "vis_radiance", "vis_albedo_percent"}
 QPE_CHANNELS = {"qpe_rate_mm_hr", "qpe_1h_mm", "qpe_3h_mm", "qpe_6h_mm"}
 # Physically plausible bounds (NaN = missing observation, allowed but counted).
@@ -71,14 +75,41 @@ def label_counts() -> dict[str, dict[str, int]]:
         if not line.strip():
             continue
         record = json.loads(line)
-        stats = counts.setdefault(record["hazard"], {"positive": 0, "negative": 0, "unknown": 0})
+        stats = counts.setdefault(record["hazard"], {"positive": 0, "negative": 0, "unknown": 0, "invalid": 0, "contract_invalid": 0, "confirmed": 0, "proxy": 0})
+        if record.get("label_type") == "confirmed":
+            try:
+                validate_ground_truth(record)
+                stats["confirmed"] += 1
+            except LabelContractError:
+                stats["contract_invalid"] += 1
+        elif record.get("label_type") == "proxy":
+            stats["proxy"] += 1
         if record.get("label") is None:
             stats["unknown"] += 1
         elif record["label"] in (1, 1.0, True):
             stats["positive"] += 1
-        else:
+        elif record["label"] in (0, 0.0, False):
             stats["negative"] += 1
+        else:
+            stats["invalid"] += 1
     return counts
+
+
+def source_readiness() -> dict[str, dict[str, object]]:
+    """Report missing upstream sources explicitly; never imply a fallback exists."""
+    contract = source_contract()
+    imdaa = ROOT / contract["IMDAA"]["path"]
+    labels = ROOT / contract["ground_truth"]["path"]
+    drainage_manifest = ROOT / contract["drainage"]["path"]
+    try:
+        drainage_available = drainage_manifest.exists() and json.loads(drainage_manifest.read_text(encoding="utf-8")).get("drainage", {}).get("status") == "available"
+    except (OSError, json.JSONDecodeError):
+        drainage_available = False
+    return {
+        "IMDAA": {"available": imdaa.exists() and (any(imdaa.rglob("*.nc")) or any(imdaa.rglob("*.nc4"))), "path": str(imdaa.relative_to(ROOT))},
+        "ground_truth": {"available": labels.exists(), "path": str(labels.relative_to(ROOT))},
+        "drainage": {"available": drainage_available, "path": str(drainage_manifest.relative_to(ROOT)), "note": "DEM-derived drainage is unavailable unless a hydrologically conditioned product is present."},
+    }
 
 
 def validate() -> dict:
@@ -118,6 +149,7 @@ def validate() -> dict:
 
     counts = label_counts()
     unknown_labels = sum(stats["unknown"] for stats in counts.values())
+    invalid_labels = sum(stats["invalid"] + stats.get("contract_invalid", 0) for stats in counts.values())
     positive_labels = sum(stats["positive"] for stats in counts.values())
     negative_labels = sum(stats["negative"] for stats in counts.values())
     label_imbalance = []
@@ -155,7 +187,11 @@ def validate() -> dict:
     else:
         grid_errors.append("grid_manifest.json missing; CRS/grid contract unverified")
 
-    checks_failed = any(item["errors"] for item in checks) or bool(grid_errors)
+    sources = source_readiness()
+    source_manifest = manifest_summary(ROOT)
+    missing_sources = [name for name, item in sources.items() if not item["available"]]
+    missing_sources.extend(source_manifest["missing_required"])
+    checks_failed = any(item["errors"] for item in checks) or bool(grid_errors) or invalid_labels > 0 or bool(missing_sources)
     report = {
         "status": "failed" if checks_failed or unknown_labels else "passed",
         "file_count": len(files),
@@ -165,12 +201,15 @@ def validate() -> dict:
         "corrupt_files": corrupt,
         "grid_checks": grid_errors,
         "unknown_label_records": unknown_labels,
+        "invalid_label_records": invalid_labels,
         "label_counts": counts,
         "label_imbalance": label_imbalance,
         "positive_label_records": positive_labels,
         "negative_label_records": negative_labels,
         "checks": checks,
-        "critical_missing": (["IMDAA", "CMV", "observed hazard ground truth"] if unknown_labels else []),
+        "source_readiness": sources,
+        "source_manifest": source_manifest,
+        "critical_missing": missing_sources + (["unknown/invalid hazard labels"] if unknown_labels or invalid_labels else []),
     }
     reports = ROOT / "reports"
     reports.mkdir(parents=True, exist_ok=True)

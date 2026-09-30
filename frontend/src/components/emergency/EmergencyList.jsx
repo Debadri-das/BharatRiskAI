@@ -12,19 +12,19 @@ export default function EmergencyList({ refreshKey = 0 }) {
   async function loadEmergencies() {
     setLoading(true);
     try {
-      setEmergencies(await getEmergencies());
+      const data = await getEmergencies();
+      setEmergencies(Array.isArray(data) ? data : []);
       setError(null);
-    } catch {
-      setError('Unable to load persisted SOS messages.');
+    } catch (loadError) {
+      console.error('SOS list request failed:', loadError);
+      setError(loadError.message || 'Unable to load persisted SOS messages.');
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    let active = true;
-    loadEmergencies().then(() => { if (!active) setError(null); });
-    return () => { active = false; };
+    loadEmergencies();
   }, [refreshKey]);
 
   return <section className="records-panel panel">

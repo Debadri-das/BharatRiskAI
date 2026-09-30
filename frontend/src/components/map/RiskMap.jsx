@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { MapContainer, TileLayer, Popup, CircleMarker, useMap } from "react-leaflet";
+import { MapContainer, TileLayer, Popup, CircleMarker, Rectangle, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 function colorForCategory(cat){
@@ -30,7 +30,27 @@ function MapViewport({ zones }) {
   return null;
 }
 
-export default function RiskMap({ zones, location, selectedZoneId, onZoneSelect }){
+function ProbabilityRaster({ layers }) {
+  const layer = layers?.find((item) => item?.type === 'raster' && item.values?.length);
+  if (!layer) return null;
+  const { west, south, east, north } = layer.bounds || {};
+  if (![west, south, east, north].every(Number.isFinite)) return null;
+  const rows = layer.values.length;
+  const cols = layer.values[0]?.length || 0;
+  if (!cols) return null;
+  return <>
+    {layer.values.flatMap((row, r) => row.map((value, c) => {
+      const southCell = south + ((north - south) * (rows - r - 1) / rows);
+      const northCell = south + ((north - south) * (rows - r) / rows);
+      const westCell = west + ((east - west) * c / cols);
+      const eastCell = west + ((east - west) * (c + 1) / cols);
+      return <Rectangle key={`${layer.id}-${r}-${c}`} bounds={[[southCell, westCell], [northCell, eastCell]]}
+        pathOptions={{ stroke: false, fillColor: '#be2630', fillOpacity: Math.max(0.05, Math.min(0.65, Number(value) || 0)) }} />;
+    }))}
+  </>;
+}
+
+export default function RiskMap({ zones, location, selectedZoneId, onZoneSelect, probabilityLayers }){
   const center = zones && zones.length ? [zones[0].latitude, zones[0].longitude] : [22.57,88.36];
   return (
     <MapContainer center={center} zoom={12} style={{ height: '100%', width: '100%' }} scrollWheelZoom>
@@ -40,6 +60,7 @@ export default function RiskMap({ zones, location, selectedZoneId, onZoneSelect 
         attribution="&copy; OpenStreetMap contributors"
         eventHandlers={{ tileerror: () => console.warn('Map tiles could not be loaded') }}
       />
+      <ProbabilityRaster layers={probabilityLayers} />
       {zones && zones.map(z => (
         <CircleMarker
           key={z.id}

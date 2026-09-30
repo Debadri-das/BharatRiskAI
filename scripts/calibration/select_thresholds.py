@@ -42,9 +42,11 @@ def main() -> None:
     selected: dict[str, dict[str, dict]] = {hazard: {} for hazard in HAZARDS}
     for horizon_index, horizon in enumerate(HORIZONS):
         for hazard_index, hazard in enumerate(HAZARDS):
-            mask = finite[:, horizon_index, hazard_index]
-            probs = probabilities[mask, horizon_index, hazard_index].ravel()
-            truth = targets[mask, horizon_index, hazard_index].ravel()
+            mask = finite[:, horizon_index, hazard_index] & np.isfinite(probabilities[:, horizon_index, hazard_index])
+            probs = probabilities[:, horizon_index, hazard_index][mask].ravel()
+            truth = targets[:, horizon_index, hazard_index][mask].ravel()
+            if not truth.size or not np.isin(truth, (0, 1)).all():
+                raise RuntimeError(f"Threshold selection blocked: no finite binary known labels for {hazard} {horizon}.")
             best_threshold, best_csi, best_metrics = None, -1.0, None
             for threshold in candidates:
                 metrics = scores(probs, truth, float(threshold))

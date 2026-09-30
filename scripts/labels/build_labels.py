@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
+from scripts.labels.contracts import load_filesystem_observations
 
 ROOT = Path(__file__).resolve().parents[2]
 HAZARDS = ("thunderstorm", "cloudburst", "flash_flood")
@@ -35,7 +36,7 @@ def parse_labels_config(path: Path) -> dict:
         value = value.strip().strip('"').strip("'")
         if value in ("null", ""):
             config[current][key] = None
-        elif value.replace(".", "", 1).isdigit():
+        elif value.lstrip("-").replace(".", "", 1).isdigit():
             config[current][key] = float(value) if "." in value else int(value)
         else:
             config[current][key] = value
@@ -54,6 +55,12 @@ def main() -> None:
     feature_dir = ROOT / "data" / "derived" / "satellite"
     grid_dir = ROOT / "data" / "datasets" / "labels" / "grids"
     records: list[dict] = []
+
+    # Authoritative observations are optional local inputs.  They are kept
+    # separate from predictor products and are accepted only by the contract
+    # adapter (QPE/IMERG can never enter here as confirmed truth).
+    observed, blocked_observations = load_filesystem_observations(ROOT / "data" / "ground_truth")
+    records.extend(observed)
 
     thunder_cfg = config.get("thunderstorm", {})
     ctt_max = thunder_cfg.get("ctt_proxy_max_c", -40)
@@ -104,15 +111,18 @@ def main() -> None:
     labels_path = output_dir / "labels.jsonl"
     labels_path.write_text("\n".join(json.dumps(record) for record in records) + ("\n" if records else ""), encoding="utf-8")
 
-    stats: dict = {"generated_at": datetime.now(timezone.utc).isoformat(), "timestamps": len({r["timestamp"] for r in records}), "hazards": {}, "event_count": 0, "confirmed_event_count": 0, "proxy_event_dates": {}, "thresholds_configured": {"thunderstorm": {"ctt_proxy_max_c": ctt_max, "ctt_cooling_min_c_per_hr": cooling_min, "source_file": "config/labels.yaml"}, "cloudburst": {"threshold_mm": qpe_threshold, "window_hours": qpe_window_h, "source_file": "config/labels.yaml"}, "flash_flood": {"threshold": None, "reason": "no configured threshold and no overlapping observations"}}, "provenance": "Proxy labels are deterministic rules on observed fields configured in config/labels.yaml; they are never confirmed observations and never model outputs. Unknown labels remain null."}
+    stats: dict = {"generated_at": datetime.now(timezone.utc).isoformat(), "timestamps": len({r["timestamp"] for r in records}), "hazards": {}, "event_count": 0, "confirmed_event_count": 0, "proxy_event_dates": {}, "blocked_observations": blocked_observations, "thresholds_configured": {"thunderstorm": {"ctt_proxy_max_c": ctt_max, "ctt_cooling_min_c_per_hr": cooling_min, "source_file": "config/labels.yaml"}, "cloudburst": {"threshold_mm": qpe_threshold, "window_hours": qpe_window_h, "source_file": "config/labels.yaml"}, "flash_flood": {"threshold": None, "reason": "no configured threshold and no overlapping observations"}}, "provenance": "Confirmed labels come only from validated independent observations under data/ground_truth. Proxy labels are deterministic rules on predictor products and are never confirmed observations or model outputs. Unknown labels remain null."}
     for hazard in HAZARDS:
         subset = [r for r in records if r["hazard"] == hazard]
-        proxy_pos = sum(1 for r in subset if r["label"] == 1)
-        proxy_neg = sum(1 for r in subset if r["label"] == 0)
+        proxy_pos = sum(1 for r in subset if r.get("label_type") == "proxy" and r["label"] == 1)
+        proxy_neg = sum(1 for r in subset if r.get("label_type") == "proxy" and r["label"] == 0)
         unknown = sum(1 for r in subset if r["label"] is None)
-        stats["hazards"][hazard] = {"confirmed_positive": 0, "confirmed_negative": 0, "proxy_positive": proxy_pos, "proxy_negative": proxy_neg, "unknown": unknown, "label_types": sorted({r["label_type"] for r in subset}), "spatial_grids": sum(1 for r in subset if r.get("label_grid_path"))}
-        stats["proxy_event_dates"][hazard] = sorted({r["timestamp"][:10] for r in subset if r["label"] == 1})
-    stats["event_count"] = len({r["timestamp"][:10] for r in records if r["label"] == 1})
+        confirmed_pos = sum(1 for r in subset if r.get("label_type") == "confirmed" and r.get("label") == 1)
+        confirmed_neg = sum(1 for r in subset if r.get("label_type") == "confirmed" and r.get("label") == 0)
+        stats["hazards"][hazard] = {"confirmed_positive": confirmed_pos, "confirmed_negative": confirmed_neg, "proxy_positive": proxy_pos, "proxy_negative": proxy_neg, "unknown": unknown, "label_types": sorted({r["label_type"] for r in subset}), "spatial_grids": sum(1 for r in subset if r.get("label_grid_path"))}
+        stats["proxy_event_dates"][hazard] = sorted({r["timestamp"][:10] for r in subset if r.get("label_type") == "proxy" and r["label"] == 1})
+    stats["event_count"] = len({r["timestamp"][:10] for r in records if r["label"] == 1 and r.get("label_type") == "confirmed"})
+    stats["confirmed_event_count"] = stats["event_count"]
     (ROOT / "reports").mkdir(parents=True, exist_ok=True)
     (ROOT / "reports" / "label_statistics.json").write_text(json.dumps(stats, indent=2), encoding="utf-8")
     print(json.dumps({"records": len(records), "hazards": stats["hazards"]}, indent=2))

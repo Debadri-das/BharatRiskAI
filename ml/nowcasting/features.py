@@ -36,17 +36,25 @@ RAW_FEATURES = [
 
 def extract_features(data: Dict[str, Any]) -> List[float]:
     """Extract standard feature vector from observation or scenario dict."""
+    # Scalar diagnostics (timeline/XAI) use the most recent grid cell only;
+    # model tensors are built separately and retain every pixel and timestep.
+    scalar_data = {}
+    for key, value in data.items():
+        if hasattr(value, "values"):
+            value = value.values
+        if np is not None and isinstance(value, np.ndarray) and value.ndim:
+            value = float(value.reshape(-1)[-1])
+        scalar_data[key] = value
+    data = scalar_data
     vector = [
         float(data.get("rainfall_15m_rate", data.get("rainfall_24h", 0) / 8.0)),
         float(data.get("rainfall_1h_accum", data.get("rainfall_24h", 0) / 4.0)),
         float(data.get("rainfall_3h_accum", data.get("rainfall_24h", 0) / 2.0)),
         float(data.get("radar_reflectivity_dbz", min(65.0, max(10.0, float(data.get("rainfall_24h", 10)) * 0.25 + 15.0)))),
         # Updated to use unified feature schema
-        float(data.get("cape", 1200.0)),
+        float(data.get("cape", data.get("cape_j_kg", 1200.0))),
         float(data.get("lifted_index", -2.5)),
-        float(data.get("cape", 1200.0)),
 
-        float(data.get("lifted_index", -2.5)),
         float(data.get("dew_point_spread", 1.8)),
         float(data.get("wind_speed_kmh", 25.0)),
         float(data.get("wind_gust_kmh", 42.0)),
@@ -69,8 +77,7 @@ def extract_features(data: Dict[str, Any]) -> List[float]:
         float(data.get("elevation_m", data.get("elevation", 6.0))),
         float(data.get("drainage_score", 45.0)),
         
-        float(data.get("cape", 1200.0)),
-        float(data.get("cape", 1200.0)),
+        float(data.get("cape", data.get("cape_j_kg", 1200.0))),
         float(data.get("lifted_index", -2.5)),
         float(data.get("dew_point_spread", 1.8)),
         float(data.get("wind_speed_kmh", 25.0)),
@@ -93,39 +100,63 @@ def build_spatiotemporal_features(
     if time_steps != 7:
         raise ValueError(f"Expected sequence length 7, got {time_steps}. Training and inference must use the same sequence length.")
     
-    scalar = extract_features(observation)
-    y, x = np.mgrid[0:grid_size, 0:grid_size]
-    spatial = 1.0 + 0.12 * np.sin(x / max(grid_size, 1) * np.pi) * np.cos(y / max(grid_size, 1) * np.pi)
-    values = np.array([
-        float(observation.get("iwv", 45.0)), float(observation.get("ctt", -45.0)), scalar[0],
-        scalar[3], scalar[4], scalar[11],
-    ], dtype=np.float32)
-    derived = [
-        float(observation.get("iwv_change", observation.get("iwv_delta", 4.0))),
-        float(observation.get("ctt_drop_rate", 2.5)),
-        float(observation.get("qpe_mm_hr", scalar[0])),
-        float(observation.get("cin_j_kg", -80.0)),
-        float(observation.get("low_level_convergence", 0.12)),
-        float(observation.get("wind_shear_ms", 12.0)),
-        float(observation.get("elevation_m", scalar[10])),
-        float(observation.get("slope_degrees", 3.0)),
-        float(observation.get("drainage_score", scalar[11])),
-    ]
-    values = np.array([values[0], derived[0], values[1], derived[1], derived[2], scalar[0],
-                       values[2], derived[3], derived[4], derived[5], derived[6], derived[7], derived[8]], dtype=np.float32)
-    sequence = np.stack([
-        np.full((grid_size, grid_size), value, dtype=np.float32) * spatial
-        for _ in range(time_steps) for value in values
-    ]).reshape(time_steps, len(GRID_CHANNELS), grid_size, grid_size)
-    sequence *= np.linspace(0.96, 1.04, time_steps, dtype=np.float32)[:, None, None, None]
-    baseline_values = [scalar[4], derived[3], scalar[5], derived[4], derived[5], derived[6]]
-    baseline = np.stack([np.full((grid_size, grid_size), value, dtype=np.float32) * spatial for value in baseline_values])
+    # Production callers pass arrays from the unified ingestion dataset.  Do
+    # not collapse those arrays to means (or manufacture a spatial gradient).
+    # A scalar mapping remains supported for small callers/tests, but is
+    # explicitly broadcast and never used by the backend ingestion path.
+    def as_grid(value: Any, name: str, temporal: bool) -> np.ndarray:
+        if hasattr(value, "values"):
+            value = value.values
+        array = np.asarray(value, dtype=np.float32)
+        if temporal:
+            if array.ndim == 0:
+                array = np.full((time_steps, grid_size, grid_size), array, dtype=np.float32)
+            if array.ndim == 2:
+                array = np.broadcast_to(array, (time_steps, *array.shape))
+            if array.ndim != 3 or array.shape[0] != time_steps:
+                raise ValueError(f"{name} must have shape [{time_steps}, height, width], got {array.shape}")
+        else:
+            if array.ndim == 3:
+                if array.shape[0] != time_steps:
+                    raise ValueError(f"{name} has invalid time dimension: {array.shape}")
+                array = array[-1]
+            if array.ndim == 0:
+                array = np.full((grid_size, grid_size), array, dtype=np.float32)
+            if array.ndim != 2:
+                raise ValueError(f"{name} must be a 2-D grid, got {array.shape}")
+        return array
+
+    def channel(name: str, *aliases: str) -> np.ndarray:
+        for key in (name, *aliases):
+            if key in observation:
+                return as_grid(observation[key], key, temporal=True)
+        # Legacy scalar observations are retained for non-production utility
+        # callers; real ingestion must provide every canonical channel.
+        return as_grid(0.0, name, temporal=True)
+
+    sequence = np.stack([channel(name) for name in GRID_CHANNELS], axis=1)
+    height, width = sequence.shape[-2:]
+    if (height, width) != (grid_size, grid_size):
+        raise ValueError(f"Expected feature grid {grid_size}x{grid_size}, got {height}x{width}")
+    baseline = np.stack([
+        as_grid(observation.get("qpe", observation.get("qpe_mm_hr", 0.0)), "qpe", False),
+        as_grid(observation.get("cin", observation.get("cin_j_kg", 0.0)), "cin", False),
+        as_grid(observation.get("rainfall", 0.0), "rainfall", False),
+        as_grid(observation.get("convergence", observation.get("low_level_convergence", 0.0)), "convergence", False),
+        as_grid(observation.get("wind_shear", observation.get("wind_shear_ms", 0.0)), "wind_shear", False),
+        as_grid(observation.get("elevation", observation.get("elevation_m", 0.0)), "elevation", False),
+    ])
     return sequence.astype(np.float32), baseline.astype(np.float32)
 
 
 def compute_convective_severity(features: Dict[str, float]) -> Dict[str, Any]:
     """Compute physical instability and severe weather probability indicators."""
-    cape = float(features.get("cape", 1200.0))
+    features = {
+        key: (float(value.values.reshape(-1)[-1]) if hasattr(value, "values") else
+              float(value.reshape(-1)[-1]) if np is not None and isinstance(value, np.ndarray) and value.ndim else value)
+        for key, value in features.items()
+    }
+    cape = float(features.get("cape", features.get("cape_j_kg", 1200.0)))
     li = float(features.get("lifted_index", -2.0))
     dbz = float(features.get("radar_reflectivity_dbz", 35.0))
     rain_rate = float(features.get("rainfall_15m_rate", 20.0))

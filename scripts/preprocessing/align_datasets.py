@@ -13,10 +13,15 @@ GRID = {"crs": "EPSG:4326", "resolution_degrees": [0.05, 0.05], "extent": {"west
 
 def jitter_and_gaps(timestamps: list[str]) -> tuple[list[dict], list[dict]]:
     """Separate provider clock jitter (seconds from the nominal 30-min slot) from real temporal gaps (missing observations)."""
-    parsed = [datetime.fromisoformat(value) for value in timestamps]
+    parsed = sorted(datetime.fromisoformat(value.replace("Z", "+00:00")) for value in timestamps)
+    if not parsed:
+        return [], []
+    if any((stamp.tzinfo is None) != (parsed[0].tzinfo is None) for stamp in parsed):
+        raise ValueError("timestamps must consistently include or omit timezone information")
     jitter: list[dict] = []
     for stamp in parsed:
-        # Nominal INSAT slots are :15 and :45 past the hour.
+        # Nominal INSAT slots are :15 and :45 past the hour.  This function
+        # records jitter; it does not silently snap observations.
         nominal = stamp.replace(minute=(15 if stamp.minute < 30 else 45), second=0, microsecond=0)
         offset = (stamp - nominal).total_seconds()
         if abs(offset) > 0:

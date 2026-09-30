@@ -11,7 +11,7 @@ from backend.schemas.nowcast import (
 )
 
 
-router = APIRouter(prefix="/api")
+router = APIRouter()
 
 
 @router.get("/nowcast/city", response_model=CityNowcastOut)
@@ -30,14 +30,17 @@ def zone_nowcast(zone_id: int, live: bool = Query(True), db: Client = Depends(ge
 
 
 @router.get("/nowcast/zone/{zone_id}/xai", response_model=NowcastPredictionOut)
-def zone_nowcast_xai(zone_id: int, live: bool = Query(True)):
+def zone_nowcast_xai(zone_id: int, live: bool = Query(True), db: Client = Depends(get_db)):
     """Retrieve detailed XAI triggers for a specific zone's nowcast."""
     try:
-        # Fetch data from the database
-        zn = get_zone_nowcast(zone_id=zone_id, live=live)
+        zn = get_zone_nowcast(db, zone_id=zone_id, live=live)
         if not zn:
             raise HTTPException(status_code=404, detail="Zone not found")
+        if zn.get("nowcast") is None:
+            raise HTTPException(status_code=400, detail=zn.get("blocked_reason", "Nowcast unavailable"))
         return zn["nowcast"]
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 @router.get("/nowcast/alerts")

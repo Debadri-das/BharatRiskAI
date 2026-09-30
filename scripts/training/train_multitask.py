@@ -135,7 +135,9 @@ def main() -> None:
         if validation_loss < best_loss:
             best_loss = validation_loss
             epochs_without_improvement = 0
-            torch.save({"model": model.state_dict(), "input_channels": channels, "sequence_length": 7, "baseline_channels": 6, "hidden_channels": 32, "num_heads": 4, "num_layers": 2, "horizons": 5, "validation_loss": best_loss, "epoch": epoch, "seed": args.seed, "model_class": "HistoricalMultiTaskNet", "normalization": {"method": "training-only per-channel standardization", "channels": [{"mean": float(values[index].mean()), "std": float(max(values[index].std(), 1e-8))} for index in range(values.shape[0])]}}, checkpoint_dir / "best.pt")
+            scaler_path = ROOT / "models" / "preprocessing" / "scaler.json"
+            norm_info = json.loads(scaler_path.read_text(encoding="utf-8")) if scaler_path.exists() else {"method": "training-only per-channel standardization", "channels": []}
+            torch.save({"model": model.state_dict(), "input_channels": channels, "sequence_length": 7, "baseline_channels": 6, "hidden_channels": 32, "num_heads": 4, "num_layers": 2, "horizons": 5, "validation_loss": best_loss, "epoch": epoch, "seed": args.seed, "model_class": "HistoricalMultiTaskNet", "normalization": norm_info}, checkpoint_dir / "best.pt")
         else:
             epochs_without_improvement += 1
             if epochs_without_improvement >= args.patience:
