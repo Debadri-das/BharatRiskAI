@@ -16,10 +16,22 @@ from ml.nowcasting.model import WeatherNowcastModel
 _nowcast_engine = WeatherNowcastModel()
 _checkpoint = os.getenv("NOWCAST_CHECKPOINT")
 _normalization = os.getenv("NOWCAST_NORMALIZATION")
-if _checkpoint:
+if _checkpoint and os.path.exists(_checkpoint):
     _nowcast_engine.load_artifact(_checkpoint)
-if _normalization:
+if _normalization and os.path.exists(_normalization):
     _nowcast_engine.load_normalization(_normalization)
+
+
+def reload_nowcast_engine(checkpoint_path: Optional[str] = None, normalization_path: Optional[str] = None) -> WeatherNowcastModel:
+    """Reload the nowcasting engine weights and normalization statistics."""
+    global _nowcast_engine
+    ckpt = checkpoint_path or os.getenv("NOWCAST_CHECKPOINT")
+    norm = normalization_path or os.getenv("NOWCAST_NORMALIZATION")
+    if ckpt and os.path.exists(ckpt):
+        _nowcast_engine.load_artifact(ckpt)
+    if norm and os.path.exists(norm):
+        _nowcast_engine.load_normalization(norm)
+    return _nowcast_engine
 
 
 def get_zone_nowcast(db: Client, zone_id: int, live: bool = True) -> Optional[Dict[str, Any]]:

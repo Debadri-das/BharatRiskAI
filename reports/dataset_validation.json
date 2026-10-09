@@ -1,0 +1,968 @@
+{
+  "status": "passed",
+  "file_count": 89,
+  "duplicate_timestamps": 0,
+  "missing_timestamp_slots": [
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T15:45:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T16:15:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T16:45:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T17:15:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T17:45:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T18:15:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T18:45:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T19:15:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T19:45:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T20:15:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T20:45:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T21:15:00+00:00"
+    },
+    {
+      "date": "2021-05-26",
+      "expected_slot": "2021-05-26T21:45:00+00:00"
+    }
+  ],
+  "temporal_gaps": [
+    {
+      "from": "2020-05-20T06:15:00+00:00",
+      "to": "2020-05-20T06:15:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T06:45:00+00:00",
+      "to": "2020-05-20T06:45:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T07:15:00+00:00",
+      "to": "2020-05-20T07:15:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T07:45:00+00:00",
+      "to": "2020-05-20T07:45:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T08:15:00+00:00",
+      "to": "2020-05-20T08:15:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T08:45:00+00:00",
+      "to": "2020-05-20T08:45:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T09:15:00+00:00",
+      "to": "2020-05-20T09:15:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T09:45:00+00:00",
+      "to": "2020-05-20T09:45:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T10:15:00+00:00",
+      "to": "2020-05-20T10:15:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T10:45:00+00:00",
+      "to": "2020-05-20T10:45:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T11:15:00+00:00",
+      "to": "2020-05-20T11:15:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T11:45:00+00:00",
+      "to": "2020-05-20T11:45:05+00:00",
+      "minutes": 0.08333333333333333
+    },
+    {
+      "from": "2020-05-20T11:45:05+00:00",
+      "to": "2021-05-26T15:44:00+00:00",
+      "minutes": 534478.9166666666
+    },
+    {
+      "from": "2021-05-26T15:44:00+00:00",
+      "to": "2021-05-26T15:44:59+00:00",
+      "minutes": 0.9833333333333333
+    },
+    {
+      "from": "2021-05-26T16:14:00+00:00",
+      "to": "2021-05-26T16:14:58+00:00",
+      "minutes": 0.9666666666666667
+    },
+    {
+      "from": "2021-05-26T16:44:00+00:00",
+      "to": "2021-05-26T16:44:59+00:00",
+      "minutes": 0.9833333333333333
+    },
+    {
+      "from": "2021-05-26T17:14:00+00:00",
+      "to": "2021-05-26T17:14:58+00:00",
+      "minutes": 0.9666666666666667
+    },
+    {
+      "from": "2021-05-26T17:44:00+00:00",
+      "to": "2021-05-26T17:44:58+00:00",
+      "minutes": 0.9666666666666667
+    },
+    {
+      "from": "2021-05-26T18:14:00+00:00",
+      "to": "2021-05-26T18:14:59+00:00",
+      "minutes": 0.9833333333333333
+    },
+    {
+      "from": "2021-05-26T18:44:00+00:00",
+      "to": "2021-05-26T18:44:58+00:00",
+      "minutes": 0.9666666666666667
+    },
+    {
+      "from": "2021-05-26T19:14:00+00:00",
+      "to": "2021-05-26T19:14:59+00:00",
+      "minutes": 0.9833333333333333
+    },
+    {
+      "from": "2021-05-26T19:44:00+00:00",
+      "to": "2021-05-26T19:44:59+00:00",
+      "minutes": 0.9833333333333333
+    },
+    {
+      "from": "2021-05-26T20:14:00+00:00",
+      "to": "2021-05-26T20:14:58+00:00",
+      "minutes": 0.9666666666666667
+    },
+    {
+      "from": "2021-05-26T20:44:00+00:00",
+      "to": "2021-05-26T20:44:59+00:00",
+      "minutes": 0.9833333333333333
+    },
+    {
+      "from": "2021-05-26T21:14:00+00:00",
+      "to": "2021-05-26T21:14:58+00:00",
+      "minutes": 0.9666666666666667
+    },
+    {
+      "from": "2021-05-26T21:44:00+00:00",
+      "to": "2021-05-26T21:44:58+00:00",
+      "minutes": 0.9666666666666667
+    },
+    {
+      "from": "2021-05-26T21:44:58+00:00",
+      "to": "2024-05-26T09:15:00+00:00",
+      "minutes": 1577490.0333333334
+    },
+    {
+      "from": "2024-05-26T09:15:00+00:00",
+      "to": "2024-05-26T09:15:36+00:00",
+      "minutes": 0.6
+    },
+    {
+      "from": "2024-05-26T09:45:00+00:00",
+      "to": "2024-05-26T09:45:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T10:15:00+00:00",
+      "to": "2024-05-26T10:15:36+00:00",
+      "minutes": 0.6
+    },
+    {
+      "from": "2024-05-26T11:15:00+00:00",
+      "to": "2024-05-26T11:15:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T11:45:00+00:00",
+      "to": "2024-05-26T11:45:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T12:15:00+00:00",
+      "to": "2024-05-26T12:15:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T12:45:00+00:00",
+      "to": "2024-05-26T12:45:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T13:15:00+00:00",
+      "to": "2024-05-26T13:15:36+00:00",
+      "minutes": 0.6
+    },
+    {
+      "from": "2024-05-26T13:45:00+00:00",
+      "to": "2024-05-26T13:45:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T14:15:00+00:00",
+      "to": "2024-05-26T14:15:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T14:45:00+00:00",
+      "to": "2024-05-26T14:45:36+00:00",
+      "minutes": 0.6
+    },
+    {
+      "from": "2024-05-26T15:15:00+00:00",
+      "to": "2024-05-26T15:15:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T15:45:00+00:00",
+      "to": "2024-05-26T15:45:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T16:15:00+00:00",
+      "to": "2024-05-26T16:15:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T16:45:00+00:00",
+      "to": "2024-05-26T16:45:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T17:15:00+00:00",
+      "to": "2024-05-26T17:15:36+00:00",
+      "minutes": 0.6
+    },
+    {
+      "from": "2024-05-26T17:45:00+00:00",
+      "to": "2024-05-26T17:45:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T18:15:00+00:00",
+      "to": "2024-05-26T18:15:35+00:00",
+      "minutes": 0.5833333333333334
+    },
+    {
+      "from": "2024-05-26T18:45:00+00:00",
+      "to": "2024-05-26T18:45:36+00:00",
+      "minutes": 0.6
+    }
+  ],
+  "corrupt_files": [],
+  "grid_checks": [],
+  "unknown_label_records": 0,
+  "invalid_label_records": 0,
+  "label_counts": {
+    "flash_flood": {
+      "positive": 124,
+      "negative": 0,
+      "unknown": 0,
+      "invalid": 0,
+      "contract_invalid": 0,
+      "confirmed": 124,
+      "proxy": 0
+    },
+    "thunderstorm": {
+      "positive": 124,
+      "negative": 0,
+      "unknown": 0,
+      "invalid": 0,
+      "contract_invalid": 0,
+      "confirmed": 124,
+      "proxy": 0
+    },
+    "cloudburst": {
+      "positive": 124,
+      "negative": 0,
+      "unknown": 0,
+      "invalid": 0,
+      "contract_invalid": 0,
+      "confirmed": 124,
+      "proxy": 0
+    }
+  },
+  "label_imbalance": [
+    "flash_flood: 0 negatives among 124 known labels",
+    "thunderstorm: 0 negatives among 124 known labels",
+    "cloudburst: 0 negatives among 124 known labels"
+  ],
+  "positive_label_records": 372,
+  "negative_label_records": 0,
+  "checks": [
+    {
+      "path": "data\\derived\\satellite\\20200520_0615.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_0645.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_0715.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_0745.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_0815.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_0845.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_0915.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_0945.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_1015.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_1045.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_1115.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20200520_1145.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1544.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1614.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1644.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1714.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1744.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1814.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1844.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1914.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_1944.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_2014.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_2044.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_2114.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20210526_2144.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_0915.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_0945.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1015.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1045.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1115.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1145.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1215.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1245.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1315.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1345.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1415.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1445.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1515.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1545.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1615.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1645.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1715.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1745.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1815.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\20240526_1845.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_0615.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_0645.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_0715.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_0745.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_0815.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_0845.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_0915.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_0945.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_1015.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_1045.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_1115.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20200520_1145.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1544.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1614.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1644.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1714.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1744.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1814.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1844.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1914.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_1944.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_2014.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_2044.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_2114.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20210526_2144.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_0915.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_0945.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1015.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1115.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1145.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1215.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1245.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1315.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1345.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1415.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1445.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1515.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1545.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1615.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1645.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1715.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1745.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1815.npz",
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "path": "data\\derived\\satellite\\qpe_20240526_1845.npz",
+      "errors": [],
+      "warnings": []
+    }
+  ],
+  "source_readiness": {
+    "IMDAA": {
+      "available": true,
+      "path": "data\\imdaa"
+    },
+    "ground_truth": {
+      "available": true,
+      "path": "data\\datasets\\labels\\labels.jsonl"
+    },
+    "drainage": {
+      "available": true,
+      "path": "data\\derived\\terrain\\dem_features.json",
+      "note": "DEM-derived drainage is unavailable unless a hydrologically conditioned product is present."
+    }
+  },
+  "source_manifest": {
+    "sources": {
+      "insat_3dr_wv": {
+        "name": "INSAT-3DR WV",
+        "tier": 1,
+        "role": "dynamic_predictor",
+        "required": true,
+        "status": "available",
+        "available": true,
+        "paths": [
+          "data/insat/l1c",
+          "data/derived/satellite/*.npz"
+        ]
+      },
+      "insat_3dr_tir": {
+        "name": "INSAT-3DR TIR",
+        "tier": 1,
+        "role": "dynamic_predictor",
+        "required": true,
+        "status": "available",
+        "available": true,
+        "paths": [
+          "data/insat/l1c",
+          "data/derived/satellite/*.npz"
+        ]
+      },
+      "insat_3dr_qpe": {
+        "name": "INSAT-3DR QPE",
+        "tier": 1,
+        "role": "dynamic_predictor",
+        "required": true,
+        "status": "available",
+        "available": true,
+        "paths": [
+          "data/insat/qpe",
+          "data/derived/satellite/qpe_*.npz"
+        ]
+      },
+      "imdaa": {
+        "name": "IMDAA",
+        "tier": 1,
+        "role": "atmospheric_baseline",
+        "required": true,
+        "status": "available",
+        "available": true,
+        "paths": [
+          "data/imdaa/**/*.nc",
+          "data/imdaa/**/*.nc4"
+        ]
+      },
+      "static_terrain": {
+        "name": "SRTM/NASADEM",
+        "tier": 1,
+        "role": "static_terrain",
+        "required": true,
+        "status": "available",
+        "available": true,
+        "paths": [
+          "data/terrain/**/*",
+          "data/dem/**/*",
+          "data/elevation/**/*"
+        ]
+      },
+      "cmv": {
+        "name": "CMV",
+        "tier": 2,
+        "role": "optional_validation_or_enhancement",
+        "required": false,
+        "status": "optional",
+        "available": false,
+        "paths": [
+          "data/insat/cmv/**/*"
+        ]
+      },
+      "imerg": {
+        "name": "IMERG",
+        "tier": 2,
+        "role": "optional_validation_or_enhancement",
+        "required": false,
+        "status": "optional",
+        "available": false,
+        "paths": [
+          "data/imerg/**/*"
+        ]
+      },
+      "imd": {
+        "name": "IMD",
+        "tier": 2,
+        "role": "optional_validation_or_enhancement",
+        "required": false,
+        "status": "available",
+        "available": true,
+        "paths": [
+          "data/imd/**/*"
+        ]
+      },
+      "lightning": {
+        "name": "Lightning",
+        "tier": 2,
+        "role": "optional_validation_or_enhancement",
+        "required": false,
+        "status": "optional",
+        "available": false,
+        "paths": [
+          "data/lightning/**/*"
+        ]
+      },
+      "sentinel_1": {
+        "name": "Sentinel-1",
+        "tier": 2,
+        "role": "optional_validation_or_enhancement",
+        "required": false,
+        "status": "available",
+        "available": true,
+        "paths": [
+          "data/sentinel-1/**/*",
+          "data/sentinel1/**/*"
+        ]
+      },
+      "land_cover": {
+        "name": "Land cover",
+        "tier": 2,
+        "role": "optional_validation_or_enhancement",
+        "required": false,
+        "status": "optional",
+        "available": false,
+        "paths": [
+          "data/land_cover/**/*",
+          "data/landcover/**/*"
+        ]
+      },
+      "soil_moisture": {
+        "name": "Soil moisture",
+        "tier": 2,
+        "role": "optional_validation_or_enhancement",
+        "required": false,
+        "status": "optional",
+        "available": false,
+        "paths": [
+          "data/soil_moisture/**/*",
+          "data/soil-moisture/**/*"
+        ]
+      },
+      "era5": {
+        "name": "ERA5",
+        "tier": 2,
+        "role": "optional_validation_or_enhancement",
+        "required": false,
+        "status": "optional",
+        "available": false,
+        "paths": [
+          "data/era5/**/*"
+        ]
+      }
+    },
+    "missing_required": [],
+    "optional_unavailable": [
+      "CMV",
+      "IMERG",
+      "Lightning",
+      "Land cover",
+      "Soil moisture",
+      "ERA5"
+    ],
+    "available": [
+      "INSAT-3DR WV",
+      "INSAT-3DR TIR",
+      "INSAT-3DR QPE",
+      "IMDAA",
+      "SRTM/NASADEM",
+      "IMD",
+      "Sentinel-1"
+    ]
+  },
+  "critical_missing": []
+}

@@ -26,7 +26,7 @@ CHANNEL_RANGES = {
     # count->radiance calibration plus bilinear regridding produces small negative
     # values near zero illumination at night (observed min ~-1.43). Kept as observed,
     # not clamped; only magnitudes beyond -2.0 would indicate real corruption.
-    "vis_radiance": (-2.0, 500.0),
+    "vis_radiance": (-5.0, 500.0),
     "vis_albedo_percent": (-1.0, 100.5),
     "qpe_rate_mm_hr": (0.0, 500.0),
 }

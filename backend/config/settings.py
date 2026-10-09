@@ -39,10 +39,26 @@ try:
         alert_webhook_url: str = ""
         alert_webhook_token: str = ""
         alert_sms_webhook_url: str = ""
+        nowcast_checkpoint: str = "models/checkpoints/best.pt"
+        nowcast_normalization: str = "models/preprocessing/scaler.json"
 
         @property
         def cors_list(self) -> list[str]:
             return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+        @property
+        def resolved_checkpoint(self) -> str:
+            from pathlib import Path
+            root = Path(__file__).resolve().parents[2]
+            p = Path(self.nowcast_checkpoint)
+            return str(p if p.is_absolute() else root / p)
+
+        @property
+        def resolved_normalization(self) -> str:
+            from pathlib import Path
+            root = Path(__file__).resolve().parents[2]
+            p = Path(self.nowcast_normalization)
+            return str(p if p.is_absolute() else root / p)
 except ImportError:
     class Settings:
         def __init__(self):
@@ -79,10 +95,26 @@ except ImportError:
             self.alert_webhook_url = os.getenv("ALERT_WEBHOOK_URL", "")
             self.alert_webhook_token = os.getenv("ALERT_WEBHOOK_TOKEN", "")
             self.alert_sms_webhook_url = os.getenv("ALERT_SMS_WEBHOOK_URL", "")
+            self.nowcast_checkpoint = os.getenv("NOWCAST_CHECKPOINT", "models/checkpoints/best.pt")
+            self.nowcast_normalization = os.getenv("NOWCAST_NORMALIZATION", "models/preprocessing/scaler.json")
 
         @property
         def cors_list(self) -> list[str]:
             return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+
+        @property
+        def resolved_checkpoint(self) -> str:
+            from pathlib import Path
+            root = Path(__file__).resolve().parents[2]
+            p = Path(self.nowcast_checkpoint)
+            return str(p if p.is_absolute() else root / p)
+
+        @property
+        def resolved_normalization(self) -> str:
+            from pathlib import Path
+            root = Path(__file__).resolve().parents[2]
+            p = Path(self.nowcast_normalization)
+            return str(p if p.is_absolute() else root / p)
 
 
 @lru_cache

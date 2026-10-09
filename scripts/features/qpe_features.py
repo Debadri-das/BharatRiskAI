@@ -27,6 +27,7 @@ def main() -> None:
         source_transform = from_bounds(float(np.nanmin(product["longitude"][valid])), float(np.nanmin(product["latitude"][valid])), float(np.nanmax(product["longitude"][valid])), float(np.nanmax(product["latitude"][valid])), values.shape[1], values.shape[0])
         aligned = np.full((114, 84), np.nan, dtype=np.float32)
         reproject(values, aligned, src_transform=source_transform, src_crs="EPSG:4326", dst_transform=from_bounds(85.7, 21.5, 89.9, 27.2, 84, 114), dst_crs="EPSG:4326", src_nodata=-999.0, dst_nodata=np.nan, resampling=Resampling.nearest)
+        aligned[aligned < 0] = np.nan
         target = output_dir / f"qpe_{product['observed_at'][:16].replace(':', '').replace('-', '').replace('T', '_')}.npz"
         np.savez_compressed(target, timestamp=product["observed_at"], qpe_rate_mm_hr=aligned, qpe_1h_mm=np.full_like(aligned, np.nan), qpe_3h_mm=np.full_like(aligned, np.nan), qpe_6h_mm=np.full_like(aligned, np.nan))
         target.with_suffix(".json").write_text(json.dumps({"source": str(path.relative_to(ROOT)), "units": "mm/hr", "aggregation": "1h/3h/6h unavailable because only one QPE timestamp is present; no temporal accumulation fabricated."}, indent=2), encoding="utf-8")

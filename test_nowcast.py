@@ -1,16 +1,25 @@
+"""Optional manual smoke test for a running local backend.
+
+This file is named like a pytest module, so importing it during test
+collection must not make a network request. Run it directly when the backend
+is already running on localhost:8000.
+"""
+
 import json
-import requests
 
-# Test the API endpoint directly
-response = requests.get('http://localhost:8000/api/nowcast/zone/1/xai')
 
-print(f"Status Code: {response.status_code}")
-print(f"Response: {response.text}")
+def main() -> None:
+    import requests
 
-# Parse the response to validate structure
-try:
-    response_data = response.json()
-    print("\nResponse Data Structure:")
-    print(json.dumps(response_data, indent=2))
-except json.JSONDecodeError as e:
-    print(f"Error parsing JSON: {e}")
+    response = requests.get("http://localhost:8000/api/nowcast/zone/1/xai", timeout=10)
+    print(f"Status Code: {response.status_code}")
+    print(f"Response: {response.text}")
+    try:
+        print("\nResponse Data Structure:")
+        print(json.dumps(response.json(), indent=2))
+    except json.JSONDecodeError:
+        print("Error parsing JSON response")
+
+
+if __name__ == "__main__":
+    main()

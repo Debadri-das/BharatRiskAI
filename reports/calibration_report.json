@@ -1,0 +1,124 @@
+{
+  "status": "completed",
+  "generated_at": "2026-10-08T15:36:21.767950+00:00",
+  "method": "platt_scaling",
+  "fit_split": "validation",
+  "test_split_used": false,
+  "samples": 1005480,
+  "hazard_reports": {
+    "thunderstorm": {
+      "raw_brier_score": 0.4135218999880654,
+      "calibrated_brier_score": 4.372637441690969e-09,
+      "raw_ece": 0.4135218999880653,
+      "calibrated_ece": 5.460845126625813e-05,
+      "brier_improvement_percent": 99.99999894258626,
+      "reliability_bins_raw": [
+        {
+          "bin": [
+            0.0,
+            0.1
+          ],
+          "count": 138596,
+          "mean_predicted": 6.261208249641643e-17,
+          "observed_fraction": 1.0
+        },
+        {
+          "bin": [
+            0.9,
+            1.0
+          ],
+          "count": 196564,
+          "mean_predicted": 1.0,
+          "observed_fraction": 1.0
+        }
+      ],
+      "reliability_bins_calibrated": [
+        {
+          "bin": [
+            0.9,
+            1.0
+          ],
+          "count": 335160,
+          "mean_predicted": 0.9999453915487337,
+          "observed_fraction": 1.0
+        }
+      ]
+    },
+    "cloudburst": {
+      "raw_brier_score": 0.4099594223654374,
+      "calibrated_brier_score": 4.4022855504911454e-09,
+      "raw_ece": 0.4099594223654374,
+      "calibrated_ece": 5.464408500155393e-05,
+      "brier_improvement_percent": 99.99999892616555,
+      "reliability_bins_raw": [
+        {
+          "bin": [
+            0.0,
+            0.1
+          ],
+          "count": 137402,
+          "mean_predicted": 0.0,
+          "observed_fraction": 1.0
+        },
+        {
+          "bin": [
+            0.9,
+            1.0
+          ],
+          "count": 197758,
+          "mean_predicted": 1.0,
+          "observed_fraction": 1.0
+        }
+      ],
+      "reliability_bins_calibrated": [
+        {
+          "bin": [
+            0.9,
+            1.0
+          ],
+          "count": 335160,
+          "mean_predicted": 0.9999453559149984,
+          "observed_fraction": 1.0
+        }
+      ]
+    },
+    "flash_flood": {
+      "raw_brier_score": 0.46292218641842703,
+      "calibrated_brier_score": 0.2147405959877234,
+      "raw_ece": 0.4629221864184271,
+      "calibrated_ece": 3.3042637315183754e-06,
+      "brier_improvement_percent": 53.61194553038266,
+      "reliability_bins_raw": [
+        {
+          "bin": [
+            0.0,
+            0.1
+          ],
+          "count": 192633,
+          "mean_predicted": 4.715894004610984e-26,
+          "observed_fraction": 0.3045843650880171
+        },
+        {
+          "bin": [
+            0.9,
+            1.0
+          ],
+          "count": 142527,
+          "mean_predicted": 1.0,
+          "observed_fraction": 0.32307562777578985
+        }
+      ],
+      "reliability_bins_calibrated": [
+        {
+          "bin": [
+            0.30000000000000004,
+            0.4
+          ],
+          "count": 335160,
+          "mean_predicted": 0.31245109039572816,
+          "observed_fraction": 0.31244778613199664
+        }
+      ]
+    }
+  }
+}

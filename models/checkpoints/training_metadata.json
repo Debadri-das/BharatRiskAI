@@ -1,0 +1,408 @@
+{
+  "status": "completed",
+  "epochs_completed": 22,
+  "best_epoch": 7,
+  "final_train_loss": 0.22580867012341818,
+  "final_val_loss": 0.5201577097177505,
+  "best_validation_loss": 0.4287463650107384,
+  "time_elapsed_seconds": 745.14,
+  "early_stopped": true,
+  "device": "cpu",
+  "amp_enabled": false,
+  "hyperparameters": {
+    "epochs": 100,
+    "patience": 15,
+    "seed": 20260922,
+    "learning_rate": 0.0001,
+    "weight_decay": 1e-05,
+    "amp": true,
+    "batch_size": 2,
+    "loss_weights": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "input_channels": 13,
+    "baseline_channels": 6,
+    "hidden_channels": 32,
+    "num_heads": 4,
+    "num_layers": 2,
+    "horizons": 5
+  },
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.2584443887074788,
+      "val_loss": 0.4997811019420624,
+      "validation_loss": 0.4997811019420624,
+      "validation_brier": 0.4997810960778683,
+      "train_task_losses": {
+        "thunderstorms": 0.27265065908432007,
+        "cloudbursts": 0.24103406568368277,
+        "flash_floods": 0.2616484562555949
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.6323529183864594,
+        "cloudbursts": 0.41327276825904846,
+        "flash_floods": 0.4537176266312599
+      }
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.25248536467552185,
+      "val_loss": 0.48605193942785263,
+      "validation_loss": 0.48605193942785263,
+      "validation_brier": 0.4860519353940407,
+      "train_task_losses": {
+        "thunderstorms": 0.2694859007994334,
+        "cloudbursts": 0.23807157576084137,
+        "flash_floods": 0.24989864230155945
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.42716163396835327,
+        "cloudbursts": 0.5691650956869125,
+        "flash_floods": 0.4618290588259697
+      }
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.24902120232582092,
+      "val_loss": 0.4879116341471672,
+      "validation_loss": 0.4879116341471672,
+      "validation_brier": 0.487911619326093,
+      "train_task_losses": {
+        "thunderstorms": 0.26736929019292194,
+        "cloudbursts": 0.2362051010131836,
+        "flash_floods": 0.24348923563957214
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4167632609605789,
+        "cloudbursts": 0.5834064334630966,
+        "flash_floods": 0.4635651558637619
+      }
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.24655705193678537,
+      "val_loss": 0.48271024972200394,
+      "validation_loss": 0.48271024972200394,
+      "validation_brier": 0.4827102478418268,
+      "train_task_losses": {
+        "thunderstorms": 0.26552297671635944,
+        "cloudbursts": 0.23425947626431784,
+        "flash_floods": 0.23988870282967886
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.414896622300148,
+        "cloudbursts": 0.5679250210523605,
+        "flash_floods": 0.46530910581350327
+      }
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.2441905935605367,
+      "val_loss": 0.43424271792173386,
+      "validation_loss": 0.43424271792173386,
+      "validation_brier": 0.43424272486772486,
+      "train_task_losses": {
+        "thunderstorms": 0.26383914550145465,
+        "cloudbursts": 0.23228547970453897,
+        "flash_floods": 0.23644715547561646
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4132283851504326,
+        "cloudbursts": 0.42471282184123993,
+        "flash_floods": 0.46478696912527084
+      }
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.24177239338556925,
+      "val_loss": 0.42983850091695786,
+      "validation_loss": 0.42983850091695786,
+      "validation_brier": 0.429838485101643,
+      "train_task_losses": {
+        "thunderstorms": 0.2621619602044423,
+        "cloudbursts": 0.23071491221586862,
+        "flash_floods": 0.23244033257166544
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.41281067579984665,
+        "cloudbursts": 0.4128420054912567,
+        "flash_floods": 0.4638627916574478
+      }
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.23976977666219076,
+      "val_loss": 0.4287463650107384,
+      "validation_loss": 0.4287463650107384,
+      "validation_brier": 0.42874634502923975,
+      "train_task_losses": {
+        "thunderstorms": 0.2606580952803294,
+        "cloudbursts": 0.22934007147947946,
+        "flash_floods": 0.22931115825970969
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.41351816803216934,
+        "cloudbursts": 0.4099467471241951,
+        "flash_floods": 0.4627741277217865
+      }
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.238243838151296,
+      "val_loss": 0.4287376329302788,
+      "validation_loss": 0.4287376329302788,
+      "validation_brier": 0.4287376427179058,
+      "train_task_losses": {
+        "thunderstorms": 0.2592596213022868,
+        "cloudbursts": 0.22805745402971903,
+        "flash_floods": 0.2274144490559896
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4134685695171356,
+        "cloudbursts": 0.40976138412952423,
+        "flash_floods": 0.46298297494649887
+      }
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.2369582106669744,
+      "val_loss": 0.429940328001976,
+      "validation_loss": 0.429940328001976,
+      "validation_brier": 0.4299403089429302,
+      "train_task_losses": {
+        "thunderstorms": 0.2578708827495575,
+        "cloudbursts": 0.22694135208924612,
+        "flash_floods": 0.22606239219506583
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4129125103354454,
+        "cloudbursts": 0.4128759428858757,
+        "flash_floods": 0.46403247863054276
+      }
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.2356510212024053,
+      "val_loss": 0.44238460063934326,
+      "validation_loss": 0.44238460063934326,
+      "validation_brier": 0.4423846073517126,
+      "train_task_losses": {
+        "thunderstorms": 0.2565008004506429,
+        "cloudbursts": 0.2258244256178538,
+        "flash_floods": 0.22462786734104156
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4124712869524956,
+        "cloudbursts": 0.4435829147696495,
+        "flash_floods": 0.4710996225476265
+      }
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.23452812929948172,
+      "val_loss": 0.5116080194711685,
+      "validation_loss": 0.5116080194711685,
+      "validation_brier": 0.5116080130882762,
+      "train_task_losses": {
+        "thunderstorms": 0.2553936739762624,
+        "cloudbursts": 0.2247453232606252,
+        "flash_floods": 0.2234453707933426
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4120118096470833,
+        "cloudbursts": 0.5939484238624573,
+        "flash_floods": 0.5288638323545456
+      }
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.2335224449634552,
+      "val_loss": 0.5129342526197433,
+      "validation_loss": 0.5129342526197433,
+      "validation_brier": 0.5129342453355612,
+      "train_task_losses": {
+        "thunderstorms": 0.2544790307680766,
+        "cloudbursts": 0.2237198750178019,
+        "flash_floods": 0.22236843407154083
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4112573117017746,
+        "cloudbursts": 0.5921600908041,
+        "flash_floods": 0.5353853404521942
+      }
+    },
+    {
+      "epoch": 13,
+      "train_loss": 0.23256559669971466,
+      "val_loss": 0.5109457671642303,
+      "validation_loss": 0.5109457671642303,
+      "validation_brier": 0.5109457671957672,
+      "train_task_losses": {
+        "thunderstorms": 0.2536212007204692,
+        "cloudbursts": 0.2227236032485962,
+        "flash_floods": 0.22135199109713236
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.40817146748304367,
+        "cloudbursts": 0.588079571723938,
+        "flash_floods": 0.5365862548351288
+      }
+    },
+    {
+      "epoch": 14,
+      "train_loss": 0.23167665799458823,
+      "val_loss": 0.5090747475624084,
+      "validation_loss": 0.5090747475624084,
+      "validation_brier": 0.5090747702589808,
+      "train_task_losses": {
+        "thunderstorms": 0.2527874708175659,
+        "cloudbursts": 0.2217887838681539,
+        "flash_floods": 0.22045371433099112
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4080774858593941,
+        "cloudbursts": 0.5766473412513733,
+        "flash_floods": 0.5424994677305222
+      }
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.23083760837713876,
+      "val_loss": 0.4776959866285324,
+      "validation_loss": 0.4776959866285324,
+      "validation_brier": 0.4776959760512392,
+      "train_task_losses": {
+        "thunderstorms": 0.2520374159018199,
+        "cloudbursts": 0.2208896279335022,
+        "flash_floods": 0.21958579123020172
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4064536318182945,
+        "cloudbursts": 0.48004646599292755,
+        "flash_floods": 0.5465878248214722
+      }
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.22999062140782675,
+      "val_loss": 0.4650811031460762,
+      "validation_loss": 0.4650811031460762,
+      "validation_brier": 0.46508110554163185,
+      "train_task_losses": {
+        "thunderstorms": 0.2513270378112793,
+        "cloudbursts": 0.21989846726258597,
+        "flash_floods": 0.2187463641166687
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.4062004014849663,
+        "cloudbursts": 0.4408991187810898,
+        "flash_floods": 0.5481438040733337
+      }
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.22918842236200967,
+      "val_loss": 0.4615984484553337,
+      "validation_loss": 0.4615984484553337,
+      "validation_brier": 0.46159844054580895,
+      "train_task_losses": {
+        "thunderstorms": 0.2506023943424225,
+        "cloudbursts": 0.2189889202515284,
+        "flash_floods": 0.21797393759091696
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.403829887509346,
+        "cloudbursts": 0.4291771128773689,
+        "flash_floods": 0.551788330078125
+      }
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.22846292952696481,
+      "val_loss": 0.4737599194049835,
+      "validation_loss": 0.4737599194049835,
+      "validation_brier": 0.4737599206349206,
+      "train_task_losses": {
+        "thunderstorms": 0.24998490512371063,
+        "cloudbursts": 0.21819943686326346,
+        "flash_floods": 0.21720442175865173
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.40339911729097366,
+        "cloudbursts": 0.4280388429760933,
+        "flash_floods": 0.5898417830467224
+      }
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.2277891884247462,
+      "val_loss": 0.4814806655049324,
+      "validation_loss": 0.4814806655049324,
+      "validation_brier": 0.4814806656397939,
+      "train_task_losses": {
+        "thunderstorms": 0.24943350752194723,
+        "cloudbursts": 0.21745839218298593,
+        "flash_floods": 0.21647569040457407
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.40193452686071396,
+        "cloudbursts": 0.43509310483932495,
+        "flash_floods": 0.6074143797159195
+      }
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.22709367672602335,
+      "val_loss": 0.5131362676620483,
+      "validation_loss": 0.5131362676620483,
+      "validation_brier": 0.513136274932122,
+      "train_task_losses": {
+        "thunderstorms": 0.24879895150661469,
+        "cloudbursts": 0.21673465271790823,
+        "flash_floods": 0.21574742595354715
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.40190842002630234,
+        "cloudbursts": 0.529871940612793,
+        "flash_floods": 0.6076284497976303
+      }
+    },
+    {
+      "epoch": 21,
+      "train_loss": 0.22642486790815988,
+      "val_loss": 0.5339668244123459,
+      "validation_loss": 0.5339668244123459,
+      "validation_brier": 0.5339668344037176,
+      "train_task_losses": {
+        "thunderstorms": 0.24815775454044342,
+        "cloudbursts": 0.21609584987163544,
+        "flash_floods": 0.21502098937829336
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.40318504720926285,
+        "cloudbursts": 0.5940423160791397,
+        "flash_floods": 0.6046731472015381
+      }
+    },
+    {
+      "epoch": 22,
+      "train_loss": 0.22580867012341818,
+      "val_loss": 0.5201577097177505,
+      "validation_loss": 0.5201577097177505,
+      "validation_brier": 0.5201576804424256,
+      "train_task_losses": {
+        "thunderstorms": 0.24765452245871225,
+        "cloudbursts": 0.21548432608445486,
+        "flash_floods": 0.21428717176119486
+      },
+      "val_task_losses": {
+        "thunderstorms": 0.40556860715150833,
+        "cloudbursts": 0.6006135046482086,
+        "flash_floods": 0.5542909502983093
+      }
+    }
+  ]
+}

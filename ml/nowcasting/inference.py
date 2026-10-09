@@ -4,7 +4,7 @@ from typing import Dict, Any, Optional, Tuple, List
 import json
 import numpy as np
 import torch
-from models.historical_multitask import HistoricalMultiTaskNet
+from ml.nowcasting.architecture import SpatiotemporalMTLNet
 from ml.nowcasting.features import (
     NOWCAST_INTERVALS,
     build_spatiotemporal_features,
@@ -38,7 +38,7 @@ class NowcastingInferenceEngine:
 
     def __init__(self, device: str = "cpu") -> None:
         self.device = torch.device(device)
-        self.model: Optional[HistoricalMultiTaskNet] = None
+        self.model: Optional[SpatiotemporalMTLNet] = None
         self._loaded_checkpoint_path: str | None = None
         self._normalization_stats: Optional[Dict[str, Any]] = None
 
@@ -69,12 +69,16 @@ class NowcastingInferenceEngine:
         # Load model state_dict only after all artifact validation succeeds.
         if isinstance(checkpoint, dict) and "model" in checkpoint:
             state_dict = checkpoint["model"]
-            input_channels = checkpoint.get("input_channels", 6)
+            input_channels = checkpoint.get("input_channels", 13)
+            baseline_channels = checkpoint.get("baseline_channels", 6)
+            hidden_channels = checkpoint.get("hidden_channels", 32)
+            num_heads = checkpoint.get("num_heads", 4)
+            num_layers = checkpoint.get("num_layers", 2)
         else:
             state_dict = checkpoint
-            input_channels = 6
+            input_channels, baseline_channels, hidden_channels, num_heads, num_layers = 13, 6, 32, 4, 2
 
-        self.model = HistoricalMultiTaskNet(input_channels).to(self.device)
+        self.model = SpatiotemporalMTLNet(input_channels, baseline_channels, hidden_channels, num_heads, num_layers).to(self.device)
         self.model.load_state_dict(state_dict)
         self.model.eval()
         self._loaded_checkpoint_path = path

@@ -1,0 +1,322 @@
+{
+  "schema_version": "1.0",
+  "generated_at": "2026-10-08T15:36:38.616235+00:00",
+  "fitted_on": "validation",
+  "validation_samples": 7,
+  "validation_event_id": "2021-05-26",
+  "optimization_metric": "csi",
+  "hazard_channels": [
+    "thunderstorm",
+    "cloudburst",
+    "flash_flood"
+  ],
+  "lead_time_horizons": [
+    "+2h",
+    "+3h",
+    "+4h",
+    "+5h",
+    "+6h"
+  ],
+  "thresholds": {
+    "thunderstorm": 0.5,
+    "cloudburst": 0.5,
+    "flash_flood": 0.3
+  },
+  "per_horizon_thresholds": {
+    "thunderstorm": {
+      "+2h": 0.5,
+      "+3h": 0.5,
+      "+4h": 0.5,
+      "+5h": 0.5,
+      "+6h": 0.5
+    },
+    "cloudburst": {
+      "+2h": 0.5,
+      "+3h": 0.5,
+      "+4h": 0.5,
+      "+5h": 0.5,
+      "+6h": 0.5
+    },
+    "flash_flood": {
+      "+2h": 0.32,
+      "+3h": 0.3,
+      "+4h": 0.3,
+      "+5h": 0.3,
+      "+6h": 0.32
+    }
+  },
+  "metrics": {
+    "thunderstorm": {
+      "overall": {
+        "threshold": 0.5,
+        "csi": 1.0,
+        "f1": 1.0,
+        "pod": 1.0,
+        "far": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positives": 335160,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 0
+      },
+      "per_horizon": {
+        "+2h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+3h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+4h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+5h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+6h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      }
+    },
+    "cloudburst": {
+      "overall": {
+        "threshold": 0.5,
+        "csi": 1.0,
+        "f1": 1.0,
+        "pod": 1.0,
+        "far": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positives": 335160,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 0
+      },
+      "per_horizon": {
+        "+2h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+3h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+4h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+5h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+6h": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      }
+    },
+    "flash_flood": {
+      "overall": {
+        "threshold": 0.3,
+        "csi": 0.31244778613199664,
+        "f1": 0.4761298535964354,
+        "pod": 1.0,
+        "far": 0.6875522138680034,
+        "precision": 0.31244778613199664,
+        "recall": 1.0,
+        "true_positives": 104720,
+        "false_positives": 230440,
+        "false_negatives": 0,
+        "true_negatives": 0
+      },
+      "per_horizon": {
+        "+2h": {
+          "threshold": 0.32,
+          "csi": 0.31627906976744186,
+          "f1": 0.480565371024735,
+          "pod": 1.0,
+          "far": 0.6837209302325581,
+          "precision": 0.31627906976744186,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 45276,
+          "false_negatives": 0,
+          "true_negatives": 812
+        },
+        "+3h": {
+          "threshold": 0.3,
+          "csi": 0.31244778613199664,
+          "f1": 0.4761298535964354,
+          "pod": 1.0,
+          "far": 0.6875522138680034,
+          "precision": 0.31244778613199664,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 46088,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+4h": {
+          "threshold": 0.3,
+          "csi": 0.31244778613199664,
+          "f1": 0.4761298535964354,
+          "pod": 1.0,
+          "far": 0.6875522138680034,
+          "precision": 0.31244778613199664,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 46088,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+5h": {
+          "threshold": 0.3,
+          "csi": 0.31244778613199664,
+          "f1": 0.4761298535964354,
+          "pod": 1.0,
+          "far": 0.6875522138680034,
+          "precision": 0.31244778613199664,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 46088,
+          "false_negatives": 0,
+          "true_negatives": 0
+        },
+        "+6h": {
+          "threshold": 0.32,
+          "csi": 0.3162122172902135,
+          "f1": 0.4804881965633531,
+          "pod": 1.0,
+          "far": 0.6837877827097865,
+          "precision": 0.3162122172902135,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 45290,
+          "false_negatives": 0,
+          "true_negatives": 798
+        }
+      }
+    }
+  },
+  "calibration_parameters": {
+    "thunderstorm": {
+      "method": "platt_scaling",
+      "slope": 1.4470907249444511,
+      "intercept": 9.220115782137716,
+      "fitted_samples": 335160,
+      "positive_rate": 1.0,
+      "isotonic_brier": 2.152751935492731e-11
+    },
+    "cloudburst": {
+      "method": "platt_scaling",
+      "slope": 1.4558180055354808,
+      "intercept": 9.212310350828329,
+      "fitted_samples": 335160,
+      "positive_rate": 1.0,
+      "isotonic_brier": 2.171443043869572e-11
+    },
+    "flash_flood": {
+      "method": "platt_scaling",
+      "slope": 0.08598044177359147,
+      "intercept": -0.8255860361286083,
+      "fitted_samples": 335160,
+      "positive_rate": 0.31244778613199664,
+      "isotonic_brier": 0.21474059589060607
+    }
+  }
+}

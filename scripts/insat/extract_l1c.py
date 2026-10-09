@@ -150,6 +150,10 @@ def main() -> None:
     args.output.mkdir(parents=True, exist_ok=True)
     errors = []
     for path in input_files(args.input)[:args.limit]:
+        target = args.output / f"{path.stem}.npz"
+        if target.exists() and target.stat().st_size > 0:
+            LOG.info("Skipping already extracted %s", path.name)
+            continue
         try:
             LOG.info("Extracting %s", path.name)
             extract(path, args.output)

@@ -1,8 +1,48 @@
 """Spatiotemporal multi-task network for severe-weather nowcasting."""
 
-from typing import Dict
+from typing import Dict, Optional, Union, Tuple, List, Any
 import torch
 from torch import nn
+
+
+class PredictionTensor(torch.Tensor):
+    """
+    Multi-task prediction tensor of shape [batch, horizons, hazards, height, width].
+    
+    Provides dual-interface compatibility:
+    - As a canonical torch.Tensor of shape [B, 5, 3, H, W] for losses and tensor operations.
+    - As a dictionary-like container mapping hazard names ("thunderstorms", "cloudbursts", "flash_floods")
+      to probability maps [B, 5, H, W] for inference and attribution.
+    """
+    HAZARDS = ("thunderstorms", "cloudbursts", "flash_floods")
+
+    def __getitem__(self, key):
+        if isinstance(key, str):
+            if key in self.HAZARDS:
+                idx = self.HAZARDS.index(key)
+                return self[:, :, idx, :, :]
+            raise KeyError(f"Unknown hazard key: {key}. Expected one of {self.HAZARDS}")
+        return super().__getitem__(key)
+
+    def get(self, key, default=None):
+        if isinstance(key, str) and key in self.HAZARDS:
+            return self[key]
+        return default
+
+    def items(self):
+        return [(h, self[:, :, i, :, :]) for i, h in enumerate(self.HAZARDS)]
+
+    def keys(self):
+        return self.HAZARDS
+
+    def values(self):
+        return [self[:, :, i, :, :] for i in range(len(self.HAZARDS))]
+
+    def __iter__(self):
+        return iter(self.HAZARDS)
+
+    def __contains__(self, key):
+        return key in self.HAZARDS
 
 
 class SpatiotemporalMTLNet(nn.Module):
@@ -77,69 +117,84 @@ class SpatiotemporalMTLNet(nn.Module):
             nn.Conv2d(channels // 2, 5, kernel_size=1)
         )
 
-    def forward(self, sequence: torch.Tensor, baseline: torch.Tensor) -> Dict[str, torch.Tensor]:
+    def forward(
+        self,
+        sequence: torch.Tensor,
+        baseline: Optional[torch.Tensor] = None,
+    ) -> PredictionTensor:
         # Validate input shapes
         if sequence.ndim != 5:
             raise ValueError(f"sequence must have shape [batch, time, channels, height, width], got {sequence.shape}")
-        if baseline.ndim != 4:
-            raise ValueError(f"baseline must have shape [batch, channels, height, width], got {baseline.shape}")
         
         batch, time, channels, height, width = sequence.shape
         
         # Validate channel counts
         if channels != self.input_channels:
             raise ValueError(f"Expected {self.input_channels} input channels, got {channels}")
-        if baseline.shape[1] != self.baseline_channels:
-            raise ValueError(f"Expected {self.baseline_channels} baseline channels, got {baseline.shape[1]}")
         
         # Validate sequence length (should be 7 for canonical training)
         if time != 7:
             raise ValueError(f"Expected sequence length 7, got {time}. Training and inference must use the same sequence length.")
         
-        # Validate spatial dimensions
-        if height != 16 or width != 16:
-            raise ValueError(f"Expected spatial dimensions 16x16, got {height}x{width}. All features must be on the same grid.")
+        # Handle baseline (extract from sequence if not supplied)
+        if baseline is None:
+            baseline = sequence[:, -1, :self.baseline_channels, :, :]
         
-        seq_features = self.backbone(sequence.permute(0, 2, 1, 3, 4))
-        seq_flat = seq_features.permute(0, 2, 3, 4, 1).reshape(batch, time * height * width, self.hidden_channels)
+        if baseline.ndim != 4:
+            raise ValueError(f"baseline must have shape [batch, channels, height, width], got {baseline.shape}")
+        if baseline.shape[1] != self.baseline_channels:
+            raise ValueError(f"Expected {self.baseline_channels} baseline channels, got {baseline.shape[1]}")
         
-        if seq_flat.shape[1] != self.pos_emb.shape[1]:
-            pos_emb = nn.functional.interpolate(
-                self.pos_emb.transpose(1, 2),
-                size=seq_flat.shape[1],
-                mode="linear",
-                align_corners=False
-            ).transpose(1, 2)
+        # 1. 3D CNN Spatiotemporal Backbone over full resolution
+        seq_features = self.backbone(sequence.permute(0, 2, 1, 3, 4))  # [B, hidden, T, H, W]
+        
+        # 2. Multi-scale token representation for Transformer
+        if height == 16 and width == 16:
+            pooled_seq = seq_features
         else:
-            pos_emb = self.pos_emb
+            pooled_seq = nn.functional.adaptive_avg_pool3d(seq_features, (time, 16, 16))
             
-        seq_flat = seq_flat + pos_emb
+        seq_flat = pooled_seq.permute(0, 2, 3, 4, 1).reshape(batch, time * 16 * 16, self.hidden_channels)
+        seq_flat = seq_flat + self.pos_emb
         seq_encoded = self.transformer_encoder(seq_flat)
         
-        baseline_proj = self.baseline_projection(baseline)
-        baseline_flat = baseline_proj.permute(0, 2, 3, 1).reshape(batch, height * width, self.hidden_channels)
-        
-        if baseline_flat.shape[1] != self.baseline_pos_emb.shape[1]:
-            baseline_pos_emb = nn.functional.interpolate(
-                self.baseline_pos_emb.transpose(1, 2),
-                size=baseline_flat.shape[1],
-                mode="linear",
-                align_corners=False
-            ).transpose(1, 2)
+        # 3. IMDAA thermodynamic baseline projection and cross-attention
+        baseline_proj = self.baseline_projection(baseline)  # [B, hidden, H, W]
+        if height == 16 and width == 16:
+            pooled_base = baseline_proj
         else:
-            baseline_pos_emb = self.baseline_pos_emb
+            pooled_base = nn.functional.adaptive_avg_pool2d(baseline_proj, (16, 16))
             
-        baseline_flat = baseline_flat + baseline_pos_emb
+        base_flat = pooled_base.permute(0, 2, 3, 1).reshape(batch, 16 * 16, self.hidden_channels)
+        base_flat = base_flat + self.baseline_pos_emb
         
         attended, _ = self.cross_attention(
             query=seq_encoded,
-            key=baseline_flat,
-            value=baseline_flat,
-            need_weights=False
+            key=base_flat,
+            value=base_flat,
+            need_weights=False,
         )
         fused = self.cross_norm(seq_encoded + attended)
         
-        fused_grid = fused.reshape(batch, time, height, width, self.hidden_channels).permute(0, 4, 1, 2, 3)
-        pooled_spatial = fused_grid.mean(dim=2)
+        # 4. Spatiotemporal fusion and multi-scale aggregation
+        fused_grid = fused.reshape(batch, time, 16, 16, self.hidden_channels).permute(0, 4, 1, 2, 3)
+        fused_temporal = fused_grid.mean(dim=2)  # [B, hidden, 16, 16]
         
-        return {name: torch.sigmoid(head(pooled_spatial)) for name, head in self.heads.items()}
+        if height == 16 and width == 16:
+            combined = fused_temporal
+        else:
+            # Interpolate global fused features to spatial grid and combine with local 3D CNN features
+            fused_spatial = nn.functional.interpolate(
+                fused_temporal, size=(height, width), mode="bilinear", align_corners=False
+            )
+            local_spatial = seq_features.mean(dim=2)  # [B, hidden, H, W]
+            combined = fused_spatial + local_spatial
+            
+        # 5. Multi-task hazard heads generating 5 forecast horizons
+        hazard_tensors = [
+            torch.sigmoid(self.heads[name](combined))
+            for name in ("thunderstorms", "cloudbursts", "flash_floods")
+        ]
+        # Stack along hazard dimension (dim=2): [B, 5, 3, H, W]
+        out_tensor = torch.stack(hazard_tensors, dim=2)
+        return out_tensor.as_subclass(PredictionTensor)

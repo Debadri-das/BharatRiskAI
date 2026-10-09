@@ -1,0 +1,27 @@
+{
+  "generated_at": "2026-10-08T08:05:36.790560+00:00",
+  "timestamps": 124,
+  "records": 372,
+  "hazards": {
+    "thunderstorm": {
+      "confirmed_positive": 124,
+      "confirmed_negative": 0,
+      "unknown": 0,
+      "spatial_grids": 124
+    },
+    "cloudburst": {
+      "confirmed_positive": 124,
+      "confirmed_negative": 0,
+      "unknown": 0,
+      "spatial_grids": 124
+    },
+    "flash_flood": {
+      "confirmed_positive": 124,
+      "confirmed_negative": 0,
+      "unknown": 0,
+      "spatial_grids": 124
+    }
+  },
+  "event_count": 5,
+  "confirmed_event_count": 5
+}

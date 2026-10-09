@@ -9,9 +9,21 @@ from backend.schemas.nowcast import (
     NowcastPredictionOut,
     NowcastIntervalOut,
 )
+from backend.services.state_service import get_system_state
 
 
-router = APIRouter()
+def verify_nowcast_ready():
+    """Ensure system state is READY; otherwise raise 503 Service Unavailable."""
+    state = get_system_state()
+    if state.get("status") != "READY":
+        reason = state.get("blocked_reason") or "Model artifacts missing or invalid"
+        raise HTTPException(
+            status_code=503,
+            detail=f"Service Unavailable: System state is BLOCKED. Reason: {reason}",
+        )
+
+
+router = APIRouter(dependencies=[Depends(verify_nowcast_ready)])
 
 
 @router.get("/nowcast/city", response_model=CityNowcastOut)

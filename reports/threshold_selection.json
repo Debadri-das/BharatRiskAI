@@ -1,0 +1,310 @@
+{
+  "status": "completed",
+  "generated_at": "2026-10-08T15:36:38.618251+00:00",
+  "fit_split": "validation",
+  "test_split_used": false,
+  "selection_metric": "csi",
+  "candidate_grid": {
+    "start": 0.01,
+    "stop": 0.99,
+    "steps": 99
+  },
+  "selected": {
+    "thunderstorm": {
+      "+2h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+3h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+4h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+5h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+6h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      }
+    },
+    "cloudburst": {
+      "+2h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+3h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+4h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+5h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+6h": {
+        "threshold": 0.5,
+        "metrics": {
+          "threshold": 0.5,
+          "csi": 1.0,
+          "f1": 1.0,
+          "pod": 1.0,
+          "far": 0.0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "true_positives": 67032,
+          "false_positives": 0,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      }
+    },
+    "flash_flood": {
+      "+2h": {
+        "threshold": 0.32,
+        "metrics": {
+          "threshold": 0.32,
+          "csi": 0.31627906976744186,
+          "f1": 0.480565371024735,
+          "pod": 1.0,
+          "far": 0.6837209302325581,
+          "precision": 0.31627906976744186,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 45276,
+          "false_negatives": 0,
+          "true_negatives": 812
+        }
+      },
+      "+3h": {
+        "threshold": 0.3,
+        "metrics": {
+          "threshold": 0.3,
+          "csi": 0.31244778613199664,
+          "f1": 0.4761298535964354,
+          "pod": 1.0,
+          "far": 0.6875522138680034,
+          "precision": 0.31244778613199664,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 46088,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+4h": {
+        "threshold": 0.3,
+        "metrics": {
+          "threshold": 0.3,
+          "csi": 0.31244778613199664,
+          "f1": 0.4761298535964354,
+          "pod": 1.0,
+          "far": 0.6875522138680034,
+          "precision": 0.31244778613199664,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 46088,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+5h": {
+        "threshold": 0.3,
+        "metrics": {
+          "threshold": 0.3,
+          "csi": 0.31244778613199664,
+          "f1": 0.4761298535964354,
+          "pod": 1.0,
+          "far": 0.6875522138680034,
+          "precision": 0.31244778613199664,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 46088,
+          "false_negatives": 0,
+          "true_negatives": 0
+        }
+      },
+      "+6h": {
+        "threshold": 0.32,
+        "metrics": {
+          "threshold": 0.32,
+          "csi": 0.3162122172902135,
+          "f1": 0.4804881965633531,
+          "pod": 1.0,
+          "far": 0.6837877827097865,
+          "precision": 0.3162122172902135,
+          "recall": 1.0,
+          "true_positives": 20944,
+          "false_positives": 45290,
+          "false_negatives": 0,
+          "true_negatives": 798
+        }
+      }
+    }
+  },
+  "overall_selected": {
+    "thunderstorm": {
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "csi": 1.0,
+        "f1": 1.0,
+        "pod": 1.0,
+        "far": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positives": 335160,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 0
+      }
+    },
+    "cloudburst": {
+      "threshold": 0.5,
+      "metrics": {
+        "threshold": 0.5,
+        "csi": 1.0,
+        "f1": 1.0,
+        "pod": 1.0,
+        "far": 0.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "true_positives": 335160,
+        "false_positives": 0,
+        "false_negatives": 0,
+        "true_negatives": 0
+      }
+    },
+    "flash_flood": {
+      "threshold": 0.3,
+      "metrics": {
+        "threshold": 0.3,
+        "csi": 0.31244778613199664,
+        "f1": 0.4761298535964354,
+        "pod": 1.0,
+        "far": 0.6875522138680034,
+        "precision": 0.31244778613199664,
+        "recall": 1.0,
+        "true_positives": 104720,
+        "false_positives": 230440,
+        "false_negatives": 0,
+        "true_negatives": 0
+      }
+    }
+  }
+}

@@ -1,24 +1,100 @@
 {
   "method": "training-only per-channel standardization",
   "channels": [
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0},
-    {"mean": 0.0, "std": 1.0}
+    {
+      "name": "iwv",
+      "mean": 58.30994756598221,
+      "std": 3.1218531280360042
+    },
+    {
+      "name": "iwv_change",
+      "mean": 0.0,
+      "std": 1e-07
+    },
+    {
+      "name": "ctt",
+      "mean": -53.11264144947133,
+      "std": 23.271566138538365
+    },
+    {
+      "name": "ctt_drop_rate",
+      "mean": 0.8622714855135798,
+      "std": 18.70183668451967
+    },
+    {
+      "name": "qpe",
+      "mean": 0.010531725758182339,
+      "std": 0.20023204527529043
+    },
+    {
+      "name": "rainfall",
+      "mean": 0.011584898594339818,
+      "std": 0.22025525513476005
+    },
+    {
+      "name": "cape",
+      "mean": 1852.3809465680804,
+      "std": 142.24073204463417
+    },
+    {
+      "name": "cin",
+      "mean": 25.0,
+      "std": 1e-07
+    },
+    {
+      "name": "convergence",
+      "mean": 3.5000000934815034e-05,
+      "std": 1e-07
+    },
+    {
+      "name": "wind_shear",
+      "mean": 0.0,
+      "std": 1e-07
+    },
+    {
+      "name": "elevation",
+      "mean": 9.597019996950541,
+      "std": 1.7046590389188534
+    },
+    {
+      "name": "slope",
+      "mean": 0.4732933162172017,
+      "std": 0.1112385643894977
+    },
+    {
+      "name": "drainage",
+      "mean": 97.63353341882589,
+      "std": 0.5561928219447118
+    },
+    {
+      "name": "baseline_qpe",
+      "mean": 0.010531725758182339,
+      "std": 0.20023204527529043
+    },
+    {
+      "name": "baseline_cin",
+      "mean": 25.0,
+      "std": 1e-07
+    },
+    {
+      "name": "baseline_rainfall",
+      "mean": 0.011584898594339818,
+      "std": 0.22025525513476005
+    },
+    {
+      "name": "baseline_convergence",
+      "mean": 3.5000000934815034e-05,
+      "std": 1e-07
+    },
+    {
+      "name": "baseline_wind_shear",
+      "mean": 0.0,
+      "std": 1e-07
+    },
+    {
+      "name": "baseline_elevation",
+      "mean": 9.597019996950541,
+      "std": 1.7046590389188534
+    }
   ]
 }

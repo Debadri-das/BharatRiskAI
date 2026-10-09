@@ -30,8 +30,11 @@ def json_value(value: Any) -> Any:
         return [json_value(item) for item in value]
     if isinstance(value, dict):
         return {str(key): json_value(item) for key, item in value.items()}
-    if value is None or isinstance(value, (str, int, float, bool)):
+    if value is None or isinstance(value, (str, int, bool)):
         return value
+    if isinstance(value, float):
+        import math
+        return None if not math.isfinite(value) else value
     return str(value)
 
 
@@ -144,6 +147,40 @@ def source_files(data_root: Path) -> list[Path]:
     return sorted(path for path in data_root.rglob("*") if path.is_file() and path.suffix.lower() in {".h5", ".hdf5", ".nc", ".nc4", ".netcdf", ".tif", ".tiff"})
 
 
+def netcdf_record(path: Path) -> dict[str, Any]:
+    """Inspect a NetCDF file using the netCDF4 library (works for both NetCDF3 and NetCDF4)."""
+    import netCDF4
+    with netCDF4.Dataset(path, "r") as ds:
+        file_attrs = {name: json_value(ds.getncattr(name)) for name in ds.ncattrs()}
+        datasets = []
+        for var_name in ds.variables:
+            var = ds.variables[var_name]
+            var_attrs = {name: json_value(var.getncattr(name)) for name in var.ncattrs()}
+            datasets.append({
+                "path": var_name,
+                "shape": list(var.shape),
+                "dtype": str(var.dtype),
+                "units": var_attrs.get("units"),
+                "fill_values": {name: json_value(var.getncattr(name)) for name in ("_FillValue", "missing_value") if hasattr(var, name)},
+                "scale_offset": {name: json_value(var.getncattr(name)) for name in ("scale_factor", "add_offset") if hasattr(var, name)},
+                "attributes": var_attrs,
+                "missing_value_percentage": None,
+            })
+    timestamp = timestamp_from_attrs(file_attrs) or timestamp_from_name(path)
+    return {
+        "path": str(path.relative_to(ROOT)),
+        "file_type": "NetCDF",
+        "size_bytes": path.stat().st_size,
+        "timestamps": [timestamp] if timestamp else [],
+        "spatial_extent": {},
+        "crs": file_attrs.get("crs") or file_attrs.get("projection"),
+        "spatial_resolution": [],
+        "coordinate_structure": {},
+        "global_attributes": file_attrs,
+        "variables": datasets,
+    }
+
+
 def build_audit(data_root: Path) -> dict[str, Any]:
     records = []
     errors = []
@@ -151,6 +188,12 @@ def build_audit(data_root: Path) -> dict[str, Any]:
         try:
             if path.suffix.lower() in {".tif", ".tiff"}:
                 records.append(raster_record(path))
+            elif path.suffix.lower() in {".nc", ".nc4", ".netcdf"}:
+                # Try h5py first (NetCDF4/HDF5-based), fall back to netCDF4 library
+                try:
+                    records.append(hdf5_record(path))
+                except OSError:
+                    records.append(netcdf_record(path))
             else:
                 records.append(hdf5_record(path))
         except Exception as error:  # preserve failures in the report and continue auditing other files
@@ -163,7 +206,7 @@ def build_audit(data_root: Path) -> dict[str, Any]:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "project_root": str(ROOT),
         "study_region": DEFAULT_REGION,
-        "summary": {"file_count": len(records), "file_type_counts": {kind: sum(item["file_type"] == kind for item in records) for kind in ("HDF5", "GeoTIFF")}, "timestamp_count": len(timestamps), "timestamps": timestamps, "available_time_range": [timestamps[0], timestamps[-1]] if timestamps else [], "imdaa_available": has_imdaa, "cmv_available": has_cmv, "official_event_ground_truth_available": False, "official_flood_ground_truth_available": False},
+        "summary": {"file_count": len(records), "file_type_counts": {kind: sum(item["file_type"] == kind for item in records) for kind in ("HDF5", "GeoTIFF", "NetCDF")}, "timestamp_count": len(timestamps), "timestamps": timestamps, "available_time_range": [timestamps[0], timestamps[-1]] if timestamps else [], "imdaa_available": has_imdaa, "cmv_available": has_cmv, "official_event_ground_truth_available": False, "official_flood_ground_truth_available": False},
         "records": records,
         "errors": errors,
         "readiness": {"missing_sources": [name for name, present in (("IMDAA", has_imdaa), ("CMV", has_cmv)) if not present], "missing_ground_truth": ["official thunderstorm/lightning events", "official cloudburst events", "official flood observations or inundation maps"], "label_policy": "Only proxy labels may be generated for hazards without observed ground truth; every proxy must carry provenance."},

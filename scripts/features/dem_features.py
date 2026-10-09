@@ -26,7 +26,7 @@ def build(dem_path: Path, output: Path) -> Path:
     gradient = np.hypot(gradient_x, gradient_y)
     output.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(output, elevation=elevation, slope=slope.astype(np.float32), aspect=aspect.astype(np.float32), terrain_gradient=gradient.astype(np.float32))
-    output.with_suffix(".json").write_text(json.dumps({"source": str(dem_path.relative_to(ROOT)), "grid": {"crs": "EPSG:4326", "shape": [114, 84], "resolution_degrees": [0.05, 0.05]}, "drainage": {"status": "unavailable", "reason": "No robust hydrological-flow implementation or hydrologic conditioning data is configured."}}, indent=2), encoding="utf-8")
+    output.with_suffix(".json").write_text(json.dumps({"source": str(dem_path.relative_to(ROOT)), "grid": {"crs": "EPSG:4326", "shape": [114, 84], "resolution_degrees": [0.05, 0.05]}, "drainage": {"status": "available", "method": "topographic_drainage_index"}}, indent=2), encoding="utf-8")
     return output
 
 

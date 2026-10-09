@@ -222,7 +222,7 @@ def integrated_water_vapor(specific_humidity: np.ndarray, pressure_pa: np.ndarra
     order = np.argsort(pressure[:, 0, 0] if pressure.ndim > 1 else pressure)
     q = np.take(q, order, axis=0)
     pressure = np.take(pressure, order, axis=0)
-    integrate = getattr(np, "trapezoid", np.trapz)
+    integrate = getattr(np, "trapezoid", getattr(np, "trapz", None))
     return integrate(q, pressure, axis=0) / 9.80665
 
 

@@ -6,7 +6,7 @@ from ingestion.real_data import cloud_top_temperature, integrated_water_vapor, t
 def test_integrated_water_vapor_uses_pressure_column():
     pressure = np.array([100000.0, 80000.0, 60000.0])
     humidity = np.array([0.02, 0.01, 0.004])
-    integrate = getattr(np, "trapezoid", np.trapz)
+    integrate = getattr(np, "trapezoid", getattr(np, "trapz", None))
     expected = integrate(humidity[::-1], pressure[::-1]) / 9.80665
     assert np.isclose(integrated_water_vapor(humidity, pressure), expected)
 
