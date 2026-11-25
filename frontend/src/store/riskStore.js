@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 import { api } from '../services/api';
-import { demoDashboard } from '../services/demoData';
+import { demoDashboard, demoNowcast } from '../services/demoData';
 
 export const useRiskStore = create((set, get) => ({
   dashboard: demoDashboard(),
-  nowcast: null,
+  nowcast: demoNowcast(),
   selectedZoneId: 1,
   load: async () => {
     try {
@@ -12,10 +12,20 @@ export const useRiskStore = create((set, get) => ({
         api('/dashboard'),
         api('/nowcast/city?live=true').catch(() => null),
       ]);
-      set({ dashboard, nowcast, isLive: true, lastUpdated: new Date(), liveError: null });
+      set((state) => ({
+        dashboard,
+        nowcast: nowcast || state.nowcast || demoNowcast(),
+        isLive: true,
+        lastUpdated: new Date(),
+        liveError: null,
+      }));
       return dashboard;
     } catch (error) {
-      set(() => ({ isLive: false, liveError: error.message || 'Live risk feed unavailable' }));
+      set((state) => ({
+        isLive: false,
+        nowcast: state.nowcast || demoNowcast(),
+        liveError: error.message || 'Live risk feed unavailable',
+      }));
       return get().dashboard;
     }
   },

@@ -3,16 +3,16 @@
   "fit_split": "validation",
   "hazard_models": {
     "thunderstorm": {
-      "slope": 1.4470907249444511,
-      "intercept": 9.220115782137716
+      "slope": 3.992861459254549,
+      "intercept": 6.824665991408341
     },
     "cloudburst": {
-      "slope": 1.4558180055354808,
-      "intercept": 9.212310350828329
+      "slope": 3.996274814201015,
+      "intercept": 6.719091957907451
     },
     "flash_flood": {
-      "slope": 0.08598044177359147,
-      "intercept": -0.8255860361286083
+      "slope": 1.734725981456494,
+      "intercept": -1.9132091740740351
     }
   }
 }

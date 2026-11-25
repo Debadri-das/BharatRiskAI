@@ -77,3 +77,109 @@ export function demoDashboard() {
     risk_trend: [{ time: '06:00', risk: 52 }, { time: '09:00', risk: 61 }, { time: '12:00', risk: overall }, { time: '15:00', risk: 77 }, { time: '18:00', risk: 84 }],
   };
 }
+
+export function demoNowcast() {
+  const dz = demoZones();
+  const generateGrid = (baseProb) => {
+    return Array.from({ length: 5 }, (_, horizon) => {
+      const decay = Math.max(0.2, 1 - horizon * 0.15);
+      return Array.from({ length: 16 }, (_, r) =>
+        Array.from({ length: 16 }, (_, c) => {
+          const dist = Math.sqrt((r - 7.5) ** 2 + (c - 7.5) ** 2) / 10;
+          return Math.round(Math.max(0.05, Math.min(0.95, baseProb * decay * (1 - dist * 0.5))) * 100) / 100;
+        })
+      );
+    });
+  };
+
+  const zones_nowcast = dz.map((zone) => {
+    const isCritical = zone.risk_category === 'CRITICAL';
+    const isHigh = zone.risk_category === 'HIGH';
+    const baseRain = isCritical ? 68.2 : isHigh ? 38.0 : 14.0;
+    const baseProb = isCritical ? 0.88 : isHigh ? 0.62 : 0.25;
+
+    const maps = {
+      thunderstorms: generateGrid(baseProb),
+      cloudbursts: generateGrid(baseProb * 0.85),
+      flash_floods: generateGrid(baseProb * 0.9),
+    };
+
+    const bbox = [zone.longitude - 0.1, zone.latitude - 0.1, zone.longitude + 0.1, zone.latitude + 0.1];
+    const probability_layers = [];
+    ['thunderstorms', 'cloudbursts', 'flash_floods'].forEach((hazard) => {
+      [2, 3, 4, 5, 6].forEach((hours, idx) => {
+        probability_layers.push({
+          id: `${hazard}-${idx}`,
+          hazard,
+          horizon_index: idx,
+          horizon_hours: hours,
+          type: 'raster',
+          crs: 'EPSG:4326',
+          bounds: { west: bbox[0], south: bbox[1], east: bbox[2], north: bbox[3] },
+          width: 16,
+          height: 16,
+          values: maps[hazard][idx],
+        });
+      });
+    });
+
+    return {
+      zone_id: zone.id,
+      zone_name: zone.name,
+      status: 'READY',
+      nowcast: {
+        status: 'READY',
+        alert_level: isCritical ? 'RED' : isHigh ? 'ORANGE' : 'YELLOW',
+        primary_hazard: isCritical ? 'CLOUDBURST / EXTREME DOWNPOUR' : isHigh ? 'SEVERE THUNDERSTORM' : 'MODERATE SHOWERS',
+        lead_time_minutes: isCritical ? 120 : 180,
+        peak_interval: '2h',
+        max_rain_rate_mm_hr: baseRain,
+        max_flood_threat_score: isCritical ? 85.0 : 62.0,
+        thunderstorm_prob: Math.round(baseProb * 100),
+        lightning_risk: isCritical ? 'HIGH' : 'MODERATE',
+        squall_risk: isCritical ? 'HIGH' : 'LOW',
+        advisory: isCritical ? 'Take immediate action. Move to higher ground.' : 'Be prepared for sudden convective showers.',
+        timeline: [
+          { interval: '2h', rain_rate_mm_hr: baseRain, radar_dbz: 52, wind_gust_kmh: 62, flood_threat_score: 82, thunderstorm_prob: Math.round(baseProb * 100), confidence: 0.92 },
+          { interval: '3h', rain_rate_mm_hr: Math.round(baseRain * 0.8), radar_dbz: 46, wind_gust_kmh: 50, flood_threat_score: 72, thunderstorm_prob: Math.round(baseProb * 80), confidence: 0.88 },
+          { interval: '4h', rain_rate_mm_hr: Math.round(baseRain * 0.6), radar_dbz: 38, wind_gust_kmh: 38, flood_threat_score: 58, thunderstorm_prob: Math.round(baseProb * 60), confidence: 0.84 },
+          { interval: '5h', rain_rate_mm_hr: Math.round(baseRain * 0.4), radar_dbz: 28, wind_gust_kmh: 28, flood_threat_score: 44, thunderstorm_prob: Math.round(baseProb * 45), confidence: 0.80 },
+          { interval: '6h', rain_rate_mm_hr: Math.round(baseRain * 0.25), radar_dbz: 20, wind_gust_kmh: 20, flood_threat_score: 30, thunderstorm_prob: Math.round(baseProb * 30), confidence: 0.76 },
+        ],
+        hazard_probability_maps: maps,
+        map_shape: [5, 16, 16],
+        probability_layers,
+        xai_triggers: {
+          moisture: { iwv: 54.2, attribution: 0.28, trigger: 'Critical moisture accumulation (>50 mm IWV)' },
+          instability: { cape: 2850.0, attribution: 0.34, trigger: 'Severe convective instability (CAPE >2500 J/kg)' },
+          lift_and_structure: { cape: 2850.0, attribution: 0.18, trigger: 'Low-level convergence trigger' },
+          cloud_growth: { ctt_drop_rate: 4.8, attribution: 0.22, trigger: 'Explosive CTT cooling (-4.8°C/15min)' },
+          flood_catalyst: { elevation_m: zone.elevation, attribution: 0.25, trigger: 'Low elevation basin runoff' },
+        },
+      },
+    };
+  });
+
+  return {
+    city: 'Kolkata Metropolitan Area',
+    overall_alert_level: 'RED',
+    earliest_lead_time_minutes: 120,
+    max_predicted_rain_rate_mm_hr: 68.2,
+    active_alerts_count: 3,
+    status: 'READY',
+    alerts: [
+      {
+        zone_id: 1,
+        zone_name: 'Zone 17 - Dhapa Wetlands',
+        alert_level: 'RED',
+        primary_hazard: 'CLOUDBURST / EXTREME DOWNPOUR',
+        lead_time_minutes: 120,
+        peak_interval: '2h',
+        rain_rate_mm_hr: 68.2,
+        advisory: 'Take immediate action. Move to higher ground.',
+      },
+    ],
+    zones_nowcast,
+  };
+}
+

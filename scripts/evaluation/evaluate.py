@@ -1,4 +1,4 @@
-"""Evaluate forecasting performance on the unseen test split (Cyclone Remal)."""
+"""Evaluate forecasting performance on the configured unseen test split."""
 from __future__ import annotations
 
 import csv
@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 from sklearn.metrics import average_precision_score
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -99,6 +100,13 @@ def compute_metrics(
 
 
 def evaluate_test_split() -> dict:
+    index_path = ROOT / "data" / "datasets" / "final" / "index.csv"
+    if index_path.exists():
+        df = pd.read_csv(index_path)
+        test_df = df[df["split"].isin(["test"])].copy()
+    else:
+        test_df = pd.DataFrame([{"event_id": "cyclone_remal_2024"}])
+
     test_pred_path = ROOT / "data" / "datasets" / "final" / "test_predictions.npz"
     if not test_pred_path.exists():
         raise FileNotFoundError(
@@ -183,7 +191,7 @@ def evaluate_test_split() -> dict:
         "status": "completed",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "evaluated_split": "test",
-        "test_event_id": "2024-05-26",
+        "test_event_ids": sorted(test_df["event_id"].unique().tolist()),
         "test_samples": num_samples,
         "threshold_fit_split": "validation",
         "calibration_fit_split": "validation",
@@ -206,7 +214,7 @@ def evaluate_test_split() -> dict:
     print("STAGE: TEST EVALUATION (CYCLONE REMAL, UNSEEN TEST SPLIT - 14 SAMPLES)")
     print("=" * 86)
     print(f"Spatial Grid:             {height} x {width} ({height * width} pixels per frame)")
-    print(f"Total Test Sequences:     {num_samples} (2024-05-26 Cyclone Remal)")
+    print(f"Total Test Sequences:     {num_samples} across events {sorted(test_df['event_id'].unique())}")
     print(f"Calibration Applied:      Platt Scaling (Fitted on Validation Split Only)")
     print(f"Thresholds Applied:       CSI-Optimized (Fitted on Validation Split Only)")
     print("-" * 86)

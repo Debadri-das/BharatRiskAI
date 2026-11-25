@@ -1,0 +1,39 @@
+{
+  "projectType": "webapp",
+  "devServer": {
+    "command": "npm",
+    "args": ["run", "dev"],
+    "url": "http://localhost:5173/"
+  },
+  "setup": [],
+  "assertions": [
+    {
+      "name": "vite-builds",
+      "kind": "process",
+      "command": "npm",
+      "args": ["run", "build"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 180
+    },
+    {
+      "name": "tests-pass",
+      "kind": "process",
+      "command": "npm",
+      "args": ["test"],
+      "verificationMethod": "test-results",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "dev-server-serves-home",
+      "kind": "http-probe",
+      "startCommand": "npm",
+      "startArgs": ["run", "dev"],
+      "url": "http://localhost:5173/",
+      "verificationMethod": "http-status",
+      "expected": "200",
+      "timeoutSeconds": 120
+    }
+  ]
+}

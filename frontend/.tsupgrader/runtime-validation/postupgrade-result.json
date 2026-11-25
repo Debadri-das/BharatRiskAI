@@ -1,0 +1,109 @@
+{
+  "planHash": "edddf1b9fdab45b83cf2e6a66d5287168a8247cdc82d188c08e2d66a36e46f13",
+  "phase": "postupgrade",
+  "recordedAtUtc": "2026-11-05T16:36:35.4425210Z",
+  "retryCount": 2,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "vite-builds",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": false,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 1,
+        "outputSample": "npm notice run bharatrisk-frontend@1.0.0 build\r\nnpm notice run vite build\r\n\u001B[36mvite v5.4.21 \u001B[32mbuilding for production...\u001B[36m\u001B[39m\r\ntransforming...\r\n\u001B[32m\u2713\u001B[39m 1055 modules transformed.\r\n\u001B[31mx\u001B[39m Build failed in 2.32s\r\n\u001B[31merror during build:\r\n\u001B[31mCould not resolve \u0022./icons/sparkles.mjs\u0022 from \u0022node_modules/lucide-react/dist/esm/lucide-react.mjs\u0022\u001B[31m\r\nfile: \u001B[36mC:/Users/datta/BharatRiskAI/frontend/node_modules/lucide-react/dist/esm/lucide-react.mjs\u001B[31m\r\n    at getRollupError (file:///C:/Users/datta/BharatRiskAI/frontend/node_modules/rollup/dist/es/shared/parseAst.js:319:41)\r\n    at error (file:///C:/Users/datta/BharatRiskAI/frontend/node_modules/rollup/dist/es/shared/parseAst.js:315:42)\r\n    at ModuleLoader.handleInvalidResolvedId (file:///C:/Users/datta/BharatRiskAI/frontend/node_modules/rollup/dist/es/shared/node-entry.js:22654:24)\r\n    at file:///C:/Users/datta/BharatRiskAI/frontend/node_modules/rollup/dist/es/shared/node-entry.js:22614:26\u001B[39m\r\n",
+        "durationMs": 4187
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "npm notice run bharatrisk-frontend@1.0.0 test\r\nnpm notice run vitest run\r\n\r\n\u001B[1m\u001B[7m\u001B[36m RUN \u001B[39m\u001B[27m\u001B[22m \u001B[36mv2.1.9 \u001B[39m\u001B[90mC:/Users/datta/BharatRiskAI/frontend\u001B[39m\r\n\r\n \u001B[32m\u2713\u001B[39m src/App.test.jsx \u001B[2m(\u001B[22m\u001B[2m1 test\u001B[22m\u001B[2m)\u001B[22m\u001B[33m 441\u001B[2mms\u001B[22m\u001B[39m\r\n   \u001B[33m\u001B[2m\u2713\u001B[22m\u001B[39m renders the BharatRisk dashboard title \u001B[33m440\u001B[2mms\u001B[22m\u001B[39m\r\n\r\n\u001B[2m Test Files \u001B[22m \u001B[1m\u001B[32m1 passed\u001B[39m\u001B[22m\u001B[90m (1)\u001B[39m\r\n\u001B[2m      Tests \u001B[22m \u001B[1m\u001B[32m1 passed\u001B[39m\u001B[22m\u001B[90m (1)\u001B[39m\r\n\u001B[2m   Start at \u001B[22m 22:06:29\r\n\u001B[2m   Duration \u001B[22m 4.22s\u001B[2m (transform 516ms, setup 0ms, collect 1.78s, tests 441ms, environment 1.54s, prepare 141ms)\u001B[22m\r\n\r\n",
+        "durationMs": 5371,
+        "testResults": {
+          "testFramework": "vitest",
+          "runnerDetectedFrom": "package_json",
+          "testsTotal": 1,
+          "testsPassed": 1,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": false
+        }
+      },
+      {
+        "name": "dev-server-serves-home",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\r\n\u003Chtml\u003E\r\n  \u003Chead\u003E\n    \u003Cscript type=\u0022module\u0022\u003Eimport { injectIntoGlobalHook } from \u0022/@react-refresh\u0022;\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () =\u003E {};\nwindow.$RefreshSig$ = () =\u003E (type) =\u003E type;\u003C/script\u003E\n\n    \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\r\n    \u003Cmeta charset=\u0022utf-8\u0022 /\u003E\r\n    \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1.0\u0022 /\u003E\r\n    \u003Cmeta name=\u0022theme-color\u0022 content=\u0022#163b35\u0022 /\u003E\r\n    \u003Cmeta name=\u0022description\u0022 content=\u0022Live disaster intelligence and emergency response console for India.\u0022 /\u003E\r\n    \u003Ctitle\u003EBharatRisk AI | Live Operations Console\u003C/title\u003E\r\n  \u003C/head\u003E\r\n  \u003Cbody\u003E\r\n    \u003Cdiv id=\u0022root\u0022\u003E\u003C/div\u003E\r\n    \u003Cscript type=\u0022module\u0022 src=\u0022/src/main.jsx\u0022\u003E\u003C/script\u003E\r\n  \u003C/body\u003E\r\n\u003C/html\u003E\r\n\r\n\n--- server output ---\nnpm notice run bharatrisk-frontend@1.0.0 dev\r\nnpm notice run vite\r\n\r\n  \u001B[32m\u001B[1mVITE\u001B[22m v5.4.21\u001B[39m  \u001B[2mready in \u001B[0m\u001B[1m396\u001B[22m\u001B[2m\u001B[0m ms\u001B[22m\r\n\r\n  \u001B[32m\u279C\u001B[39m  \u001B[1mLocal\u001B[22m:   \u001B[36mhttp://localhost:\u001B[1m5173\u001B[22m/\u001B[39m\r\n  \u001B[32m\u279C\u001B[39m  \u001B[1mNetwork\u001B[22m: \u001B[36mhttp://10.144.121.234:\u001B[1m5173\u001B[22m/\u001B[39m\r\n",
+        "durationMs": 1131
+      }
+    ],
+    "executions": [
+      {
+        "source": "devServer",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev"
+        ],
+        "cwd": "C:\\Users\\datta\\BharatRiskAI\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "vite-builds",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "C:\\Users\\datta\\BharatRiskAI\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "C:\\Users\\datta\\BharatRiskAI\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "dev-server-serves-home",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev"
+        ],
+        "cwd": "C:\\Users\\datta\\BharatRiskAI\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

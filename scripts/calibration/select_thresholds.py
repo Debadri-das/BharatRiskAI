@@ -103,8 +103,8 @@ def select_thresholds() -> dict:
     val_df["split"] = "val"
 
     assert set(val_df["split"].unique()) == {"val"}, "Zero Data Leakage violation: split must be exclusively 'val'"
-    assert len(val_df) == 7, f"Expected exactly 7 validation samples (Cyclone Yaas), got {len(val_df)}"
-    assert set(val_df["event_id"].unique()) == {"2021-05-26"}, f"Validation split must only contain Cyclone Yaas (2021-05-26), got {val_df['event_id'].unique()}"
+    if val_df.empty:
+        raise ValueError("Threshold selection requires a non-empty validation split")
 
     validation_pred_path = ROOT / "data" / "datasets" / "final" / "validation_predictions.npz"
     if not validation_pred_path.exists():
@@ -120,7 +120,7 @@ def select_thresholds() -> dict:
     print("=" * 80)
     print("STAGE: ALERT THRESHOLD SELECTION (ZERO DATA LEAKAGE: VALIDATION SPLIT ONLY)")
     print("=" * 80)
-    print(f"Validation sequences:   {len(val_df)} (Cyclone Yaas, 2021-05-26)")
+    print(f"Validation sequences:   {len(val_df)} across events {sorted(val_df['event_id'].unique())}")
     print(f"Optimization Metric:    Critical Success Index (CSI / Threat Score)")
     print(f"Candidate Grid:         0.01 to 0.99 (99 steps)")
     print("-" * 80)
@@ -164,7 +164,7 @@ def select_thresholds() -> dict:
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "fitted_on": "validation",
         "validation_samples": len(val_df),
-        "validation_event_id": "2021-05-26",
+        "validation_event_ids": sorted(val_df["event_id"].unique().tolist()),
         "optimization_metric": "csi",
         "hazard_channels": list(HAZARDS),
         "lead_time_horizons": list(HORIZONS),

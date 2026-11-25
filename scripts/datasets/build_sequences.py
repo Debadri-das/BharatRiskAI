@@ -3,11 +3,16 @@ from __future__ import annotations
 
 import csv
 import json
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 import numpy as np
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from reports.unified_feature_schema import (
     CHANNEL_ORDER,
@@ -18,7 +23,6 @@ from reports.unified_feature_schema import (
 from reports.source_manifest import manifest_summary
 from scripts.labels.contracts import LabelContractError, validate_ground_truth
 
-ROOT = Path(__file__).resolve().parents[2]
 HAZARDS = ("thunderstorm", "cloudburst", "flash_flood")
 
 
@@ -41,7 +45,7 @@ def discover_aligned_feature_grids(feature_dir: Path) -> dict[datetime, Path]:
                 raise ValueError(f"Feature grid {path} has no timestamp")
             stamp = _timestamp(data["timestamp"].item() if data["timestamp"].ndim == 0 else data["timestamp"][0])
             missing = [name for name in CHANNEL_ORDER if name not in data.files]
-            unknown = [name for name in data.files if name != "timestamp" and name not in CHANNEL_ORDER]
+            unknown = [name for name in data.files if name not in ("timestamp", "qpe_valid_mask") and name not in CHANNEL_ORDER]
             if missing or unknown:
                 raise ValueError(f"Feature grid {path} channel contract failed; missing={missing}, unknown={unknown}")
             local_shapes = {tuple(data[name].shape) for name in CHANNEL_ORDER}
@@ -127,12 +131,14 @@ def assemble_sequences(
         input_array = np.stack(inputs)
 
         target_layers: list[np.ndarray] = []
+        skip_anchor = False
         for target_time in target_times:
             hazard_layers: list[np.ndarray] = []
             for hazard in HAZARDS:
                 path = _find_label(target_time, hazard, label_lookup)
                 if path is None:
-                    raise ValueError(f"Missing spatial label grid for {hazard} at {target_time.isoformat()}")
+                    skip_anchor = True
+                    break
                 grid_data = np.load(path, allow_pickle=False)
                 if isinstance(grid_data, np.lib.npyio.NpzFile):
                     if "grid" not in grid_data.files:
@@ -145,19 +151,128 @@ def assemble_sequences(
                 if grid.shape != input_array.shape[-2:]:
                     raise ValueError(f"Label grid shape {grid.shape} does not match feature grid {input_array.shape[-2:]}")
                 hazard_layers.append(grid)
+            if skip_anchor:
+                break
             target_layers.append(np.stack(hazard_layers))
+        if skip_anchor:
+            continue
         target_array = np.stack(target_layers)
+
+        input_valid = np.isfinite(input_array)
+        input_missing = ~input_valid
+        target_valid = np.isfinite(target_array)
+        target_missing = ~target_valid
 
         row: dict[str, Any] = {"timestamp": anchor.isoformat(), "inputs": input_array, "targets": target_array}
         if output_dir is not None:
             Path(output_dir).mkdir(parents=True, exist_ok=True)
             path = Path(output_dir) / f"sample_{len(samples):05d}.npz"
-            np.savez_compressed(path, inputs=input_array, targets=target_array, timestamp=anchor.isoformat())
+            np.savez_compressed(
+                path,
+                inputs=input_array,
+                targets=target_array,
+                timestamp=anchor.isoformat(),
+                input_valid_mask=input_valid,
+                input_missing_mask=input_missing,
+                target_valid_mask=target_valid,
+                target_missing_mask=target_missing,
+            )
             row["path"] = path
         samples.append(row)
     if not samples:
         raise ValueError("No valid 7-frame/5-horizon sequences can be constructed from available timestamps")
     return samples
+
+
+def load_event_catalog() -> list[dict[str, Any]]:
+    """Load extreme weather event definitions within April-September 2020."""
+    catalog_path = ROOT / "config" / "events.yaml"
+    if catalog_path.exists():
+        try:
+            import yaml
+            data = yaml.safe_load(catalog_path.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and "events" in data:
+                return data["events"]
+        except Exception:
+            pass
+    return []
+
+
+def resolve_event_id(stamp: datetime, catalog: list[dict[str, Any]] | None = None) -> str:
+    """Resolve event identifier based on actual event metadata windows."""
+    date_str = stamp.strftime("%Y-%m-%d")
+    if catalog:
+        for ev in catalog:
+            start = ev.get("start_date")
+            end = ev.get("end_date")
+            if start and end and start <= date_str <= end:
+                return str(ev["event_id"])
+    return f"event_{date_str}"
+
+
+def partition_event_splits(
+    samples: list[dict[str, Any]],
+    catalog: list[dict[str, Any]] | None = None,
+    train_frac: float = 0.70,
+    val_frac: float = 0.15,
+) -> tuple[dict[str, set[str]], list[dict[str, Any]]]:
+    """Partition sequences into event-based splits (~70% train / ~15% val / ~15% test).
+    
+    Strict constraints:
+    1. Independent event groups are partitioned as whole units.
+    2. All observations/frames belonging to one storm event remain in the same split.
+    3. If there are too few independent events (< 3), reports that the dataset cannot
+       support a reliable independent evaluation; neighbouring frames are never randomly split.
+    """
+    if catalog is None:
+        catalog = load_event_catalog()
+
+    # Assign event IDs based on actual event metadata
+    for row in samples:
+        stamp = _timestamp(row["timestamp"])
+        if "event_id" not in row or not row["event_id"] or row["event_id"] == "unassigned":
+            row["event_id"] = resolve_event_id(stamp, catalog)
+
+    unique_events = sorted({row["event_id"] for row in samples})
+    n_events = len(unique_events)
+
+    if n_events < 3:
+        raise RuntimeError(
+            f"Dataset cannot support a reliable independent evaluation: only {n_events} independent "
+            f"event group(s) available ({unique_events}). At least 3 independent event groups "
+            f"within April–September 2020 are required to partition into Training (~70%), "
+            f"Validation (~15%), and Testing (~15%). Randomly splitting neighbouring frames from "
+            f"the same storm event across partitions is strictly prohibited to prevent temporal data leakage."
+        )
+
+    # Initial allocation: ~70% Training, ~15% Validation, ~15% Testing by independent event groups
+    n_train = max(1, round(n_events * train_frac))
+    n_val = max(1, round(n_events * val_frac))
+    if n_train + n_val >= n_events:
+        n_train = max(1, n_events - 2)
+        n_val = 1
+    n_test = n_events - n_train - n_val
+
+    train_events = set(unique_events[:n_train])
+    val_events = set(unique_events[n_train:n_train + n_val])
+    test_events = set(unique_events[n_train + n_val:])
+
+    # Strict zero event leakage verification
+    assert len(train_events & val_events) == 0, "Train and Val event sets overlap!"
+    assert len(train_events & test_events) == 0, "Train and Test event sets overlap!"
+    assert len(val_events & test_events) == 0, "Val and Test event sets overlap!"
+
+    for row in samples:
+        ev = row["event_id"]
+        if ev in train_events:
+            row["split"] = "train"
+        elif ev in val_events:
+            row["split"] = "validation"
+        else:
+            row["split"] = "test"
+
+    split_groups = {"train": train_events, "validation": val_events, "test": test_events}
+    return split_groups, samples
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -192,31 +307,35 @@ def main(argv: list[str] | None = None) -> None:
         (ROOT / "reports" / "data_readiness.md").write_text(report["markdown"], encoding="utf-8")
         (ROOT / "reports" / "data_readiness.json").write_text(json.dumps({key: value for key, value in report.items() if key != "markdown"}, indent=2), encoding="utf-8")
         raise RuntimeError(json.dumps({"status": "blocked", "reason": "Cannot build supervised sequences with unknown, invalid, or contract-invalid targets; null is not a negative label.", "unknown_label_records": unknown, "invalid_label_records": len(invalid), "contract_invalid_records": len(contract_invalid), "next_action": "Provide independent lightning/rainfall/flood observations; QPE and IMERG may support but cannot be confirmed truth."}))
+    
     built = assemble_sequences(args.features, records, label_root=args.label_root, output_dir=args.output)
-    samples = [{"event_id": row["timestamp"][:10], "timestamp": row["timestamp"], "input_path": str(Path(row["path"]).relative_to(ROOT)) if "path" in row else "", "target_path": str(Path(row["path"]).relative_to(ROOT)) if "path" in row else "", "split": "unassigned", "hazard_label_summary": "known labels required"} for row in built]
+    catalog = load_event_catalog()
+    
+    samples = []
+    for row in built:
+        stamp = _timestamp(row["timestamp"])
+        ev_id = resolve_event_id(stamp, catalog)
+        samples.append({
+            "event_id": ev_id,
+            "timestamp": row["timestamp"],
+            "input_path": str(Path(row["path"]).relative_to(ROOT)) if "path" in row else "",
+            "target_path": str(Path(row["path"]).relative_to(ROOT)) if "path" in row else "",
+            "split": "unassigned",
+            "hazard_label_summary": "known labels required",
+        })
+
     if not samples:
         raise RuntimeError("No valid 7-frame/5-horizon sequences can be constructed from the available timestamps.")
-    dates = sorted({row["event_id"] for row in samples})
-    if len(dates) < 3:
-        raise RuntimeError(f"Event/date split blocked: only {len(dates)} independent date group is available; at least 3 are required for train/validation/test.")
-    
-    # Event/date-group split: whole dates stay in exactly one split so frames from
-    # the same day never leak across train/validation/test.
-    train_dates = {dates[0]}  # 2020-05-20 (Amphan)
-    validation_dates = {dates[1]}  # 2021-05-26 (Yaas)
-    test_dates = {dates[2]}  # 2024-05-26 (Remal)
 
-    for row in samples:
-        if row["event_id"] in train_dates:
-            row["split"] = "train"
-        elif row["event_id"] in validation_dates:
-            row["split"] = "validation"
-        else:
-            row["split"] = "test"
+    # Event-based split: ~70% train / ~15% validation / ~15% test across independent event groups
+    split_groups, samples = partition_event_splits(samples, catalog)
+    train_events = split_groups["train"]
+    validation_events = split_groups["validation"]
+    test_events = split_groups["test"]
 
     # Write split CSVs
-    for name, split_dates in [("train", train_dates), ("validation", validation_dates), ("test", test_dates)]:
-        split_samples = [r for r in samples if r["event_id"] in split_dates]
+    for name, split_events in [("train", train_events), ("validation", validation_events), ("test", test_events)]:
+        split_samples = [r for r in samples if r["event_id"] in split_events]
         with (split_dir / f"{name}.csv").open("w", newline="", encoding="utf-8") as handle:
             writer = csv.DictWriter(handle, fieldnames=fields)
             writer.writeheader()
@@ -237,7 +356,14 @@ def main(argv: list[str] | None = None) -> None:
         writer = csv.DictWriter(handle, fieldnames=samples[0].keys())
         writer.writeheader()
         writer.writerows(samples)
-    print(f"Sequence stage complete: created {len(samples)} samples across {len(dates)} event dates: train={len([s for s in samples if s['split']=='train'])}, val={len([s for s in samples if s['split']=='validation'])}, test={len([s for s in samples if s['split']=='test'])}")
+        
+    n_train_s = len([s for s in samples if s["split"] == "train"])
+    n_val_s = len([s for s in samples if s["split"] == "validation"])
+    n_test_s = len([s for s in samples if s["split"] == "test"])
+    print(f"Sequence stage complete: created {len(samples)} samples across {len(split_groups['train']) + len(split_groups['validation']) + len(split_groups['test'])} independent events.")
+    print(f"  * Training (~70% events):   {len(train_events)} events ({n_train_s} sequences): {sorted(train_events)}")
+    print(f"  * Validation (~15% events): {len(validation_events)} events ({n_val_s} sequences): {sorted(validation_events)}")
+    print(f"  * Testing (~15% events):    {len(test_events)} events ({n_test_s} sequences): {sorted(test_events)}")
 
 
 def blocked_readiness(records: list[dict]) -> dict:
@@ -262,7 +388,7 @@ def blocked_readiness(records: list[dict]) -> dict:
     missing_sources = [f"{name} (required source)" for name in source_manifest["missing_required"]]
     missing_sources.extend(["official lightning/thunderstorm event catalogue", "official cloudburst event catalogue with authoritative threshold", "official flood/inundation observations (gauge, extent, or disaster reports)", "contemporaneous multi-date INSAT L1C + QPE sequences"])
     required = [
-        "INSAT-3DR L1C imager granules for at least 3+ independent dates covering real weather events.",
+        "INSAT-3DR L1C imager granules for at least 3+ independent dates covering real weather events within April-September 2020.",
         "Contemporaneous INSAT QPE (HEM) for those same dates.",
         "IMDAA pressure-level profiles.",
         "At least one authoritative thunderstorm/lightning observation source.",
@@ -273,19 +399,16 @@ def blocked_readiness(records: list[dict]) -> dict:
     lines = [
         "# Data readiness", "",
         "## Status", "",
-        f"Blocked for supervised training: {sum(v['unknown'] for v in per_hazard.values())} targets unknown.", "",
-        f"- Timestamp count: {len(timestamps)}",
-        f"- Independent dates: {len(dates)}",
+        "- Independent event sequence assembly: BLOCKED until at least 3 independent event groups with valid observations exist within April–September 2020.",
     ]
     return {
-        "status": "blocked",
-        "timestamp_count": len(timestamps),
-        "independent_dates": len(dates),
-        "labels": per_hazard,
-        "missing_sources": missing_sources,
-        "source_manifest": source_manifest,
-        "required_additional_data": required,
         "markdown": "\n".join(lines),
+        "status": "blocked",
+        "labels": per_hazard,
+        "timestamps": timestamps,
+        "missing_sources": missing_sources,
+        "required_actions": required,
+        "source_manifest": source_manifest,
     }
 
 

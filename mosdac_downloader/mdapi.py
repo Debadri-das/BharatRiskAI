@@ -1,3 +1,4 @@
+import socket
 import requests
 import os
 from pathlib import Path
@@ -9,6 +10,12 @@ import threading
 from datetime import datetime
 import re
 import sys
+
+# Force IPv4 to bypass unreachable MOSDAC IPv6 route
+_orig_gai = socket.getaddrinfo
+def _ipv4_getaddrinfo(host, port, family=0, type=0, proto=0, flags=0):
+    return _orig_gai(host, port, socket.AF_INET, type, proto, flags)
+socket.getaddrinfo = _ipv4_getaddrinfo
 
 try:
     from tqdm.auto import tqdm
@@ -23,6 +30,11 @@ check_internet_url = "https://mosdac.gov.in/download_api/check-internet"
 download_url = "https://mosdac.gov.in/download_api/download"
 refresh_url = "https://mosdac.gov.in/download_api/refresh-token"
 logout_url = "https://mosdac.gov.in/download_api/logout"
+
+DEFAULT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    "Accept": "application/json, text/plain, */*",
+}
 
 def preprocess_json(raw_json):
     """
@@ -76,7 +88,7 @@ config_file = load_config()
 
 # Fetching Information from 'config.json'
 user_creds = config_file['user_credentials']
-username = user_creds.get("username/email", "")
+username = user_creds.get("username/email") or user_creds.get("username") or user_creds.get("email") or ""
 password = user_creds.get("password", "")
 
 download_settings = config_file['download_settings']
@@ -85,8 +97,8 @@ download_settings = config_file['download_settings']
 download_path = download_settings.get("download_path").replace("\\", "/") or os.path.join(os.getcwd(), "MOSDAC Data Download")
 
 use_date_structure = download_settings.get("organize_by_date", False)
-skip_user_input = download_settings.get("skip_user_input", False)
-generate_logs = download_settings.get("generate_error_logs", False)
+skip_user_input = download_settings.get("skip_user_input") if "skip_user_input" in download_settings else download_settings.get("skip_user_prompt", False)
+generate_logs = download_settings.get("generate_error_logs") if "generate_error_logs" in download_settings else download_settings.get("generate_error_log", False)
 
 bool_fields = {
     "organize_by_date": use_date_structure,
@@ -169,7 +181,7 @@ def get_token():
         "password": password
     }
     try:
-        response = requests.post(token_url,json=data)
+        response = requests.post(token_url, json=data, headers=DEFAULT_HEADERS, timeout=30)
 
         # Catches and Displays - 'Server Maintainance' messages from Server Side
         if response.status_code == 503:
@@ -268,7 +280,7 @@ def search_results():
     data.update({k: v for k, v in optional_parameters.items() if v})
 
     try:
-        res = requests.get(search_url, params=data)
+        res = requests.get(search_url, params=data, headers=DEFAULT_HEADERS, timeout=30)
         if res.status_code == 200:
             list = res.json()
             totalResults = list["totalResults"]
@@ -278,11 +290,12 @@ def search_results():
             formatted_size = format_size(totalSize)
 
             if count != "":
+                actual_found = min(totalResults, itemsPerPage)
                 if skip_user_input:
-                    print(f"\n{UNDERLINE}{itemsPerPage}{RESET} Files Found for {datasetId}{RESET}")
+                    print(f"\n{UNDERLINE}{actual_found}{RESET} Files Found for {datasetId}{RESET}")
                 else:
-                    print(f"\n{UNDERLINE}{itemsPerPage}{RESET} Files Found for {datasetId}{RESET}.\nDo you want to Download them? [Y/N]: ")
-                return list['itemsPerPage']
+                    print(f"\n{UNDERLINE}{actual_found}{RESET} Files Found for {datasetId}{RESET}.\nDo you want to Download them? [Y/N]: ")
+                return actual_found
 
             if skip_user_input:
                 print(f"\n{UNDERLINE}{totalResults:,}{RESET} Files Found with Total Size of {UNDERLINE}{formatted_size}{RESET}")
@@ -353,7 +366,7 @@ def fetch_and_download_data(total_files, access_token, refresh_token):
             
             data["startIndex"] = start_Index # Sets 'startIndex' for Pagination 
             try:
-                res = requests.get(search_url, params=data)
+                res = requests.get(search_url, params=data, headers=DEFAULT_HEADERS, timeout=30)
                 
                 if res.status_code == 200:
                     list=res.json()
@@ -396,17 +409,23 @@ def fetch_and_download_data(total_files, access_token, refresh_token):
 
                     # Increments startIndex for Next Batch
                     start_Index += batch_size
+                    if len(list.get('entries', [])) < batch_size or counter > total_files:
+                        break
                 
                 else:
                     print(f"\nUnexpected Status Code: {res.status_code}")
                     res.raise_for_status()
 
             except requests.exceptions.RequestException as e:
-                res_json = res.json()
-                error_message = res_json['message'][0] 
+                error_message = str(e)
+                try:
+                    if 'res' in locals() and res is not None:
+                        error_message = res.json().get('message', [str(e)])[0]
+                except Exception:
+                    pass
                 print(f"\n\n[ERROR] Error Fetching Data from 'fetch_and_download_data()' method.\n\nError Message: {error_message}\nError Details: {e}")
                 if generate_logs:
-                    logger.error("\n\nError Fetching Data from 'fetch_and_download_data()' method.\n\nError Message: {error_message}\nError Details: ", exc_info=True)
+                    logger.error(f"\n\nError Fetching Data from 'fetch_and_download_data()' method.\n\nError Message: {error_message}\nError Details: ", exc_info=True)
                 break # Exits loop on Error
 
         if counter == (total_files + 1):
@@ -451,7 +470,10 @@ def download_data(bearer_token, record_id, identifier, prod_date, counter, total
     # Creates Download Path if Not Already Exist
     os.makedirs(download_path, exist_ok=True)
 
-    headers = {"Authorization": f"Bearer {bearer_token}"}
+    headers = {
+        "Authorization": f"Bearer {bearer_token}",
+        "User-Agent": DEFAULT_HEADERS["User-Agent"]
+    }
     params = {"id": record_id}
 
     tmp_file_path = '' 
@@ -490,10 +512,20 @@ def download_data(bearer_token, record_id, identifier, prod_date, counter, total
 
                 # Checks if File Already Exists
                 if os.path.exists(file_path):
-                    print(f"\n[INFO] {identifier} Already Exists in {folder_structure}. Skipping Download..")
-                    return None
+                    actual_size = os.path.getsize(file_path)
+                    # L1C Asia Mer files are ~20-30MB; QPE HEM files are ~9MB
+                    min_valid_size = 5 * 1024 * 1024 if ("L2B" in datasetId or "HEM" in datasetId or "QPE" in datasetId) else 15 * 1024 * 1024
+                    if actual_size < min_valid_size:
+                        print(f"\n[WARNING] Existing {identifier} is truncated ({actual_size / (1024*1024):.2f} MB). Removing and re-downloading...")
+                        try:
+                            os.remove(file_path)
+                        except OSError:
+                            pass
+                    else:
+                        print(f"\n[INFO] {identifier} Already Exists in {folder_structure}. Skipping Download..")
+                        return None
 
-                response = requests.get(download_url, headers=headers, params=params, stream=True, timeout=5)
+                response = requests.get(download_url, headers=headers, params=params, stream=True, timeout=(15, 60))
 
                 if response.status_code == 400:
                     resp = response.json()
@@ -597,6 +629,12 @@ def download_data(bearer_token, record_id, identifier, prod_date, counter, total
                             print("[ERROR] Error Encountered in download_data():", e)
                             if generate_logs:
                                 logger.error("An error was encountered while Downloading ")
+                            if os.path.exists(tmp_file_path):
+                                try:
+                                    os.remove(tmp_file_path)
+                                except OSError:
+                                    pass
+                            raise e
 
                     else:                     
                         # Alternative for Download Progress - w/o TQDM
@@ -624,11 +662,31 @@ def download_data(bearer_token, record_id, identifier, prod_date, counter, total
                                 logger.error(f"\nPermission Error encountered: No Permission to Write to {download_path}, hence could not Proceed with Download.\nPlease Check and Update the Permission for Writing files inside: {download_path}")
                             print("Stopping Further Downloads..\n")
                             return "Permission Denied"
+                        except Exception as e:
+                            print("[ERROR] Error Encountered in download_data():", e)
+                            if os.path.exists(tmp_file_path):
+                                try:
+                                    os.remove(tmp_file_path)
+                                except OSError:
+                                    pass
+                            raise e
 
-                # Renames Temp File to Final File after Successful Download
-                os.rename(tmp_file_path, file_path)
-                
-                return file_path
+                # Verify file size before finalizing
+                if os.path.exists(tmp_file_path):
+                    actual_downloaded = os.path.getsize(tmp_file_path)
+                    if total_size > 0 and actual_downloaded < total_size:
+                        print(f"\n[WARNING] Download incomplete ({actual_downloaded}/{total_size} bytes). Discarding...")
+                        try:
+                            os.remove(tmp_file_path)
+                        except OSError:
+                            pass
+                        raise requests.exceptions.ConnectionError(f"Incomplete download: {actual_downloaded}/{total_size}")
+
+                    # Renames Temp File to Final File after Successful Download
+                    os.rename(tmp_file_path, file_path)
+                    return file_path
+                else:
+                    raise requests.exceptions.ConnectionError("Temporary download file missing")
 
             except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
                 print(f"\n[WARNING] Network Error encountered: Please check your Internet connection and reconnect if needed.\nError Details: {e}")
@@ -645,6 +703,18 @@ def download_data(bearer_token, record_id, identifier, prod_date, counter, total
             except requests.exceptions.RequestException as e:
                 error_message = str(e)
                 
+                if any(err_code in error_message for err_code in ["502 Server Error", "503 Server Error", "504 Server Error"]):
+                    retry_wait = delay if delay is not None else 10
+                    print(f"\n[WARNING] Transient MOSDAC error ({error_message}). Retrying in {retry_wait}s...")
+                    if delay is not None:
+                        if tmp_file_path and os.path.exists(tmp_file_path):
+                            try:
+                                os.remove(tmp_file_path)
+                            except OSError:
+                                pass
+                        time.sleep(delay)
+                        continue
+
                 if "NOT FOUND for url" in error_message:
                     print(f"\n[WARNING] {identifier}: File Not Available on the Server. Skipping File..")
                     if generate_logs:

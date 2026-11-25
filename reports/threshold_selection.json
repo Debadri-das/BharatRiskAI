@@ -1,6 +1,6 @@
 {
   "status": "completed",
-  "generated_at": "2026-10-08T15:36:38.618251+00:00",
+  "generated_at": "2026-11-22T15:41:07.503249+00:00",
   "fit_split": "validation",
   "test_split_used": false,
   "selection_metric": "csi",
@@ -176,25 +176,9 @@
     },
     "flash_flood": {
       "+2h": {
-        "threshold": 0.32,
+        "threshold": 0.25,
         "metrics": {
-          "threshold": 0.32,
-          "csi": 0.31627906976744186,
-          "f1": 0.480565371024735,
-          "pod": 1.0,
-          "far": 0.6837209302325581,
-          "precision": 0.31627906976744186,
-          "recall": 1.0,
-          "true_positives": 20944,
-          "false_positives": 45276,
-          "false_negatives": 0,
-          "true_negatives": 812
-        }
-      },
-      "+3h": {
-        "threshold": 0.3,
-        "metrics": {
-          "threshold": 0.3,
+          "threshold": 0.25,
           "csi": 0.31244778613199664,
           "f1": 0.4761298535964354,
           "pod": 1.0,
@@ -207,10 +191,26 @@
           "true_negatives": 0
         }
       },
-      "+4h": {
-        "threshold": 0.3,
+      "+3h": {
+        "threshold": 0.27,
         "metrics": {
-          "threshold": 0.3,
+          "threshold": 0.27,
+          "csi": 0.3128150663415656,
+          "f1": 0.47655617971126774,
+          "pod": 0.998472116119175,
+          "far": 0.6870351247399692,
+          "precision": 0.3129648752600308,
+          "recall": 0.998472116119175,
+          "true_positives": 20912,
+          "false_positives": 45907,
+          "false_negatives": 32,
+          "true_negatives": 181
+        }
+      },
+      "+4h": {
+        "threshold": 0.24000000000000002,
+        "metrics": {
+          "threshold": 0.24000000000000002,
           "csi": 0.31244778613199664,
           "f1": 0.4761298535964354,
           "pod": 1.0,
@@ -227,32 +227,32 @@
         "threshold": 0.3,
         "metrics": {
           "threshold": 0.3,
-          "csi": 0.31244778613199664,
-          "f1": 0.4761298535964354,
-          "pod": 1.0,
-          "far": 0.6875522138680034,
-          "precision": 0.31244778613199664,
-          "recall": 1.0,
-          "true_positives": 20944,
-          "false_positives": 46088,
-          "false_negatives": 0,
-          "true_negatives": 0
+          "csi": 0.3415006100040667,
+          "f1": 0.5091322470632815,
+          "pod": 0.8019003055767762,
+          "far": 0.6270347094223979,
+          "precision": 0.3729652905776021,
+          "recall": 0.8019003055767762,
+          "true_positives": 16795,
+          "false_positives": 28236,
+          "false_negatives": 4149,
+          "true_negatives": 17852
         }
       },
       "+6h": {
         "threshold": 0.32,
         "metrics": {
           "threshold": 0.32,
-          "csi": 0.3162122172902135,
-          "f1": 0.4804881965633531,
-          "pod": 1.0,
-          "far": 0.6837877827097865,
-          "precision": 0.3162122172902135,
-          "recall": 1.0,
-          "true_positives": 20944,
-          "false_positives": 45290,
-          "false_negatives": 0,
-          "true_negatives": 798
+          "csi": 0.3244327027409539,
+          "f1": 0.48991949846833377,
+          "pod": 0.6567035905271199,
+          "far": 0.6093057607090103,
+          "precision": 0.3906942392909897,
+          "recall": 0.6567035905271199,
+          "true_positives": 13754,
+          "false_positives": 21450,
+          "false_negatives": 7190,
+          "true_negatives": 24638
         }
       }
     }
@@ -291,9 +291,9 @@
       }
     },
     "flash_flood": {
-      "threshold": 0.3,
+      "threshold": 0.18000000000000002,
       "metrics": {
-        "threshold": 0.3,
+        "threshold": 0.18000000000000002,
         "csi": 0.31244778613199664,
         "f1": 0.4761298535964354,
         "pod": 1.0,

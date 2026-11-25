@@ -138,28 +138,46 @@ def input_files(root: Path) -> list[Path]:
     return selected
 
 
+def _extract_worker(args_tuple: tuple[Path, Path]) -> tuple[str, str | None]:
+    path, output_dir = args_tuple
+    try:
+        extract(path, output_dir)
+        return str(path), None
+    except Exception as error:
+        return str(path), str(error)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=ROOT / "data" / "insat" / "l1c")
     parser.add_argument("--output", type=Path, default=ROOT / "data" / "insat" / "l1c" / "processed")
     parser.add_argument("--limit", type=int, default=None)
     args = parser.parse_args()
-    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
     args.input = args.input.resolve()
     args.output = args.output.resolve()
     args.output.mkdir(parents=True, exist_ok=True)
-    errors = []
+    
+    files_to_process = []
     for path in input_files(args.input)[:args.limit]:
         target = args.output / f"{path.stem}.npz"
         if target.exists() and target.stat().st_size > 0:
-            LOG.info("Skipping already extracted %s", path.name)
             continue
-        try:
-            LOG.info("Extracting %s", path.name)
-            extract(path, args.output)
-        except Exception as error:
-            LOG.error("Skipping %s: %s", path, error)
-            errors.append({"path": relative(path), "error": str(error)})
+        files_to_process.append((path, args.output))
+
+    LOG.info("Found %d unextracted files to process in parallel...", len(files_to_process))
+    import concurrent.futures
+    import os
+    workers = min(8, os.cpu_count() or 4)
+    errors = []
+    with concurrent.futures.ProcessPoolExecutor(max_workers=workers) as executor:
+        for idx, (path_str, error) in enumerate(executor.map(_extract_worker, files_to_process), 1):
+            if error:
+                LOG.error("Failed %s: %s", path_str, error)
+                errors.append({"path": path_str, "error": error})
+            if idx % 100 == 0 or idx == len(files_to_process):
+                LOG.info("Progress: [%d/%d] files extracted...", idx, len(files_to_process))
+
     # Always rewrite the error record so stale failures from earlier runs are cleared.
     (args.output / "extraction_errors.json").write_text(json.dumps(errors, indent=2), encoding="utf-8")
 

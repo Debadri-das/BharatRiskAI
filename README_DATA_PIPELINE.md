@@ -2,6 +2,18 @@
 
 This pipeline is an AI nowcasting layer over observed satellite/reanalysis inputs. It does not replace NWP and does not claim confirmed hazard ground truth when source observations are absent. Observations, derived features, proxy labels, and model predictions are always kept distinct.
 
+The metadata-first ingestion command is:
+
+```powershell
+python -m ml.ingestion.batch_ingest --config config/data.yaml --inspect --all
+```
+
+See [docs/data-pipeline-contract.md](docs/data-pipeline-contract.md) for the
+raw/interim/processed layout, provenance requirements, future QPE proxy target
+contract, and the dedicated Flood Random Forest command. The production RF
+trainer requires an explicit user-supplied dataset and never creates synthetic
+rows or a demo CSV.
+
 ## Current audit
 
 Run:
@@ -34,6 +46,14 @@ python scripts/run_pipeline.py --stage evaluate
 `extract_l1c.py` reads provider projection metadata, crops the study region, applies radiance calibration and temperature/albedo lookup tables, and writes processed NPZ files. Corrupted/truncated granules are skipped with explicit error records. Raw files are never changed.
 
 The common ML grid is EPSG:4326 at 0.05 degrees, 114 by 84 cells, with a 30-minute time contract. This is intentionally coarser than the 30 m DEM because the satellite channels are approximately 4 km resolution; the DEM's native 30 m resolution is never used as the ML resolution.
+
+Atmospheric feature derivation is available through:
+
+```powershell
+python -m scripts.atmosphere.derive_features --pressure-dir data\imdaa\pressure_level --single-dir data\imdaa\single_level
+```
+
+The command writes timestamped NetCDF products and an `atmospheric_feature_manifest.json` under `data\processed\atmospheric_features`. It requires pressure-level temperature, relative humidity, U/V wind, and geopotential-height variables with units. Surface-only IMDAA files are recorded as `BLOCKED`; they are never treated as pressure-level profiles.
 
 Satellite WV is stored as calibrated radiance and is never mislabeled as IWV. IMDAA processing derives IWV, CAPE, CIN, convergence, and shear only when real vertical-profile files are present, and fails loudly (no defaults) when IMDAA is absent. QPE 1h/3h/6h accumulations remain NaN when the required historical QPE timestamps are missing; missing observations are never interpolated as if measured. CMV features are documented as absent and the pipeline continues without them.
 

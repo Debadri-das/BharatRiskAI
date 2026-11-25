@@ -209,19 +209,31 @@ class NowcastingInferenceEngine:
         hazard_map = outputs["thunderstorms"]  # Focus on thunderstorms for attribution
 
         hazard_map.mean().backward()
-        gradients = sequence_tensor.grad.abs().mean(dim=(0, 2, 3, 4)).cpu().numpy()
+        gradients = sequence_tensor.grad
 
-        feature_importance = gradients / (gradients.sum() + 1e-8)
+        from reports.unified_feature_schema import CHANNEL_ORDER, validate_channel_order
+        validate_channel_order(CHANNEL_ORDER)
+        feature_names = CHANNEL_ORDER
+        if gradients is None:
+            feature_importance = np.ones(len(feature_names), dtype=np.float32) / len(feature_names)
+        else:
+            feature_importance = self._reduce_channel_attributions(gradients, len(feature_names))
 
-        # Use the canonical feature order from reports.unified_feature_schema
-        from reports.unified_feature_schema import FEATURE_SCHEMA
-        feature_names = FEATURE_SCHEMA['insat'] + FEATURE_SCHEMA['imdaa'] + FEATURE_SCHEMA['dem'] + FEATURE_SCHEMA['qpe']
-        
-        # Fallback to uniform attribution if gradients cannot be computed
-        if feature_importance is None or len(feature_importance) != len(feature_names):
-            feature_importance = np.ones(len(feature_names)) / len(feature_names)
-        
         return dict(zip(feature_names, map(float, feature_importance)))
+
+    @staticmethod
+    def _reduce_channel_attributions(gradients: torch.Tensor, channel_count: int) -> np.ndarray:
+        """Reduce [batch, time, channels, height, width] gradients to channels."""
+        if gradients.ndim != 5 or gradients.shape[2] != channel_count:
+            raise ValueError(
+                "Expected gradients with shape [batch, time, channels, height, width] "
+                f"and {channel_count} channels, got {tuple(gradients.shape)}"
+            )
+        channel_scores = gradients.detach().abs().mean(dim=(0, 1, 3, 4))
+        total = channel_scores.sum()
+        if not torch.isfinite(total) or total <= 0:
+            return np.ones(channel_count, dtype=np.float32) / channel_count
+        return (channel_scores / total).detach().cpu().numpy()
     def predict_nowcast(self, observation: Dict[str, Any]) -> Dict[str, Any]:
         """
         End-to-end nowcasting inference with XAI feature attribution.

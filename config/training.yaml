@@ -1,8 +1,13 @@
 seed: 20260922
-epochs: 30
+epochs: 100
 batch_size: 2
 learning_rate: 0.0001
 weight_decay: 0.00001
-patience: 6
-num_workers: 0
+patience: 15
+num_workers: 2
 mixed_precision: true
+historical_period:
+  start_date: "2020-04-01"
+  end_date: "2020-09-27"
+  end_inclusive: true
+  timezone: "UTC"

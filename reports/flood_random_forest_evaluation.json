@@ -1,0 +1,221 @@
+{
+  "artifact": "C:\\Users\\dasde\\BharatRiskAI\\ml\\artifacts\\flood_random_forest.joblib",
+  "best_hyperparameters": {
+    "n_estimators": 600,
+    "max_depth": 10,
+    "min_samples_leaf": 10,
+    "max_features": "sqrt",
+    "class_weight": "balanced"
+  },
+  "metrics": {
+    "validation": {
+      "precision": 0.312751677852349,
+      "recall": 0.9221635883905013,
+      "f1": 0.46708987637821586,
+      "roc_auc": 0.543690447774674,
+      "pr_auc": 0.39345774111825355,
+      "confusion_matrix": {
+        "tn": 200,
+        "fp": 3072,
+        "fn": 118,
+        "tp": 1398
+      },
+      "sample_count": 4788,
+      "positive_count": 1516,
+      "negative_count": 3272
+    },
+    "test": {
+      "precision": 0.38251599147121534,
+      "recall": 0.9835526315789473,
+      "f1": 0.5508136321768499,
+      "roc_auc": 0.5042165340814926,
+      "pr_auc": 0.4583269103577495,
+      "confusion_matrix": {
+        "tn": 68,
+        "fp": 2896,
+        "fn": 30,
+        "tp": 1794
+      },
+      "sample_count": 4788,
+      "positive_count": 1824,
+      "negative_count": 2964
+    },
+    "train": {
+      "precision": 0.525669153137341,
+      "recall": 1.0,
+      "f1": 0.6890997986770204,
+      "roc_auc": 0.987288235226133,
+      "pr_auc": 0.9113568418295188,
+      "confusion_matrix": {
+        "tn": 14594,
+        "fp": 2162,
+        "fn": 0,
+        "tp": 2396
+      },
+      "sample_count": 19152,
+      "positive_count": 2396,
+      "negative_count": 16756
+    }
+  },
+  "event_performance": {
+    "cyclone_amphan_2020": {
+      "precision": 0.525669153137341,
+      "recall": 1.0,
+      "f1": 0.6890997986770204,
+      "roc_auc": 0.9109538751877431,
+      "pr_auc": 0.9113568418295187,
+      "confusion_matrix": {
+        "tn": 230,
+        "fp": 2162,
+        "fn": 0,
+        "tp": 2396
+      },
+      "sample_count": 4788,
+      "positive_count": 2396,
+      "negative_count": 2392
+    },
+    "cyclone_remal_2024": {
+      "precision": 0.38251599147121534,
+      "recall": 0.9835526315789473,
+      "f1": 0.5508136321768499,
+      "roc_auc": 0.5042165340814926,
+      "pr_auc": 0.4583269103577495,
+      "confusion_matrix": {
+        "tn": 68,
+        "fp": 2896,
+        "fn": 30,
+        "tp": 1794
+      },
+      "sample_count": 4788,
+      "positive_count": 1824,
+      "negative_count": 2964
+    },
+    "cyclone_yaas_2021": {
+      "precision": 0.312751677852349,
+      "recall": 0.9221635883905013,
+      "f1": 0.46708987637821586,
+      "roc_auc": 0.543690447774674,
+      "pr_auc": 0.39345774111825355,
+      "confusion_matrix": {
+        "tn": 200,
+        "fp": 3072,
+        "fn": 118,
+        "tp": 1398
+      },
+      "sample_count": 4788,
+      "positive_count": 1516,
+      "negative_count": 3272
+    },
+    "fair_weather_2020_04_01": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": null,
+      "pr_auc": null,
+      "confusion_matrix": {
+        "tn": 4788,
+        "fp": 0,
+        "fn": 0,
+        "tp": 0
+      },
+      "sample_count": 4788,
+      "positive_count": 0,
+      "negative_count": 4788
+    },
+    "fair_weather_2020_04_06": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": null,
+      "pr_auc": null,
+      "confusion_matrix": {
+        "tn": 4788,
+        "fp": 0,
+        "fn": 0,
+        "tp": 0
+      },
+      "sample_count": 4788,
+      "positive_count": 0,
+      "negative_count": 4788
+    },
+    "fair_weather_2020_04_14": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1": 0.0,
+      "roc_auc": null,
+      "pr_auc": null,
+      "confusion_matrix": {
+        "tn": 4788,
+        "fp": 0,
+        "fn": 0,
+        "tp": 0
+      },
+      "sample_count": 4788,
+      "positive_count": 0,
+      "negative_count": 4788
+    }
+  },
+  "region_performance": {
+    "Central_Gangetic_Plain": {
+      "precision": 0.38069368992895947,
+      "recall": 0.9701810436634718,
+      "f1": 0.5468187274909964,
+      "roc_auc": 0.8975950435736213,
+      "pr_auc": 0.6409202775732976,
+      "confusion_matrix": {
+        "tn": 5238,
+        "fp": 2964,
+        "fn": 56,
+        "tp": 1822
+      },
+      "sample_count": 10080,
+      "positive_count": 1878,
+      "negative_count": 8202
+    },
+    "Coastal_Sundarbans_Delta": {
+      "precision": 0.4985405720957385,
+      "recall": 0.9488888888888889,
+      "f1": 0.6536548029085343,
+      "roc_auc": 0.8620991512345679,
+      "pr_auc": 0.5822746079177011,
+      "confusion_matrix": {
+        "tn": 4042,
+        "fp": 1718,
+        "fn": 92,
+        "tp": 1708
+      },
+      "sample_count": 7560,
+      "positive_count": 1800,
+      "negative_count": 5760
+    },
+    "Northern_Sub_Himalayan": {
+      "precision": 0.3737740646567381,
+      "recall": 1.0,
+      "f1": 0.5441565309360127,
+      "roc_auc": 0.9430503224862163,
+      "pr_auc": 0.7837730082935881,
+      "confusion_matrix": {
+        "tn": 5582,
+        "fp": 3448,
+        "fn": 0,
+        "tp": 2058
+      },
+      "sample_count": 11088,
+      "positive_count": 2058,
+      "negative_count": 9030
+    }
+  },
+  "feature_importances": {
+    "soil_moisture": 0.7697741780201693,
+    "rainfall_72h": 0.09484893320579901,
+    "rainfall_24h": 0.056294377130611944,
+    "elevation": 0.042944800419285424,
+    "slope": 0.017000074261876913,
+    "drainage_proximity": 0.008746776604115747,
+    "flow_accumulation": 0.005483588917442566,
+    "rainfall_1h": 0.0017645691005755693,
+    "rainfall_6h": 0.0016716809754517693,
+    "rainfall_3h": 0.0014710213646717458
+  },
+  "comparison_count": 144
+}

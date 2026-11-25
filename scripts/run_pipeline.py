@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -10,7 +11,14 @@ ROOT = Path(__file__).resolve().parents[1]
 STAGES = {
     "audit": ["scripts/audit_dataset.py"],
     "extract": ["scripts/insat/extract_l1c.py"],
-    "features": ["scripts/features/satellite_features.py", "scripts/features/qpe_features.py", "scripts/features/dem_features.py", "scripts/features/build_unified_features.py"],
+    "atmosphere": ["scripts/atmosphere/derive_features.py"],
+    "features": [
+        "scripts/features/satellite_features.py",
+        "scripts/features/qpe_features.py",
+        "scripts/features/dem_features.py",
+        "scripts/atmosphere/derive_features.py",
+        "scripts/features/build_unified_features.py",
+    ],
     "align": ["scripts/preprocessing/align_datasets.py"],
     "labels": ["scripts/labels/build_labels.py"],
     "split": ["scripts/datasets/build_sequences.py"],
@@ -22,9 +30,6 @@ STAGES = {
     "thresholds": ["scripts/calibration/select_thresholds.py"],
     "evaluate": ["scripts/evaluation/evaluate.py"],
 }
-
-
-import os
 
 
 def run(script_cmd: str) -> None:

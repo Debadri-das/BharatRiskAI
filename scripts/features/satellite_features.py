@@ -61,16 +61,29 @@ def build(input_dir: Path, output_dir: Path) -> list[Path]:
             albedo = align(data["vis_albedo_percent"], lat, lon, grid) if "vis_albedo_percent" in data else np.full(grid["shape"], np.nan, dtype=np.float32)
         now = datetime.fromisoformat(current_time)
         elapsed_hours = (now - previous_time).total_seconds() / 3600 if previous_time else np.nan
-        wv_change = wv - previous["wv"] if "wv" in previous else np.full(grid["shape"], np.nan, dtype=np.float32)
-        ctt_change = tir1 - previous["ctt"] if "ctt" in previous else np.full(grid["shape"], np.nan, dtype=np.float32)
-        wv_rate = wv_change / elapsed_hours if np.isfinite(elapsed_hours) and elapsed_hours > 0 else np.full(grid["shape"], np.nan, dtype=np.float32)
-        ctt_cooling_rate = -ctt_change / elapsed_hours if np.isfinite(elapsed_hours) and elapsed_hours > 0 else np.full(grid["shape"], np.nan, dtype=np.float32)
+
+        # Temporal differences are valid strictly when consecutive frames are within nominal 30-min cadence (15 to 45 min)
+        if previous_time and np.isfinite(elapsed_hours) and (0.25 <= elapsed_hours <= 0.75):
+            wv_change = wv - previous["wv"] if "wv" in previous else np.full(grid["shape"], np.nan, dtype=np.float32)
+            ctt_change = tir1 - previous["ctt"] if "ctt" in previous else np.full(grid["shape"], np.nan, dtype=np.float32)
+            wv_rate = wv_change / elapsed_hours
+            ctt_cooling_rate = -ctt_change / elapsed_hours
+        else:
+            wv_change = np.full(grid["shape"], np.nan, dtype=np.float32)
+            ctt_change = np.full(grid["shape"], np.nan, dtype=np.float32)
+            wv_rate = np.full(grid["shape"], np.nan, dtype=np.float32)
+            ctt_cooling_rate = np.full(grid["shape"], np.nan, dtype=np.float32)
+
         gradient_y, gradient_x = np.gradient(wv)
         feature_arrays = {"wv_radiance": wv, "wv_change": wv_change, "wv_rate": wv_rate, "wv_spatial_gradient": np.hypot(gradient_x, gradient_y), "tir1_bt_c": tir1, "tir2_bt_c": tir2, "ctt_change": ctt_change, "ctt_cooling_rate": ctt_cooling_rate, "vis_radiance": vis, "vis_albedo_percent": albedo}
         output_dir.mkdir(parents=True, exist_ok=True)
         target = output_dir / f"{now.strftime('%Y%m%d_%H%M')}.npz"
         np.savez_compressed(target, timestamp=current_time, **feature_arrays)
-        target.with_suffix(".json").write_text(json.dumps({"source": str(source.relative_to(ROOT)), "timestamp": current_time, "grid": {"crs": "EPSG:4326", "shape": list(grid["shape"]), "resolution_degrees": [0.05, 0.05]}, "feature_semantics": {"wv_radiance": "calibrated INSAT WV radiance, not IWV", "wv_change": "current minus previous observed WV radiance", "tir1_bt_c": "INSAT TIR1 (10.8 um) brightness temperature in degrees Celsius; used only as a cloud-top temperature (CTT) proxy", "ctt_proxy_note": "CTT is a proxy: the TIR1 window channel approximates cloud-top temperature for optically thick clouds and is slightly warmer than true CTT. It is not a retrieved cloud-top temperature product.", "ctt_cooling_rate": "negative CTT-proxy change per elapsed observed hour; positive means cooling"}, "summary": {name: finite_mean(value) for name, value in feature_arrays.items()}}, indent=2), encoding="utf-8")
+        try:
+            rel_src = str(source.resolve().relative_to(ROOT))
+        except ValueError:
+            rel_src = str(source)
+        target.with_suffix(".json").write_text(json.dumps({"source": rel_src, "timestamp": current_time, "grid": {"crs": "EPSG:4326", "shape": list(grid["shape"]), "resolution_degrees": [0.05, 0.05]}, "feature_semantics": {"wv_radiance": "calibrated INSAT WV radiance, not IWV", "wv_change": "current minus previous observed WV radiance", "tir1_bt_c": "INSAT TIR1 (10.8 um) brightness temperature in degrees Celsius; used only as a cloud-top temperature (CTT) proxy", "ctt_proxy_note": "CTT is a proxy: the TIR1 window channel approximates cloud-top temperature for optically thick clouds and is slightly warmer than true CTT. It is not a retrieved cloud-top temperature product.", "ctt_cooling_rate": "negative CTT-proxy change per elapsed observed hour; positive means cooling"}, "summary": {name: finite_mean(value) for name, value in feature_arrays.items()}}, indent=2), encoding="utf-8")
         outputs.append(target)
         previous = {"wv": wv, "ctt": tir1}
         previous_time = now
@@ -82,6 +95,8 @@ def main() -> None:
     parser.add_argument("--input", type=Path, default=ROOT / "data" / "insat" / "l1c" / "processed")
     parser.add_argument("--output", type=Path, default=ROOT / "data" / "derived" / "satellite")
     args = parser.parse_args()
+    args.input = args.input.resolve()
+    args.output = args.output.resolve()
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     outputs = build(args.input, args.output)
     LOG.info("Wrote %d satellite feature grids", len(outputs))

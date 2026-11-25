@@ -1,0 +1,97 @@
+{
+  "planHash": "edddf1b9fdab45b83cf2e6a66d5287168a8247cdc82d188c08e2d66a36e46f13",
+  "phase": "baseline",
+  "recordedAtUtc": "2026-11-05T16:32:04.7501068Z",
+  "retryCount": 0,
+  "resetBaseline": true,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "vite-builds",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": false,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 1,
+        "outputSample": "npm notice run bharatrisk-frontend@1.0.0 build\r\nnpm notice run vite build\r\n\u0027vite\u0027 is not recognized as an internal or external command,\r\noperable program or batch file.\r\n",
+        "durationMs": 486
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": false,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 1,
+        "outputSample": "npm notice run bharatrisk-frontend@1.0.0 test\r\nnpm notice run vitest run\r\n\u0027vitest\u0027 is not recognized as an internal or external command,\r\noperable program or batch file.\r\n",
+        "durationMs": 614,
+        "testResults": {
+          "testFramework": "vitest",
+          "runnerDetectedFrom": "package_json",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      },
+      {
+        "name": "dev-server-serves-home",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": false,
+        "timedOut": false,
+        "skipped": true,
+        "skippedReason": "devServer never became ready: devServer process exited before http://localhost:5173/ responded (exit=1). Output:\nnpm notice run bharatrisk-frontend@1.0.0 dev\r\nnpm notice run vite\r\n\u0027vite\u0027 is not recognized as an internal or external command,\r\noperable program or batch file.\r\n",
+        "exitCode": null,
+        "outputSample": "",
+        "durationMs": 0
+      }
+    ],
+    "executions": [
+      {
+        "source": "devServer",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev"
+        ],
+        "cwd": "C:\\Users\\datta\\BharatRiskAI\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "vite-builds",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "C:\\Users\\datta\\BharatRiskAI\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "C:\\Users\\datta\\BharatRiskAI\\frontend",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

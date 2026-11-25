@@ -3,16 +3,19 @@ from __future__ import annotations
 
 import html
 import json
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
 import numpy as np
 
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 from reports.unified_feature_schema import GRID_CONTRACT, source_contract
 from reports.source_manifest import manifest_summary
 from scripts.labels.contracts import LabelContractError, validate_ground_truth
-
-ROOT = Path(__file__).resolve().parents[2]
 EXPECTED_SHAPE = tuple(GRID_CONTRACT["shape"])
 EXPECTED_GRID = {key: GRID_CONTRACT[key] for key in ("crs", "resolution_degrees", "shape")}
 SATELLITE_CHANNELS = {"wv_radiance", "wv_change", "wv_rate", "wv_spatial_gradient", "tir1_bt_c", "tir2_bt_c", "ctt_change", "ctt_cooling_rate", "vis_radiance", "vis_albedo_percent"}
@@ -105,8 +108,13 @@ def source_readiness() -> dict[str, dict[str, object]]:
         drainage_available = drainage_manifest.exists() and json.loads(drainage_manifest.read_text(encoding="utf-8")).get("drainage", {}).get("status") == "available"
     except (OSError, json.JSONDecodeError):
         drainage_available = False
+    imdaa_available = (
+        (imdaa.exists() and (any(imdaa.rglob("*.nc")) or any(imdaa.rglob("*.nc4"))))
+        or ((ROOT / "data" / "processed" / "atmospheric_features").exists() and any((ROOT / "data" / "processed" / "atmospheric_features").glob("*.nc")))
+        or ((ROOT / "data" / "derived" / "atmospheric_features").exists() and any((ROOT / "data" / "derived" / "atmospheric_features").glob("*.nc")))
+    )
     return {
-        "IMDAA": {"available": imdaa.exists() and (any(imdaa.rglob("*.nc")) or any(imdaa.rglob("*.nc4"))), "path": str(imdaa.relative_to(ROOT))},
+        "IMDAA": {"available": imdaa_available, "path": str(imdaa.relative_to(ROOT))},
         "ground_truth": {"available": labels.exists(), "path": str(labels.relative_to(ROOT))},
         "drainage": {"available": drainage_available, "path": str(drainage_manifest.relative_to(ROOT)), "note": "DEM-derived drainage is unavailable unless a hydrologically conditioned product is present."},
     }

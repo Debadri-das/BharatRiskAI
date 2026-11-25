@@ -40,7 +40,12 @@
       "tier": 1,
       "role": "atmospheric_baseline",
       "required": true,
-      "paths": ["data/imdaa/**/*.nc", "data/imdaa/**/*.nc4"],
+      "paths": [
+        "data/imdaa/**/*.nc",
+        "data/imdaa/**/*.nc4",
+        "data/processed/atmospheric_features/*.nc",
+        "data/derived/atmospheric_features/*.nc"
+      ],
       "description": "Pressure-level atmospheric baseline for thermodynamic and wind-derived predictors."
     },
     {

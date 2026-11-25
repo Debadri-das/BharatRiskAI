@@ -151,6 +151,16 @@ FEATURE_SCHEMA = {
     "qpe": ["qpe"],
 }
 
+ATMOSPHERIC_FEATURE_SCHEMA = {
+    "iwv": {"unit": "kg m-2", "source": "IMDAA pressure-level", "method": "integral(q dp/g)"},
+    "cape": {"unit": "J kg-1", "source": "IMDAA pressure-level", "method": "MetPy surface-based parcel"},
+    "cin": {"unit": "J kg-1", "source": "IMDAA pressure-level", "method": "MetPy surface-based parcel"},
+    "wind_shear_0_6km": {"unit": "m s-1", "source": "IMDAA pressure-level", "method": "height-interpolated bulk vector shear"},
+    "wind_shear_u_0_6km": {"unit": "m s-1", "source": "IMDAA pressure-level", "method": "height-interpolated zonal shear"},
+    "wind_shear_v_0_6km": {"unit": "m s-1", "source": "IMDAA pressure-level", "method": "height-interpolated meridional shear"},
+    "horizontal_convergence": {"unit": "s-1", "source": "IMDAA pressure-level", "method": "spherical horizontal wind convergence"},
+}
+
 CHANNEL_ORDER = [
     "iwv",
     "iwv_change",
@@ -168,6 +178,33 @@ CHANNEL_ORDER = [
 ]
 
 BASELINE_ORDER = ["qpe", "cin", "rainfall", "convergence", "wind_shear", "elevation"]
+SCHEMA_VERSION = "2026-01"
+
+FEATURE_DEFINITIONS = {
+    name: {
+        "name": name,
+        "description": description,
+        "unit": unit,
+        "source_product": source,
+        "missingness_policy": "retain NaN and validity mask; never use a typical-value fallback",
+        "schema_version": SCHEMA_VERSION,
+    }
+    for name, description, unit, source in (
+        ("iwv", "Integrated water vapour from pressure-level specific humidity", "kg m-2", "IMDAA pressure level"),
+        ("iwv_change", "Temporal change in integrated water vapour", "kg m-2 h-1", "IMDAA pressure level"),
+        ("ctt", "TIR1 brightness-temperature-based cloud-top proxy", "degC", "INSAT-3DR L1C"),
+        ("ctt_drop_rate", "Cooling rate of the TIR1 brightness-temperature proxy", "degC h-1", "INSAT-3DR L1C"),
+        ("qpe", "HEM precipitation rate", "mm h-1", "INSAT-3DR HEM QPE"),
+        ("rainfall", "Provider rainfall variable when present", "mm h-1", "IMDAA"),
+        ("cape", "Convective available potential energy", "J kg-1", "IMDAA pressure level"),
+        ("cin", "Convective inhibition", "J kg-1", "IMDAA pressure level"),
+        ("convergence", "Horizontal low-level wind convergence", "s-1", "IMDAA pressure level"),
+        ("wind_shear", "Vertical wind shear magnitude", "m s-1", "IMDAA pressure level"),
+        ("elevation", "Terrain elevation", "m", "DEM"),
+        ("slope", "Terrain slope", "deg", "DEM"),
+        ("drainage", "Hydrologically derived drainage feature", "source-defined", "DEM/hydrology"),
+    )
+}
 
 
 def validate_channel_order(channels: list[str] | tuple[str, ...]) -> None:
@@ -184,5 +221,3 @@ def source_contract() -> dict[str, dict[str, str]]:
         "ground_truth": {"path": "data/datasets/labels/labels.jsonl", "status": "required"},
         "drainage": {"path": "data/derived/terrain/dem_features.json", "status": "unavailable_without_hydrology"},
     }
-
-
